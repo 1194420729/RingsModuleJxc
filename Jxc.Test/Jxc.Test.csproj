@@ -64,8 +64,8 @@
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rings.Models, Version=1.0.6198.28104, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rings.Models.1.0.6198.28104\lib\net40\Rings.Models.dll</HintPath>
+    <Reference Include="Rings.Models, Version=1.0.6332.28505, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rings.Models.1.0.6332.28505\lib\net40\Rings.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -399,12 +399,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Print\WrongPrintModel.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Print\PrintPreview.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Print\PrintPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +406,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Print\PrintDesigner.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Print\WrongPrintModel.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Print\PrintPreview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Default\Home\index.cshtml" />
