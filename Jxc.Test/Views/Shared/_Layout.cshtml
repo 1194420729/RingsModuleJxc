@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@{Account account=User.Identity.GetAccount();}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="~/Content/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-    <title>@(string.IsNullOrEmpty(ViewBag.Title)?"企业资源管理系统":ViewBag.Title)</title>
+    <title>企业资源管理系统</title>
     <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="Stylesheet" />
     <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
     <link href="//cdn.bootcss.com/jQuery.mmenu/5.3.4/css/jquery.mmenu.all.min.css" rel="stylesheet">
@@ -26,10 +27,11 @@
         <div class="pageheader" style="background-color: #438eb9; color: #fff;">
             <a href="#menu" data-step="1" data-intro="这里是导航菜单"></a>
             <img src="~/Content/images/mslogo.png" alt="" width="40" height="40" />
-            @(User.Identity.GetAccount().CompanyName)
+            <span>@(account.CompanyName)</span>
+            <span style="margin-left:20px;">@(account.ZtName)</span>
             <ul>
                 <li>
-                    欢迎您，@(User.Identity.GetAccount().Name)
+                    欢迎您，@(account.Name)
                 </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle headerdropdown" data-toggle="dropdown"
@@ -58,7 +60,7 @@
         <nav id="menu" style="display: none;">
             <ul>
                 @{ 
-                    MenuLoader menuloader = new MenuLoader(User.Identity.GetAccount());
+                    MenuLoader menuloader = new MenuLoader(account);
                 }
                 @Html.Raw(menuloader.RenderMenu())
             </ul>
@@ -81,7 +83,6 @@
             $.ajaxSetup({
                 cache: false
             });
-
 
             var setmenuSelected = function () {
                 var menus = $('nav#menu a');

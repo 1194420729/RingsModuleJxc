@@ -26,7 +26,7 @@
 <input type="hidden" id="pagewidth" value="@ViewBag.Width"/>
 <input type="hidden" id="pageheight" value="@ViewBag.Height"/>
 <input type="hidden" id="pagepadding" value="@ViewBag.Padding" />
-<input type="hidden" id="pagerepeatheader" value="@(ViewBag.RepeatHeader?"true":"false")" />
+<input type="hidden" id="pagerepeatheader" value="@ViewBag.RepeatHeader" />
 <input type="hidden" id="pagefixedlines" value="@ViewBag.FixedLines" />
 <input type="hidden" id="pagemaxlines" value="@ViewBag.MaxLines" />
 <style>
@@ -55,7 +55,7 @@
                             + '<div><label>页面宽度(mm):</label><input type="number" value="@ViewBag.Width" id="printpagewidth"/></div>'
                             + '<div><label>页面高度(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Height" id="printpageheight"/></div>'
                             + '<div><label>页边距(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Padding" id="printpagepadding"/></div>'
-                            + '<div><label>重复表头:</label><input type="checkbox" style="margin-top:5px;" id="printpagerepeatheader" @Html.Raw(ViewBag.RepeatHeader?"checked=\"checked\"":"")/></div>'
+                            + '<div><label>重复表头:</label><input type="checkbox" style="margin-top:5px;" id="printpagerepeatheader" @(ViewBag.RepeatHeader?"checked=\"checked\"":"")/></div>'
                             + '<div><label>固定行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.FixedLines" id="printpagefixedlines"/></div>'
                             + '<div><label>最大行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.MaxLines" id="printpagemaxlines"/></div>'
                             +'</div>',

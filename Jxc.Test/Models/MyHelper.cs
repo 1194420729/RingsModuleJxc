@@ -34,6 +34,22 @@ namespace Rings.Models
                 connection.Close();
             }
 
+            DataTable dtCompany = new DataTable();
+            string connectionstr = ConfigurationManager.ConnectionStrings["CentralDB"].ConnectionString;
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionstr))
+            {
+                connection.Open();
+
+                NpgsqlCommand command = new NpgsqlCommand();
+                command.Connection = connection;
+
+                command.CommandText = "select content->>'name' as name,(content->>'default')::bool as isdefault from corporation where id=" + db.CorporationId;
+                NpgsqlDataAdapter da = new NpgsqlDataAdapter(command);
+                da.Fill(dtCompany);
+
+                connection.Close();
+            }
+
             Account account = new Account()
             {
                 ApplicationId=applicationid,
@@ -42,8 +58,9 @@ namespace Rings.Models
                 UserName=ss[2],
                 CompanyName=ss[1],
                 Language=ss[3],
-                Limit = dt.Rows[0]["limits"].ToString()
-
+                Limit = dt.Rows[0]["limits"].ToString(),
+                ZtName=dtCompany.Rows[0]["name"].ToString(),
+                IsDefaultZt=Convert.ToBoolean(dtCompany.Rows[0]["isdefault"])
             };
 
             return account;
