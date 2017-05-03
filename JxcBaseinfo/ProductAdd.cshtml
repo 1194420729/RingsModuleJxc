@@ -1,0 +1,496 @@
+﻿@{
+    ViewBag.Title = "新增产品资料";
+}
+<div data-pagelimit="productadd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="vendorchoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    选择供应商
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="pull-left" style="margin-right:20px;">
+                    <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                         tree-events="select_node:selectNode">
+                    </div>
+                </div>
+                <div style="overflow-x:hidden;">
+                    <table ng-table="tableParams" show-filter="true" class="table table-bordered table-condensed table-hover">
+                        <tr ng-repeat="m in $data" ng-dblclick="vendorSelected(m)" style="cursor:pointer;">
+                            <td data-title="'No.'" header-class="'bg-warning'" style="max-width:100px;">
+                                <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                            </td>
+                            <td data-title="'供应商编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}">
+                                <span ng-bind="m.content.code"></span>
+                            </td>
+                            <td data-title="'供应商名称'" header-class="'bg-warning'" data-filter="{ name: 'text'}">
+                                <span ng-bind="m.content.name"></span>
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="help-block" style="display:inline;margin-right:40px;">鼠标双击选中</span>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <script type="text/ng-template" id="categorychoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    选择分类
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" tree="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcbaseinfo/productlist">产品资料</a></li>
+            <li><span>新增产品资料</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                新增产品资料
+            </div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group form-inline col-md-12">
+                                <label>产品编号<span style="color:red;">*</span></label>
+                                <input type="text" class="form-control" autocomplete="off" name="code" ng-model="model.content.code" required />
+                                <span class="text-danger" ng-show="myForm.code.$invalid">必填项</span>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>产品名称<span style="color:red;">*</span></label>
+                                <input type="text" class="form-control" autocomplete="off" name="name" ng-model="model.content.name" required />
+                                <span class="text-danger" ng-show="myForm.name.$invalid">必填项</span>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>产品分类</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly="readonly" style="background-color:#fff" ng-model="categoryname">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="categoryClick()"><i class="fa fa-search fa-fw"></i></button>
+                                        <button class="btn btn-default" type="button" ng-click="categoryremoveClick()"><i class="fa fa-remove"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>规格</label>
+                                <input type="text" class="form-control" autocomplete="off" name="standard" ng-model="model.content.standard" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>型号</label>
+                                <input type="text" class="form-control" autocomplete="off" name="type" ng-model="model.content.type" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>单位</label>
+                                <input type="text" class="form-control" autocomplete="off" name="unit" ng-model="model.content.unit" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>产地</label>
+                                <input type="text" class="form-control" autocomplete="off" name="area" ng-model="model.content.area" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>条码</label>
+                                <input type="text" class="form-control" autocomplete="off" name="barcode" ng-model="model.content.barcode" />
+                            </div>
+                            
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>预设售价1</label>
+                                <input type="number" class="form-control" name="saleprice1" ng-model="model.content.saleprice1" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>预设售价2</label>
+                                <input type="number" class="form-control" name="saleprice2" ng-model="model.content.saleprice2" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>预设售价3</label>
+                                <input type="number" class="form-control" name="saleprice3" ng-model="model.content.saleprice3" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>预设售价4</label>
+                                <input type="number" class="form-control" name="saleprice4" ng-model="model.content.saleprice4" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>预设进价</label>
+                                <input type="number" class="form-control" name="buyprice" ng-model="model.content.buyprice" />
+                            </div>
+                            <div class="form-group form-inline col-md-8 col-lg-6">
+                                <label>
+                                    供应商
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" autocomplete="off" ng-model="vendor" placeholder="编号或名称模糊查询" uib-typeahead="vendor.content.name for vendor in updateVendors($viewValue)"
+                                           typeahead-on-select="vendorSelected($item, $model, $label,$event)" typeahead-loading="loadingVendorLocations"
+                                           typeahead-no-results="noVendorResults" typeahead-select-on-blur="true" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="vendorClick()">...</button>
+                                    </span>
+                                </div>
+                                <i ng-show="loadingVendorLocations" class="glyphicon glyphicon-refresh"></i>
+                                <span class="text-danger" ng-show="noVendorResults">没有匹配项</span>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>备注</label>
+                                <textarea class="form-control" autocomplete="off" name="comment" ng-model="model.content.comment" style="width:500px;height:100px;"></textarea>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>图片</label>
+                                <input type="file" class="form-control" id="picture" multiple="multiple" accept="image/*" />
+                                <button class="btn btn-info" type="button" ng-click="uploadPictures()"><i class="fa fa-upload fa-fw"></i>上传</button>
+                                <img src="~/Content/images/loader.gif" ng-show="picturewaiter" />
+                                <span class="help-block" style="display:inline;">多张图片，尺寸尽量保持一致，宽高都不低于300为最佳</span>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div uib-carousel>
+                                    <div uib-slide ng-repeat="slide in model.content.pictures">
+                                        <img ng-src="{{slide.url}}" style="margin:auto;">
+                                        <div class="carousel-caption">
+                                            <h4>&nbsp;</h4>
+                                            <p><a style="color:#fff" href="javascript:;" ng-click="removePicture(slide.url)">删除本张图片</a></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-inline col-md-12">
+                                <label>附件</label>
+                                <input type="file" class="form-control" id="file" multiple="multiple" />
+                                <button class="btn btn-info" type="button" ng-click="uploadAttachments()"><i class="fa fa-upload fa-fw"></i>上传</button>
+                                <img src="~/Content/images/loader.gif" ng-show="uploadwaiter" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <ul class="list-group">
+                                    <li class="list-group-item" ng-repeat="m in model.content.attachments">
+                                        <a ng-href="{{m.url}}" download="{{m.name}}" ng-bind="m.name"></a>
+                                        <span style="margin-left:20px;" ng-bind="m.size"></span>
+                                        <a href="javascript:;" title="删除" class="text-danger" ng-click="removeAttachment(m.url)"><i class="fa fa-remove fa-fw"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button type="button" class="btn btn-primary"
+                                        ng-disabled="myForm.code.$invalid || myForm.name.$invalid || savedisabled"
+                                        ng-click="btnsaveClick()">
+                                    <i class="fa fa-save fa-fw"></i>保存
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $uibModal, $q, SweetAlert) {
+
+            $scope.model = { id: 0, content: { attachments: [], pictures: [] } };
+
+            $http.post('/productservice/getcode', {})
+                    .success(function (data) {
+                        $scope.model.content.code = data.code;
+                    });
+
+            $scope.updateVendors = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/vendorservice/vendorchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.vendorSelected = function ($item, $model, $label, $event) {
+                $scope.model.content.vendorid = $item.id;
+            };
+
+            $scope.vendorClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'vendorchoice.html',
+                    controller: 'vendorchoiceModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.vendor = model.vendor.content.name;
+                    $scope.model.content.vendorid = model.vendor.id;
+                });
+            };
+
+            $scope.categoryremoveClick = function () {
+                delete $scope.model.content.categoryid;
+                $scope.categoryname = '';
+            };
+
+            $scope.categoryClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'categorychoice.html',
+                    controller: 'categorychoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    if (model.categoryid > 0) {
+                        $scope.model.content.categoryid = model.categoryid;
+                        $scope.categoryname = model.categoryname;
+                    } else {
+                        delete $scope.model.content.categoryid;
+                        $scope.categoryname = '';
+                    }
+                });
+            };
+
+            $scope.uploadPictures = function () {
+                var file = document.getElementById('picture');
+                if (file.files.length == 0) return;
+
+                $scope.picturewaiter = true;
+
+                var myform = new FormData();
+                for (var i = 0; i < file.files.length; i++) {
+                    myform.append("files[]", file.files[i]);
+                }
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        $scope.picturewaiter = false;
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            angular.forEach(data.urls, function (item) {
+                                $scope.model.content.pictures.push(item);
+                            });
+                            SweetAlert.swal({ title: '上传成功！', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfiles", true);
+                req.send(myform);
+            };
+
+            $scope.removePicture = function (url) {
+                for (var i = 0; i < $scope.model.content.pictures.length; i++) {
+                    if ($scope.model.content.pictures[i].url === url) {
+                        $scope.model.content.pictures.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+
+            $scope.uploadAttachments = function () {
+                var file = document.getElementById('file');
+                if (file.files.length == 0) return;
+
+                $scope.uploadwaiter = true;
+
+                var myform = new FormData();
+                for (var i = 0; i < file.files.length; i++) {
+                    myform.append("files[]", file.files[i]);
+                }
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        $scope.uploadwaiter = false;
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            angular.forEach(data.urls, function (item) {
+                                $scope.model.content.attachments.push(item);
+                            });
+                            SweetAlert.swal({ title: '上传成功！', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfiles", true);
+                req.send(myform);
+            };
+
+            $scope.removeAttachment = function (url) {
+                for (var i = 0; i < $scope.model.content.attachments.length; i++) {
+                    if ($scope.model.content.attachments[i].url === url) {
+                        $scope.model.content.attachments.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/productservice/addsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!可以继续添加', type: 'success' }, function () {
+                                window.location.href = window.location.href;
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+        });
+
+        app.controller('categorychoiceModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": [
+                            "dnd", "search",
+                            "state", "types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/productservice/categorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.selectNode = function (node, selected, event) {
+                model.categoryid = parseInt(selected.node.id);
+                model.categoryname = selected.node.text;
+            };
+
+            $scope.ok = function () {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('vendorchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, NgTableParams, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/vendorservice/categorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.categoryid = '0';
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/vendorservice/list',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.vendorSelected = function (vendor) {
+                model.vendor = vendor;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "历史应收查询";
+}
+<div data-pagelimit="receivablequery">
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>历史应收查询</span></li>
+        </ol>
+        <ul class="nav nav-tabs">
+            <li role="presentation"><a href="/jxcpay/receivablequery">应收查询</a></li>
+            <li role="presentation" class="active"><a href="javascript:;">历史应收查询</a></li>
+            <li role="presentation"><a href="/jxcpay/receivableemployeequery">职员应收查询</a></li> 
+        </ul>
+        <div class="panel panel-info">
+
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>截止日期</label>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="form-group form-inline">
+                    <label>客户名称</label>
+                    <input type="text" class="form-control" ng-model="filter.customername" placeholder="按编号或名称模糊查询" />
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
+                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '历史应收查询.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                </div>
+            </div>
+            <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" style="cursor:pointer;">
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'客户编号'" header-class="'bg-warning'">
+                        <a ng-href="/jxcpay/receivablequerydetail?id={{m.customerid}}" target="_blank" title="查看往来明细账" ng-bind="m.customercode"></a>
+                    </td>
+                    <td data-title="'客户名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.customername"></span>
+                    </td>
+                    <td data-title="'应收金额'" header-class="'bg-warning'">
+                        <span ng-bind="m.total | currency:'￥'"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td colspan="3">
+                        合计：<span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td ng-bind="totalsum | currency:'￥'"></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            $http.post('/payreportservice/RefreshMVWReceivableDetail', {})
+                    .success(function (data) {
+
+                    });
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/payreportservice/receivablehistoryquery',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.showwaiter = false;
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.totalsum = data.totalsum;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+             
+            $scope.btnqueryClick = function () {
+                if (!$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请填写截止日期', type: 'error' });
+                    return;
+                }
+
+                $scope.showwaiter = true;
+
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            };
+
+        });
+
+    </script>
+}

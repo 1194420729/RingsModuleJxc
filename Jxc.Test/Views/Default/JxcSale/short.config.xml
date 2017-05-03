@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="customerproductservice" path="service/jxcsale/jxcsale/customerproduct"></short>
+  <short name="saleorderservice" path="service/jxcsale/jxcsale/saleorder"></short>
+  <short name="salebillservice" path="service/jxcsale/jxcsale/salebill"></short>
+  <short name="salebackbillservice" path="service/jxcsale/jxcsale/salebackbill"></short>
+  <short name="commonservice" path="service/jxcsale/jxcsale/common"></short>
+  <short name="salereportservice" path="service/jxcsale/jxcsale/salereport"></short>
+</shorts>

@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "系统重建";
+}
+<div data-pagelimit="rebuild">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>系统重建</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">系统重建</div>
+            <div class="panel-body">
+                <div class="alert alert-danger" role="alert">
+                    系统重建将清除所有业务单据，回到期初建账的状态，所有的基础资料予以保留。请务必谨慎操作！
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="options.clearinit"/>删除期初数据
+                    </label>
+                </div>               
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="options.clearstop" />删除停用的基础资料
+                    </label>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-danger"
+                            ng-click="btnsaveClick()" ng-disabled="savedisabled">
+                        <i class="fa fa-save fa-fw"></i>执行
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert, $uibModal) {
+
+            $scope.options = { clearinit: false, cleardraft: false, clearstop: false};
+
+            $scope.btnsaveClick = function (id) {
+                SweetAlert.swal({
+                    title: '确定要系统重建吗？',
+                    text: '数据清除后无法恢复',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '确定',
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    $scope.savedisabled = true;
+                    $http.post('/rebuildservice/rebuildsave', $scope.options).success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '系统重建成功', type: 'success' }, function () {
+
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+                });
+            };
+
+        });
+
+
+    </script>
+}

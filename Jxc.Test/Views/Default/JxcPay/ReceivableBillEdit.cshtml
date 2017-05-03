@@ -1,0 +1,751 @@
+﻿@{
+    ViewBag.Title = "编辑应收调整单";
+}
+<div data-pagelimit="receivablebilladd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcpay/checkboxheader");}
+        @{Html.RenderPartial("/jxcpay/employeechoice");}
+        @{Html.RenderPartial("/jxcpay/customerchoice");}
+        @{Html.RenderPartial("/jxcpay/customerdetail");}
+        @{Html.RenderPartial("/jxcpay/billcodeconfig");}
+        @{Html.RenderPartial("/jxcpay/billload");}
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>应收调整单</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                应收调整单
+                <span style="margin-left:200px;">制单人：{{makername}}</span>
+                <span style="margin-left:20px;" ng-bind="model.content.auditorid?'【已审核】':'【草稿】'"></span>
+            </div>
+            <div class="panel-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>单据编号<span style="color:red">*</span></label>
+                            <input type="text" class="form-control" ng-readonly="noeditbillcode" name="billcode" ng-model="model.content.billcode" required />
+                            <a href="javascript:;" ng-click="billcodeClick()" title="设置编号格式"><i class="fa fa-info-circle"></i></a>
+                        </div>
+                        <div class="form-group form-inline col-md-8 col-lg-8">
+                            <label>单据日期<span style="color:red">*</span></label>
+                            <input type="text" class="form-control" ng-if="noeditbilldate" readonly="readonly" ng-model="model.content.billdate" />
+                            <div class="dropdown" style="display: inline;" ng-if="!noeditbilldate">
+                                <a class="dropdown-toggle billdate" role="button" data-toggle="dropdown" data-target="#"
+                                   href="javascript:;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="billdate" ng-model="model.content.billdate" required />
+                                        <span class="input-group-addon">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </span>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <datetimepicker ng-model="model.content.billdate" data-datetimepicker-config="{ dropdownSelector: '.billdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>经手人<span style="color:red">*</span></label>
+                            <div class="input-group">
+                                <input type="text" autocomplete="off" ng-next="true" ng-model="employee" placeholder="编号或名称模糊查询" uib-typeahead="employee.content.name for employee in updateEmployees($viewValue)"
+                                       typeahead-on-select="employeeSelected($item, $model, $label,$event)" typeahead-loading="loadingEmployeeLocations"
+                                       typeahead-no-results="noEmployeeResults" typeahead-select-on-blur="true" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="employeeClick()">...</button>
+                                </span>
+                            </div>
+                            <i ng-show="loadingEmployeeLocations" class="glyphicon glyphicon-refresh"></i>
+                            <span class="text-danger" ng-show="noEmployeeResults">没有匹配项</span>
+                        </div>
+                        <div class="form-group form-inline col-md-8 col-lg-8">
+                            <label>
+                                客户<span style="color:red">*</span>
+                            </label>
+                            <div class="input-group">
+                                <input type="text" autocomplete="off" ng-next="true" ng-model="customer" placeholder="编号或名称模糊查询" uib-typeahead="customer.content.name for customer in updateCustomers($viewValue)"
+                                       typeahead-on-select="customerSelected($item, $model, $label,$event)" typeahead-loading="loadingCustomerLocations"
+                                       typeahead-no-results="noCustomerResults" typeahead-select-on-blur="true" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="customerClick()">...</button>
+                                </span>
+                            </div>
+                            <i ng-show="loadingCustomerLocations" class="glyphicon glyphicon-refresh"></i>
+                            <span class="text-danger" ng-show="noCustomerResults">没有匹配项</span>
+                            <a href="javascript:;" ng-click="showCustomerDetail()" title="详细信息"><i class="fa fa-info-circle"></i></a>
+                        </div>
+                        <div class="form-group form-inline col-md-12 col-lg-12">
+                            <label>调整金额<span style="color:red">*</span></label>
+                            <input type="number" class="form-control" ng-next="true" name="total" ng-model="model.content.total" required />
+                            <span class="help-block" style="display:inline;">正数为增加，负数为减少</span>
+                        </div>
+                        <div class="form-group form-inline col-md-12 col-lg-12">
+                            <label>备注</label>
+                            <input type="text" class="form-control" style="width:80%" name="comment" ng-model="model.content.comment" />
+                            <a href="javascript:;" ng-click="showAttachment=true" title="上传附件"><i class="fa fa-paperclip fa-fw"></i></a>
+                        </div>
+                        <div class="form-group form-inline col-md-12" ng-show="showAttachment">
+                            <label>附件</label>
+                            <input type="file" class="form-control" id="file" multiple="multiple" />
+                            <button class="btn btn-info" type="button" ng-click="uploadAttachments()"><i class="fa fa-upload fa-fw"></i>上传</button>
+                            <img src="~/Content/images/loader.gif" ng-show="uploadwaiter" />
+                        </div>
+                        <div class="form-group col-md-12">
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="m in model.content.attachments">
+                                    <a ng-href="{{m.url}}" download="{{m.name}}" ng-bind="m.name"></a>
+                                    <span style="margin-left:20px;" ng-bind="m.size"></span>
+                                    <a href="javascript:;" title="删除" class="text-danger" ng-click="removeAttachment(m.url)"><i class="fa fa-remove fa-fw"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group form-inline pull-right" ng-if="!model.content.auditorid">
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-change="bybillsChange()" ng-model="bybills" />按单调整(可选)</label>
+                    </div>
+                </div>
+            </div>
+            <div style="width:100%;overflow-x:auto;" ng-show="bybills">
+                <table ng-table="tableParams2" class="table table-bordered table-condensed table-striped" show-filter="false">
+                    <tr ng-repeat="m in $data">
+                        <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                            <span ng-bind="(tableParams2.page()-1)*tableParams2.count()+$index+1"></span>
+                        </td>
+
+                        <td data-title="'单据编号'" header-class="'bg-warning'">
+                            <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind="m.content.billcode" title="查看原始单据"></a>
+                        </td>
+                        <td data-title="'单据名称'" header-class="'bg-warning'">
+                            <span ng-bind=" m.content.billname | billname"></span>
+                        </td>
+                        <td data-title="'单据日期'" header-class="'bg-warning'">
+                            <span ng-bind="m.content.billdate"></span>
+                        </td>
+                        <td data-title="'经手人'" header-class="'bg-warning'">
+                            <span ng-bind="m.content.employeename"></span>
+                        </td>
+                        <td data-title="'单据金额'" header-class="'bg-warning'">
+                            <span ng-bind="m.content.total | currency:'￥'"></span>
+                        </td>
+                        <td data-title="'已结算金额'" header-class="'bg-warning'">
+                            <span ng-bind="m.content.checkouttotal | currency:'￥'"></span>
+                        </td>
+                        <td data-title="'本次调整金额'" header-class="'bg-warning'">
+                            <input type="number" class="tableinput" ng-model="m.content.thischeckouttotal" ng-focus="checkouttotalFocus(m)" ng-model-options="{ updateOn:'blur'}" ng-change="checkouttotalChange(m)" />
+                        </td>
+                    </tr>
+                    <tr class="warning">
+                        <td colspan="2">
+                            合计
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td ng-bind="billtotalsum | currency:'￥'"></td>
+                        <td ng-bind="checkouttotalsum | currency:'￥'"></td>
+                        <td ng-bind="thischeckouttotalsum | currency:'￥'"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="panel-footer">
+                <div class="form-group form-inline pull-right">
+                    <a ng-href="/jxcpay/receivablebillprint?billid={{model.id}}" ng-if="model.content.auditorid" target="_blank" class="btn btn-primary"><i class="fa fa-print fa-fw"></i>打印</a>
+                    <button type="button" class="btn btn-primary" ng-click="btnloadClick()"><i class="fa fa-folder-open-o fa-fw"></i>单据调阅</button>
+                    <button type="button" class="btn btn-primary" ng-if="!model.content.auditorid" ng-click="btnsaveClick()" ng-disabled="savedisabled"><i class="fa fa-save fa-fw"></i>保存草稿</button>
+                    <button type="button" class="btn btn-primary" ng-if="!model.content.auditorid" ng-click="btnauditClick()" ng-disabled="savedisabled" ng-limit="saleorderaudit"><i class="fa fa-save fa-fw"></i>保存并审核</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//139.196.218.9/cdn/myservice.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngnext.js"></script>
+    <script src="//cdn.bootcss.com/node-uuid/1.4.7/uuid.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree', 'ngNext', 'ui.bootstrap.datetimepicker', 'myservice', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, mytools, $uibModal) {
+
+            var id=@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("id")) ;
+
+            $scope.model = { id: id, content: {} };
+            $scope.tableParams2 = new NgTableParams({ count: 10 });
+
+            $http.post('/receivablebillservice/loadbill', {id:id})
+                    .success(function (data) {
+                        $scope.makername = data.makername;
+                        $scope.model.content = data.content;
+                        $scope.customer=data.customername;
+                        $scope.employee=data.employeename;
+
+                        $scope.digit = data.digit;
+
+                        $scope.noeditbillcode = data.noeditbillcode;
+                        $scope.noeditbilldate = data.noeditbilldate;
+
+                        if($scope.model.content.auditorid && $scope.model.content.checkoutbills){
+                            $scope.bybills=true;
+                            getCheckoutBillsHistory();
+                        }else if($scope.model.content.checkoutbills){
+                            $scope.bybills=true;
+                            $scope.bybillsChange();
+                        }
+
+                    });
+
+            var getCheckoutBillsHistory=function(){
+                $http.post('/receivablebillservice/getcheckoutbillshistory', { billid:$scope.model.id })
+                    .success(function (data) {
+                        $scope.checkoutbills = data.data;
+                        $scope.billtotalsum = data.totalsum;
+                        $scope.checkouttotalsum = data.checkouttotalsum;
+                        $scope.checkouttotalChange(null);
+
+                        $scope.tableParams2.settings({
+                            counts: [],
+                            dataset: $scope.checkoutbills
+                        });
+                    });
+            };
+
+            $scope.billcodeClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billcodeconfig.html',
+                    controller: 'billcodeconfigModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/receivablebillservice/BillCodeConfigSave', { template: model.template })
+                        .success(function (data) {
+                            if (data.message == 'ok') {
+                                $scope.model.content.billcode = data.newcode;
+                            } else {
+                                SweetAlert.swal({ title: data.message, type: 'error' });
+                            }
+                        });
+                });
+            };
+
+            $scope.bybillsChange = function () {
+                if (!$scope.model.content.customerid) {
+                    SweetAlert.swal({ title: '请先选择客户！', type: 'error' });
+                    $scope.bybills = false;
+                } else {
+                    $http.post('/receivablebillservice/getcheckoutbills', { customerid: $scope.model.content.customerid })
+                    .success(function (data) {
+                        $scope.checkoutbills = data.data;
+                        $scope.billtotalsum = data.totalsum;
+                        $scope.checkouttotalsum = data.checkouttotalsum;
+                        if($scope.model.content.checkoutbills){
+                            angular.forEach($scope.checkoutbills,function(item){
+                                for(var i=0;i<$scope.model.content.checkoutbills.length;i++){
+                                    if($scope.model.content.checkoutbills[i].billid===item.id){
+                                        item.content.thischeckouttotal=$scope.model.content.checkoutbills[i].checkouttotal;
+                                        break;
+                                    }
+                                }
+                            });
+                            $scope.checkouttotalChange(null);
+                        }
+
+                        $scope.tableParams2.settings({
+                            counts: [],
+                            dataset: $scope.checkoutbills
+                        });
+                    });
+                }
+            };
+
+
+            $scope.checkouttotalFocus = function (bill) {
+                if (bill.content.thischeckouttotal === undefined || bill.content.thischeckouttotal === null) {
+                    var ck = bill.content.total - (bill.content.checkouttotal === undefined ? 0 : bill.content.checkouttotal);
+                    bill.content.thischeckouttotal = -ck;
+                    $scope.checkouttotalChange(bill);
+                }
+            };
+
+            $scope.checkouttotalChange = function (bill) {
+                var thischeckouttotalsum = 0;
+                angular.forEach($scope.checkoutbills, function (item) {
+                    if (item.content.thischeckouttotal !== undefined && item.content.thischeckouttotal !== null) {
+                        thischeckouttotalsum += item.content.thischeckouttotal;
+                    }
+                });
+
+                $scope.thischeckouttotalsum = thischeckouttotalsum;
+                $scope.model.content.total = thischeckouttotalsum;
+
+            };
+
+            var savecheck = function () {
+                if (!$scope.model.content.billcode) {
+                    SweetAlert.swal({ title: '请填写单据编号', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.billdate) {
+                    SweetAlert.swal({ title: '请填写单据日期', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.employeeid) {
+                    SweetAlert.swal({ title: '请填写经手人', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.customerid) {
+                    SweetAlert.swal({ title: '请填写客户', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.total) {
+                    SweetAlert.swal({ title: '请填写调整金额', type: 'error' });
+                    return false;
+                }
+
+                return true;
+            };
+
+            $scope.btnloadClick = function () {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billload.html',
+                    controller: 'billloadModalCtrl',
+                    size: 'lg'
+                });
+
+                modalInstance.result.then(function (billid) {
+                    window.location.href = '/jxcpay/receivablebilledit?id=' + billid;
+                });
+            };
+
+            $scope.btnsaveClick = function () {
+                if (savecheck() === false) return;
+
+                $scope.savedisabled = true;
+
+                if ($scope.bybills) {
+                    var checkoutbills = [];
+                    angular.forEach($scope.checkoutbills, function (item) {
+                        if(item.content.thischeckouttotal!==undefined
+                            && item.content.thischeckouttotal!==null
+                            && item.content.thischeckouttotal !== 0) {
+                            checkoutbills.push({ billid: item.id, checkouttotal: item.content.thischeckouttotal });
+                        }
+                    });
+
+                    if (checkoutbills.length > 0) {
+                        $scope.model.content.checkoutbills = checkoutbills;
+                    }
+                }
+
+                $http.post('/receivablebillservice/editsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+
+                            if (data.nodraftprint) {
+                                SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
+                                    window.location.href = '/jxcpay/receivablebilladd';
+                                });
+                                return;
+                            }
+
+                            SweetAlert.swal({
+                                title: '保存成功。要打印吗？',
+                                text: '如果此处不打印，事后也可以重新调出单据打印',
+                                type: "success",
+                                showCancelButton: true,
+                                cancelButtonText: '取消',
+                                confirmButtonColor: "#0099CC",
+                                confirmButtonText: '打印',
+                                closeOnConfirm: true
+                            },
+                            function (isConfirm) {
+                                if (isConfirm) {
+                                    $window.open('/jxcpay/receivablebillprint?billid=' + data.id);
+                                }
+                                window.location.href = '/jxcpay/receivablebilladd';
+
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+            };
+
+            $scope.btnauditClick = function () {
+                if (savecheck() === false) return;
+
+                $scope.savedisabled = true;
+
+                if ($scope.bybills) {
+                    var checkoutbills = [];
+                    angular.forEach($scope.checkoutbills, function (item) {
+                        if (item.content.thischeckouttotal !== undefined
+                            && item.content.thischeckouttotal !== null
+                            && item.content.thischeckouttotal !== 0) {
+                            checkoutbills.push({ billid: item.id, checkouttotal: item.content.thischeckouttotal });
+                        }
+                    });
+
+                    if (checkoutbills.length > 0) {
+                        $scope.model.content.checkoutbills = checkoutbills;
+                    }
+                }
+
+                $http.post('/receivablebillservice/editauditsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+
+                            SweetAlert.swal({
+                                title: '保存并审核成功。要打印吗？',
+                                text: '如果此处不打印，事后也可以重新调出单据打印',
+                                type: "success",
+                                showCancelButton: true,
+                                cancelButtonText: '取消',
+                                confirmButtonColor: "#0099CC",
+                                confirmButtonText: '打印',
+                                closeOnConfirm: false
+                            },
+                            function (isConfirm) {
+                                if (isConfirm) {
+                                    $window.open('/jxcpay/receivablebillprint?billid=' + data.id);
+                                }
+                                window.location.href = '/jxcpay/receivablebilladd';
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+            };
+
+            $scope.updateEmployees = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/employeechoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.employeeSelected = function ($item, $model, $label, $event) {
+                $scope.model.content.employeeid = $item.id;
+            };
+
+            $scope.employeeClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'employeechoice.html',
+                    controller: 'employeechoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.employee = model.employee.content.name;
+                    $scope.model.content.employeeid = model.employee.id;
+                });
+            };
+
+            $scope.updateCustomers = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/customerchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.customerSelected = function ($item, $model, $label, $event) {
+                $scope.model.content.customerid = $item.id;
+            };
+
+            $scope.customerClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'customerchoice.html',
+                    controller: 'customerchoiceModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.customer = model.customer.content.name;
+                    $scope.model.content.customerid = model.customer.id;
+                });
+            };
+
+            $scope.showCustomerDetail = function () {
+                if (!$scope.model.content.customerid) return;
+
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'customerdetail.html',
+                    controller: 'customerdetailModalCtrl',
+                    resolve: {
+                        customerid: function () { return $scope.model.content.customerid; }
+                    }
+                });
+            };
+
+            $scope.uploadAttachments = function () {
+                var file = document.getElementById('file');
+                if (file.files.length == 0) return;
+
+                $scope.uploadwaiter = true;
+
+                var myform = new FormData();
+                for (var i = 0; i < file.files.length; i++) {
+                    myform.append("files[]", file.files[i]);
+                }
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        $scope.uploadwaiter = false;
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            angular.forEach(data.urls, function (item) {
+                                $scope.model.content.attachments.push(item);
+                            });
+                            SweetAlert.swal({ title: '上传成功！', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfiles", true);
+                req.send(myform);
+            };
+
+            $scope.removeAttachment = function (url) {
+                for (var i = 0; i < $scope.model.content.attachments.length; i++) {
+                    if ($scope.model.content.attachments[i].url === url) {
+                        $scope.model.content.attachments.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+
+        });
+
+        app.controller('billcodeconfigModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            $scope.items = [];
+
+            $http.post('/commonservice/GetBillCodeTemplate', { billname: 'receivablebill' })
+                    .success(function (data) {
+                        var template = data.template;
+                        var ss = template.split(',');
+                        angular.forEach(ss, function (item) {
+                            if (item) {
+                                $scope.items.push({ value: item });
+                            }
+                        });
+                        var length = $scope.items.length;
+                        for (var i = 0; i < 10 - length; i++) {
+                            $scope.items.push({ value: '' });
+                        }
+                    });
+
+            $scope.ok = function () {
+                var ss = [];
+                angular.forEach($scope.items, function (item) {
+                    if (item.value) {
+                        ss.push(item.value);
+                    }
+                });
+                model.template = ss.join(',');
+
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('customerdetailModalCtrl', function ($scope, $uibModalInstance, $http, $q, customerid) {
+
+            $http.post('/commonservice/customerdetail', { id: customerid })
+                    .success(function (data) {
+                        $scope.customer = data.data;
+                    });
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('employeechoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, model) {
+
+            $http.post('/commonservice/employeelist', {})
+                    .success(function (data) {
+                        $scope.employees = data.data;
+                    });
+
+            $scope.employeeSelected = function (employee) {
+                model.employee = employee;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('customerchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, NgTableParams, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/commonservice/customercategorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.categoryid = '0';
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/commonservice/customerlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.customerSelected = function (customer) {
+                model.customer = customer;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('billloadModalCtrl', function ($scope, $uibModalInstance, $http, $q, NgTableParams) {
+
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/receivablebillservice/loadbillquery',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            $scope.btnqueryClick = function () {
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams.reload();
+            };
+
+            $scope.billSelected = function (bill) {
+                $uibModalInstance.close(bill.id);
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

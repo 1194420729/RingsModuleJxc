@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "新增操作员";
+}
+<div data-pagelimit="userlist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcsystem/userlist">操作员与权限</a></li>
+            <li><span>新增操作员</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                新增操作员
+            </div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="form-group form-inline">
+                        <label>选择员工<span style="color:red;">*</span></label>
+                        <select class="form-control" name="employeeid" ng-change="employeeChange()" ng-model="employeeid" ng-options="m.id as m.content.name for m in employees">
+                            <option value="">请选择</option>
+                        </select>
+                        <span class="text-danger" ng-show="myForm.employeeid.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group form-inline">
+                        <label>登录名：<span ng-bind="selectedemployee.content.code"></span></label>
+                    </div>
+                    <div class="form-group form-inline">
+                        <label>初始密码<span style="color:red;">*</span></label>
+                        <input type="password" class="form-control" name="password1" ng-model="password1" required />
+                        <span class="text-danger" ng-show="myForm.password1.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group form-inline">
+                        <label>再次输入<span style="color:red;">*</span></label>
+                        <input type="password" class="form-control" name="password2" ng-model="password2" required />
+                        <span class="text-danger" ng-show="myForm.password2.$invalid">必填项</span>
+                    </div>
+                    <button type="button" class="btn btn-primary"
+                            ng-disabled="myForm.employeeid.$invalid || myForm.password1.$invalid || myForm.password2.$invalid || savedisabled"
+                            ng-click="btnsaveClick()">
+                        <i class="fa fa-save fa-fw"></i>保存
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert) {
+
+            $http.post('/userservice/getemployees', {})
+                    .success(function (data) {
+                        $scope.employees = data.data;
+                    });
+
+            $scope.employeeChange = function () {
+                for (var i = 0; i < $scope.employees.length; i++) {
+                    if ($scope.employees[i].id === $scope.employeeid) {
+                        $scope.selectedemployee = $scope.employees[i];
+                        break;
+                    }
+                }
+            };
+
+            $scope.btnsaveClick = function () {
+                if ($scope.password1 !== $scope.password2) {
+                    SweetAlert.swal({ title: '密码不一致！', type: 'error' });
+                    return;
+                }
+                $scope.savedisabled = true;
+                $http.post('/userservice/addsave', { employeeid: $scope.employeeid, password: $scope.password1 })
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!可以继续添加', type: 'success' }, function () {
+                                window.location.href = window.location.href;
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+        });
+
+    </script>
+}

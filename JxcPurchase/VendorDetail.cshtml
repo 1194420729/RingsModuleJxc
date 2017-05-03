@@ -1,0 +1,36 @@
+﻿<script type="text/ng-template" id="vendordetail.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            供应商详情
+        </h3>
+    </div>
+    <div class="modal-body">
+        <p><span ng-bind="vendor.content.code"></span><span style="margin-left:10px;" ng-bind="vendor.content.name"></span></p>
+        <p>
+            <span ng-bind="vendor.content.address"></span>
+        </p>
+        <p>
+            联系人：
+            <span ng-bind="vendor.content.linkman"></span>
+            <span style="margin-left:10px;" ng-bind="vendor.content.linkmobile"></span>
+        </p>
+        <p>
+            电子邮箱：
+            <span ng-bind="vendor.content.email"></span>
+        </p>
+        <p>
+            公司传真：
+            <span ng-bind="vendor.content.fax"></span>
+        </p>
+        <p>
+            应付账款：
+            <span ng-bind="vendor.content.payable | currency:'￥'"></span>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            关闭
+        </button>
+    </div>
+
+</script>

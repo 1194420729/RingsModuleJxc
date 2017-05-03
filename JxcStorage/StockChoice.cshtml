@@ -1,0 +1,32 @@
+﻿<script type="text/ng-template" id="stockchoice.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            选择仓库
+        </h3>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered table-condensed table-hover">
+            <thead>
+                <tr class="success">
+                    <th>No.</th>
+                    <th>仓库编号</th>
+                    <th>仓库名称</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="stock in stocks" ng-dblclick="stockSelected(stock)" style="cursor:pointer;">
+                    <td ng-bind="$index+1"></td>
+                    <td ng-bind="stock.content.code"></td>
+                    <td ng-bind="stock.content.name"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <span class="help-block" style="display:inline;margin-right:40px;">鼠标双击选中</span>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

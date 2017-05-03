@@ -1,0 +1,36 @@
+﻿<script type="text/ng-template" id="customerdetail.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            客户详情
+        </h3>
+    </div>
+    <div class="modal-body">
+        <p><span ng-bind="customer.content.code"></span><span style="margin-left:10px;" ng-bind="customer.content.name"></span></p>
+        <p>
+            <span ng-bind="customer.content.address"></span>
+        </p>
+        <p>
+            联系人：
+            <span ng-bind="customer.content.linkman"></span>
+            <span style="margin-left:10px;" ng-bind="customer.content.linkmobile"></span>
+        </p>
+        <p>
+            电子邮箱：
+            <span ng-bind="customer.content.email"></span>
+        </p>
+        <p>
+            公司传真：
+            <span ng-bind="customer.content.fax"></span>
+        </p>
+        <p>
+            应收账款：
+            <span ng-bind="customer.content.receivable | currency:'￥'"></span>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            关闭
+        </button>
+    </div>
+
+</script>

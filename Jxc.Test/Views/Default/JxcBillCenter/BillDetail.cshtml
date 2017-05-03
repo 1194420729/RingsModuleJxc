@@ -1,0 +1,77 @@
+﻿@{
+    ViewBag.Title = "";
+}
+<div>
+    <div class="alert alert-success" role="alert">正在加载单据，请稍候<i class="fa fa-refresh fa-spin fa-fw"></i></div>
+    <div ng-app="myApp" ng-controller="myCtrl">
+    </div>
+</div>
+
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+     
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script> 
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, SweetAlert) {
+
+            var billid=@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("billid")) ;
+            
+            $http.post('/billcenterservice/billdetail',
+                            { billid: billid })
+                            .success(function (data) {
+                                var billname=data.billname;
+                                if(billname==='purchaseorder'){
+                                    window.location.href='/jxcpurchase/purchaseorderedit?id='+billid;
+                                }else if(billname==='purchasebill'){
+                                    window.location.href='/jxcpurchase/purchasebilledit?id='+billid;
+                                }else if(billname==='purchasebackbill'){
+                                    window.location.href='/jxcpurchase/purchasebackbilledit?id='+billid;
+                                }else if(billname==='saleorder'){
+                                    window.location.href='/jxcsale/saleorderedit?id='+billid;
+                                }else if(billname==='salebill'){
+                                    window.location.href='/jxcsale/salebilledit?id='+billid;
+                                }else if(billname==='salebackbill'){
+                                    window.location.href='/jxcsale/salebackbilledit?id='+billid;
+                                }else if(billname==='gatheringbill'){
+                                    window.location.href='/jxcpay/gatheringbilledit?id='+billid;
+                                }else if(billname==='paybill'){
+                                    window.location.href='/jxcpay/paybilledit?id='+billid;
+                                }else if(billname==='receivablebill'){
+                                    window.location.href='/jxcpay/receivablebilledit?id='+billid;
+                                }else if(billname==='payablebill'){
+                                    window.location.href='/jxcpay/payablebilledit?id='+billid;
+                                }else if(billname==='stockinbill'){
+                                    window.location.href='/jxcstorage/stockinbilledit?id='+billid;
+                                }else if(billname==='stockoutbill'){
+                                    window.location.href='/jxcstorage/stockoutbilledit?id='+billid;
+                                }else if(billname==='stockmovebill'){
+                                    window.location.href='/jxcstorage/stockmovebilledit?id='+billid;
+                                }else if(billname==='stockinventorybill'){
+                                    window.location.href='/jxcstorage/stockinventorybilledit?id='+billid;
+                                }else if(billname==='feebill'){
+                                    window.location.href='/jxcaccounting/feebilledit?id='+billid;
+                                }else if(billname==='earningbill'){
+                                    window.location.href='/jxcaccounting/earningbilledit?id='+billid;
+                                }else if(billname==='transferbill'){
+                                    window.location.href='/jxcaccounting/transferbilledit?id='+billid;
+                                }else if(billname==='saleinvoicebill'){
+                                    window.location.href='/jxcaccounting/saleinvoicebilledit?id='+billid;
+                                }else if(billname==='purchaseinvoicebill'){
+                                    window.location.href='/jxcaccounting/purchaseinvoicebilledit?id='+billid;
+                                }
+                            });
+
+        });
+
+
+    </script>
+}

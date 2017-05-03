@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="monthbalance" title="月结存" groupname="系统设置"></limit>
+  <limit name="yearbalance" title="年结存" groupname="系统设置"></limit>
+  <limit name="userlist" title="操作员与权限" groupname="系统设置"></limit> 
+  <limit name="optionlist" title="参数配置" groupname="系统设置"></limit>
+  <limit name="rebuild" title="系统重建" groupname="系统设置"></limit>
+  <limit name="loglist" title="操作日志" groupname="系统设置"></limit>
+  <limit name="showcost" title="允许查看成本" groupname="系统设置"></limit>
+</limits>

@@ -1,0 +1,35 @@
+﻿<script type="text/ng-template" id="billcodeconfig.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            单据编号设置
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div ng-repeat="m in items track by $index" class="form-group form-inline">
+                        <label ng-bind="$index+1" style="text-align:center"></label>
+                        <input type="text" class="form-control" ng-model="m.value" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>可用变量说明：</h4>
+                    <p>日期格式：{yyyyMMdd}，{yyyy-MM-dd}，{yyMMdd}</p>
+                    <p>制单人：{制单人编号}</p>
+                    <p>流水号：{0},{00},{000},{0000},{00000}。分别代表1位流水号、2位流水号...5位流水号</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">
+            确定
+        </button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

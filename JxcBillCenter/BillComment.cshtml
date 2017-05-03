@@ -1,0 +1,23 @@
+﻿<script type="text/ng-template" id="billcomment.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            修改备注【<span ng-bind="model.billcode"></span>】
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label>单据备注</label> 
+            <input type="text" class="form-control" ng-model="model.comment" />
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">
+            确定
+        </button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

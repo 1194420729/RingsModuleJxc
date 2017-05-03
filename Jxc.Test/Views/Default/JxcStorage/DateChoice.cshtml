@@ -1,0 +1,50 @@
+﻿<script type="text/ng-template" id="datechoice.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            选择日期范围
+        </h3>
+    </div>
+    <div class="modal-body">        
+        <div class="form-group form-inline">
+            <div class="dropdown" style="display: inline;">
+                <a class="dropdown-toggle startdate" role="button" data-toggle="dropdown" data-target="#"
+                   href="javascript:;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="startdate" ng-model="filter.startdate" />
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
+                    </div>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <datetimepicker ng-model="filter.startdate" data-datetimepicker-config="{ dropdownSelector: '.startdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                </ul>
+            </div>
+            <span>-</span>
+            <div class="dropdown" style="display: inline;">
+                <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                   href="javascript:;">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                        </span>
+                    </div>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                    <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">
+            确定
+        </button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

@@ -1,0 +1,346 @@
+﻿@{
+    ViewBag.Title = "经营历程";
+}
+<div data-pagelimit="bizhistory">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcbillcenter/checkboxheader");} 
+        @{Html.RenderPartial("/jxcbillcenter/billcomment");}
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>经营历程</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                经营历程
+            </div>
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>单据日期</label>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle startdate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="startdate" ng-model="filter.startdate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.startdate" data-datetimepicker-config="{ dropdownSelector: '.startdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <span>-</span>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <label>单据类型</label>
+                    <select class="form-control" ng-model="filter.billname">
+                        <option value="">全部单据</option>
+                        <option value="purchaseorder">采购订单</option>
+                        <option value="purchasebill">采购入库单</option>
+                        <option value="purchasebackbill">采购退货单</option>
+                        <option value="saleorder">销售订单</option>
+                        <option value="salebill">销售出库单</option>
+                        <option value="salebackbill">销售退货单</option>
+                        <option value="gatheringbill">收款单</option>
+                        <option value="paybill">付款单</option>
+                        <option value="receivablebill">应收调整单</option>
+                        <option value="payablebill">应付调整单</option>
+                        <option value="stockinbill">入库单</option>
+                        <option value="stockoutbill">出库单</option>
+                        <option value="stockmovebill">调拨单</option>
+                        <option value="stockinventorybill">盘点单</option>
+                        <option value="feebill">费用单</option>
+                        <option value="earningbill">收入单</option>
+                        <option value="transferbill">转款单</option>
+                        <option value="saleinvoicebill">销售发票</option>
+                        <option value="purchaseinvoicebill">采购发票</option>
+                    </select>
+                    <label>审核状态</label>
+                    <select class="form-control" ng-model="filter.auditstatus">                        
+                        <option value="nored">不含红冲</option>
+                        <option value="all">包含红冲</option>
+                        <option value="justred">仅红冲</option> 
+                    </select>
+                </div>
+                <div class="form-group form-inline">
+                    <label>单据编号</label>
+                    <input type="text" class="form-control" ng-model="filter.billcode" />
+                    
+                    <label>供应商</label>
+                    <input type="text" class="form-control" ng-model="filter.vendorname" placeholder="按编号或名称模糊查询" />
+                    <label>客户</label>
+                    <input type="text" class="form-control" ng-model="filter.customername" placeholder="按编号或名称模糊查询" />
+                </div>
+                <div class="form-group form-inline">
+                    <label>经手人</label>
+                    <input type="text" class="form-control" ng-model="filter.employeename" placeholder="按编号或名称模糊查询" />
+                    <label>仓库名称</label>
+                    <input type="text" class="form-control" ng-model="filter.stockname" placeholder="按编号或名称模糊查询" />
+                    <label>产品名称</label>
+                    <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
+                </div>
+                <div class="form-group form-inline">
+                    
+                    <label>制单人</label>
+                    <input type="text" class="form-control" ng-model="filter.makername" placeholder="按编号或名称模糊查询" />
+                    <label>单据备注</label>
+                    <input type="text" class="form-control" ng-model="filter.comment" />
+                    <label>明细备注</label>
+                    <input type="text" class="form-control" ng-model="filter.detailcomment" />
+
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button> 
+
+                </div>
+            </div>
+            <table ng-table="tableParams" show-filter="false"  class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" ng-class="{1:'',2:'info',3:'danger'}[m.content.auditstatus]" style="cursor:pointer;">
+                    <td header-class="'bg-warning'" style="min-width:90px;width:90px;">
+                        <a href="javascript:;" ng-click="btncommentClick(m)" title="修改备注">
+                            <i class="fa fa-comment-o fa-fw"></i>
+                        </a>
+                        <a href="javascript:;" ng-show="m.content.auditstatus!==3"
+                           ng-click="btncopyClick(m.id)" title="复制为草稿">
+                            <i class="fa fa-copy fa-fw"></i>
+                        </a>
+                        <a href="javascript:;" style="color:#990033;"
+                           ng-show="m.content.auditstatus===1 && m.content.billname!=='saleorder' && m.content.billname!=='purchaseorder' && m.content.billname!=='stockinventorybill'"
+                           ng-click="btnredwordClick(m)" ng-limit="redword" title="红字反冲">
+                            <i class="fa fa-times-circle fa-fw"></i>
+                        </a>
+                    </td>
+                    <td width="30" header-class="'bg-warning'" header="'ng-table/headers/checkbox.html'">
+                        <input type="checkbox" ng-model="checkboxes.items[m.id]" ng-click="$event.stopPropagation()" ng-change="checkChange(m)" />
+                    </td>
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+
+                    <td data-title="'单据编号'" header-class="'bg-warning'">
+                        <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.content.billcode" title="查看原始单据"></a>
+
+                    </td>
+                    <td data-title="'单据名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.billname | billname"></span>
+                    </td>
+                    <td data-title="'单据日期'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.billdate"></span>
+                    </td>
+                    <td data-title="'往来单位'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.wldw"></span>
+                    </td>
+                    <td data-title="'金额'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.total | currency:'￥' | cost:showcost"></span>
+                    </td>
+                    <td data-title="'经手人'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.employeename"></span>
+                    </td>
+                    <td data-title="'制单人'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.makername"></span>
+                    </td>
+                    <td data-title="'仓库名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.stockname"></span>
+                    </td>
+                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;">
+                        <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td colspan="5">
+                        合计：<span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td></td>
+                    <td></td> 
+                    <td ng-bind="totalsum | currency:'￥' | cost:showcost"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td> 
+                </tr>
+            </table> 
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+         
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {auditstatus:'nored'};
+            $scope.queryfilter = { auditstatus: 'nored' };
+            $scope.showcost = false;
+             
+            $scope.checkboxes = { 'checked': false, items: {} };
+            $scope.$watch('checkboxes.checked', function (value) {
+                angular.forEach($scope.datalist, function (item) {
+                    $scope.checkboxes.items[item.id] = value;
+
+                });
+            });
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/billcenterservice/bizhistoryquery',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.checkboxes.items = {};
+
+                        $scope.showcost = data.showcost;
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                         
+                        $scope.totalsum = data.totalsum; 
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            $scope.btnqueryClick = function () {
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams.reload();
+            };
+             
+            $scope.btnredwordClick = function (bill) {
+                SweetAlert.swal({
+                    title: '确定要红字反冲吗？',
+                    text: '单据红字反冲后不能恢复',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '确定',
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    $http.post('/billcenterservice/redword', { id: bill.id }).success(function (data) {
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '红字反冲成功', type: 'success' }, function () {
+                                $scope.tableParams.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+                });
+            };
+
+            $scope.btncopyClick = function (id) { 
+                SweetAlert.swal({
+                    title: '确定要复制吗？',
+                    text: '',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '确定',
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    $http.post('/billcenterservice/copy', { id: id }).success(function (data) {
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '复制成功', type: 'success' }, function () {
+                                $scope.tableParams.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+                });
+            };
+
+            $scope.btncommentClick = function (bill) {
+                var model = { comment: bill.content.comment,billcode:bill.content.billcode };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billcomment.html',
+                    controller: 'billcommentModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/billcenterservice/billcomment', { id: bill.id, comment: model.comment }).success(function (data) {
+                        if (data.message == 'ok') {
+                            bill.content.comment = model.comment;
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+
+                });
+            };
+        });
+
+        app.controller('billcommentModalCtrl', function ($scope, $uibModalInstance, $http, $q, model) {
+
+            $scope.model = model;
+
+            $scope.ok = function () {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+       
+
+    </script>
+}

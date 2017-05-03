@@ -1,0 +1,18 @@
+﻿@{
+    if (User.Identity.IsAuthenticated)
+    {
+        string lan = User.Identity.GetAccount().Language;
+        if (File.Exists(Server.MapPath("~/Views/Shared/" + lan + "/_Layout.cshtml")))
+        {
+            Layout = "~/Views/Shared/" + lan + "/_Layout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        }
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

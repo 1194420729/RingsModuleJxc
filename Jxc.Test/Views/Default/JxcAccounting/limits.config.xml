@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="feebilladd" title="费用单录入" groupname="财务管理"></limit>
+  <limit name="feebillaudit" title="费用单审核" groupname="财务管理"></limit>
+  <limit name="earningbilladd" title="收入单录入" groupname="财务管理"></limit>
+  <limit name="earningbillaudit" title="收入单审核" groupname="财务管理"></limit>
+  <limit name="transferbilladd" title="转款单录入" groupname="财务管理"></limit>
+  <limit name="transferbillaudit" title="转款单审核" groupname="财务管理"></limit>
+  <limit name="saleinvoicebilladd" title="销售发票录入" groupname="财务管理"></limit>
+  <limit name="saleinvoicebillaudit" title="销售发票审核" groupname="财务管理"></limit>
+  <limit name="purchaseinvoicebilladd" title="采购发票录入" groupname="财务管理"></limit>
+  <limit name="purchaseinvoicebillaudit" title="采购发票审核" groupname="财务管理"></limit>
+  <limit name="feereport" title="费用统计" groupname="财务管理"></limit>
+
+</limits>

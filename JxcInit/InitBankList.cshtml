@@ -1,0 +1,222 @@
+﻿@{
+    ViewBag.Title = "期初现金银行";
+}
+<div data-pagelimit="initbanklist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="editbank.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    修改期初
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label ng-bind="model.content.name"></label>
+                </div>
+                <div class="form-group form-inline" >
+                    <label>期初账户余额</label>
+                    <input type="number" class="form-control" ng-model="model.content.inittotal"  />                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>期初现金银行</span></li>
+        </ol>
+        <div class="form-group form-inline pull-right">
+            <label class="checkbox-inline" style="min-width:100px;">
+                <input type="checkbox" ng-model="isFiltersVisible" />查询
+            </label>
+            <a href="javascript:;" class="btn btn-info" ng-limit="initbankexport" ng-click="csv.generate($event, '期初现金银行.csv')">
+                <i class="fa fa-file-excel-o fa-fw"></i>
+                导出Excel
+            </a>
+            <a class="btn btn-info" ng-limit="initbankimport" ng-hide="initover" href="/jxcinit/initbankimport">
+                <i class="fa fa-inbox fa-fw"></i>
+                数据导入
+            </a>
+        </div>
+        <div style="clear:both;"></div>
+        <div>
+            <div class="pull-left" style="margin-right:20px;">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <div style="width:100%;overflow-x:auto;">
+                    <table ng-table="tableParams" export-csv="csv" class="table table-bordered table-condensed table-striped"
+                           show-filter="isFiltersVisible">
+                        <tr ng-repeat="m in $data" ng-class="{'t':'danger'}[m.content.stop]">
+                            <td header-class="'bg-warning'" style="width:80px;">
+                                <a href="javascript:;" ng-click="editClick(m)" ng-hide="initover" ng-limit="initbankedit" title="修改期初现金银行">
+                                    <i class="fa fa-pencil fa-fw"></i>
+                                </a>
+                            </td>
+                            <td data-title="'No.'" header-class="'bg-warning'" style="width:100px;">
+                                <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                            </td>
+                            <td data-title="'账户编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}"
+                                data-sortable="'code'">
+                                <span ng-bind="m.content.code"></span>
+                            </td>
+                            <td data-title="'账户名称'" header-class="'bg-warning'" data-filter="{name: 'text'}"
+                                data-sortable="'name'">
+                                <span ng-bind="m.content.name"></span>
+                            </td>                             
+                            <td data-title="'期初余额'" header-class="'bg-warning'" data-sortable="'inittotal'">
+                                <span ng-bind="m.content.inittotal | currency:'￥'"></span>
+                            </td>
+                        </tr>
+                        <tr class="warning">
+                            <td>
+                                合计
+                            </td>
+                            <td>
+                                <span ng-bind="totalrecordes"></span>条记录
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td ng-bind="totalsum | currency:'￥'"></td>
+                           
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+            max-width: 200px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script> 
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport', 'ngJsTree']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/initbankservice/categorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.state = 'normal';
+            $scope.categoryid = '0';
+            $scope.initover = true;
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter())); 
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/initbankservice/list',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.initover = data.initover;
+                        $scope.datalist = data.data;
+                        $scope.totalsum = data.totalsum;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+            
+            $scope.editClick = function (m) {
+                var model = m;
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'editbank.html',
+                    controller: 'editbankModalCtrl',
+                    resolve: {
+                        model: function () { return model; } 
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/initbankservice/editsave', model)
+                        .success(function (data) {
+                            $scope.tableParams.reload();
+                        });
+                });
+            };
+
+        });
+
+        app.controller('editbankModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.model = JSON.parse(angular.toJson(model));
+             
+            $scope.ok = function () {
+                model.content.inittotal = $scope.model.content.inittotal;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+  
+        });
+
+</script>
+
+}

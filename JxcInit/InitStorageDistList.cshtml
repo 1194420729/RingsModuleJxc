@@ -1,0 +1,435 @@
+﻿@{
+    ViewBag.Title = "期初库存分布表";
+}
+<div data-pagelimit="initstoragelist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="editstorage.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    修改期初
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label ng-bind="model.content.name"></label>
+                </div>
+                <div class="form-group form-inline" ng-repeat="s in stocks" ng-if="s.id > 0">
+                    <label ng-bind="s.content.name"></label>
+                    <input type="number" class="form-control" style="width:100px;" min="0" ng-change="qtyChange(s.id)" ng-model="model.content.initstorage[s.id+'']['qty']" ng-model-options="{updateOn:'blur'}" placeholder="数量" />
+                    <input type="number" class="form-control" style="width:100px;" min="0" ng-change="priceChange(s.id)" ng-model="model.content.initstorage[s.id+'']['price']" ng-model-options="{updateOn:'blur'}" placeholder="成本单价" />
+                    <input type="number" class="form-control" style="width:100px;" min="0" ng-change="totalChange(s.id)" ng-model="model.content.initstorage[s.id+'']['total']" ng-model-options="{updateOn:'blur'}" placeholder="成本金额" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <script type="text/ng-template" id="stockchoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    选择仓库
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div js-tree="category2.treeConfig" ng-model="category2.treeData" id="treeInstance2" tree-events="loaded:treeLoaded">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>期初库存分布表</span></li>
+        </ol>
+        <div class="form-group form-inline pull-right">
+            <label class="checkbox-inline" style="min-width:100px;">
+                <input type="checkbox" ng-model="isCostVisible" ng-change="costvisibleChange()" />显示分仓成本
+            </label>
+            <label class="checkbox-inline" style="min-width:100px;">
+                <input type="checkbox" ng-model="isFiltersVisible" />查询
+            </label>
+            <a class="btn btn-primary" href="/jxcinit/initstoragelist">
+                <i class="fa fa-exchange fa-fw"></i>
+                切换到库存表
+            </a>
+            <button type="button" class="btn btn-primary" ng-click="stockClick()">
+                <i class="fa fa-list fa-fw"></i>
+                选择仓库
+            </button>
+            <a href="javascript:;" class="btn btn-info" ng-limit="initstorageexport" ng-click="csv.generate($event, '期初库存.csv')">
+                <i class="fa fa-file-excel-o fa-fw"></i>
+                导出Excel
+            </a>
+            <a class="btn btn-info" ng-limit="initstorageimport" ng-hide="initover" href="/jxcinit/initstorageimport">
+                <i class="fa fa-inbox fa-fw"></i>
+                数据导入
+            </a>
+        </div>
+        <div style="clear:both;"></div>
+        <div>
+            <div class="pull-left" style="margin-right:20px;">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <div style="width:100%;overflow-x:auto;">
+                    <table ng-table-dynamic="tableParams with cols" export-csv="csv" class="table table-bordered table-condensed table-striped"
+                           show-filter="isFiltersVisible">
+                        <tr ng-repeat="m in $data" ng-init="outerIndex = $index" ng-class="{'t':'danger'}[m.content.stop]">
+                            <td ng-repeat="col in $columns" my-bind-compiled-html="col.getValue(outerIndex, m,col.field)"></td>
+                        </tr>
+                        <tr class="warning">
+                            <td>
+                                合计
+                            </td>
+                            <td>
+                                <span ng-bind="totalrecordes"></span>条记录
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td ng-repeat-start="s in stocks">
+                                <span ng-bind="qtysums[s.id]"></span>
+                            </td>
+                            <td ng-show="isCostVisible"></td>
+                            <td ng-repeat-end ng-show="isCostVisible">
+                                <span ng-bind="totalsums[s.id]"></span>
+                            </td>
+                            <td ng-bind="qtysum"></td>
+                            <td></td>
+                            <td ng-bind="totalsum | currency:'￥' | cost:showcost"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+            max-width: 200px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngtablebindhtml.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngTableBindHtml']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal, $sce) {
+
+            $scope.selectedstockids = '';
+            $scope.cols = [];
+
+            var initcolumns = function () {
+                $scope.cols = [];
+                if ($scope.initstorageedit && !$scope.initover) {
+                    $scope.cols.push({ field: "op", title: "", "class": "bg-warning", show: true, getValue: htmlValue });
+                }
+                $scope.cols.push({ field: "no", title: "No.", "class": "bg-warning", show: true, getValue: noValue });
+                $scope.cols.push({ field: "code", title: "产品编号", sortable: "code", filter: { code: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "name", title: "产品名称", sortable: "name", filter: { name: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                angular.forEach($scope.stocks, function (item) {
+                    $scope.cols.push({ field: 'stock' + item.id, title: item.content.name, "class": "bg-info", show: true, getValue: qtyValue });
+                    $scope.cols.push({ field: "price" + item.id, title: item.content.name + '成本均价', "class": "bg-info", show: false, getValue: costValue });
+                    $scope.cols.push({ field: "total" + item.id, title: item.content.name + '成本金额', "class": "bg-info", show: false, getValue: costValue });
+                });
+
+                $scope.cols.push({ field: "qty", title: "数量小计", "class": "bg-warning", show: true, getValue: qtyValue });
+                $scope.cols.push({ field: "price", title: "成本均价", "class": "bg-warning", show: true, getValue: costValue });
+                $scope.cols.push({ field: "total", title: "成本金额", "class": "bg-warning", show: true, getValue: costValue });
+                //$scope.cols.push({ field: "categoryname", title: "分类", "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "standard", title: "规格", filter: { standard: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "type", title: "型号", filter: { type: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "unit", title: "单位", filter: { unit: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                //$scope.cols.push({ field: "comment", title: "备注", filter: { comment: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+            };
+
+            $scope.costvisibleChange = function () {
+                angular.forEach($scope.stocks, function (stock) {
+                    angular.forEach($scope.cols, function (col) {
+                        if (col.field === 'price' + stock.id || col.field === 'total' + stock.id) {
+                            col.show = $scope.isCostVisible;
+                        }
+                    });
+                });
+            };
+
+            var htmlValue = function (index, row) {
+                var html = '<a ng-click="editClick(m)" ng-hide="initover" href="javascript:;" title="修改期初库存"><i class="fa fa-pencil fa-fw"></i></a>';
+                return html;
+            };
+
+            var noValue = function (index, row) {
+                return '<span ng-bind="(tableParams.page() - 1) * tableParams.count() + outerIndex + 1"></span>';
+            };
+
+            var contentValue = function (index, row, field) {
+                if (field === 'categoryname') {
+                    return '<span ng-bind="m.content.category.name"></span>';
+                } else {
+                    return '<span ng-bind="m.content.'+field+'"></span>';
+                }
+            };
+
+            var qtyValue = function (index, row, field) {
+                if (field === 'qty') {
+                    return '<span ng-bind="m.content.initstorage[\'0\'][\'qty\']"></span>';
+                    
+                } else if (field.substring(0, 5) === 'stock') {
+                    var stockid = field.substring(5);
+                    return '<span ng-bind="m.content.initstorage[\''+stockid+'\'][\'qty\']"></span>';
+                    
+                }
+            };
+
+            var costValue = function (index, row, field) {
+                if (field === 'price' || field === 'total') {
+                    return '<span ng-bind="m.content.initstorage[\'0\'][\''+field+'\'] | currency:\'￥\' | cost:showcost"></span>';                    
+                } else {
+                    var stockid = field.substring(5);
+                    return '<span ng-bind="m.content.initstorage[\'' + stockid + '\'][\'' + field.substring(0, 5) + '\'] | currency:\'￥\' | cost:showcost"></span>';
+                    
+                }
+            }
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/initstorageservice/productcategorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.categoryid = '0';
+            $scope.initover = true;
+            $scope.showcost = false;
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/initstorageservice/distlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.showcost = data.showcost;
+                        $scope.initover = data.initover;
+                        $scope.initstorageedit = data.initstorageedit;
+                        if ($scope.selectedstockids === '') {
+                            $scope.stocks = data.stocks;
+                        } else {
+                            $scope.stocks = [];
+                            angular.forEach(data.stocks, function (item) {
+                                if ($scope.selectedstockids.indexOf(item.id + '') !== -1) {
+                                    $scope.stocks.push(item);
+                                }
+                            });
+                        }
+                        $scope.qtysums = data.qtysums;
+                        $scope.totalsums = data.totalsums;
+                        initcolumns();
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $scope.qtysum = data.qtysum;
+                        $scope.totalsum = data.totalsum;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            $scope.stockClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'stockchoice.html',
+                    controller: 'stockchoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.selectedstockids = model.stockids;
+                    $scope.tableParams.reload();
+                });
+            };
+
+            $scope.editClick = function (m) {
+                var model = m;
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'editstorage.html',
+                    controller: 'editstorageModalCtrl',
+                    resolve: {
+                        model: function () { return model; },
+                        stocks: function () { return $scope.stocks; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/initstorageservice/editsave', model)
+                        .success(function (data) {
+                            $scope.tableParams.reload();
+                        });
+                });
+            };
+        });
+
+        app.controller('stockchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.category2 = {};
+
+            $scope.treeLoaded = function () {
+                angular.element('#treeInstance2').jstree(true).open_all();
+            };
+
+            $scope.category2.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": true,
+                    "expand_selected_onload": true
+                },
+                "plugins": ["checkbox", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/initstorageservice/stockstree', {})
+                    .success(function (data) {
+                        $scope.category2.treeData = data;
+                        $scope.category2.treeConfig.version++;
+                    });
+
+            $scope.ok = function () {
+                model.stockids = angular.element('#treeInstance2').jstree(true).get_checked(false);
+
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('editstorageModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model, stocks) {
+
+            $scope.model = JSON.parse(angular.toJson(model));
+            $scope.stocks = stocks;
+
+            $scope.ok = function () {
+                model.content.initstorage = $scope.model.content.initstorage;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+
+            $scope.qtyChange = function (stockid) {
+                if ($scope.model.content.initstorage[stockid + '']['qty'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['qty'] !== null
+                    && $scope.model.content.initstorage[stockid + '']['price'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['price'] !== null) {
+
+                    var qty = parseFloat($scope.model.content.initstorage[stockid + '']['qty']);
+                    var price = parseFloat($scope.model.content.initstorage[stockid + '']['price']);
+                    var total = qty * price;
+                    $scope.model.content.initstorage[stockid + '']['total'] = total;
+                }
+            };
+
+            $scope.priceChange = function (stockid) {
+                if ($scope.model.content.initstorage[stockid + '']['qty'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['qty'] !== null
+                    && $scope.model.content.initstorage[stockid + '']['price'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['price'] !== null) {
+
+                    var qty = parseFloat($scope.model.content.initstorage[stockid + '']['qty']);
+                    var price = parseFloat($scope.model.content.initstorage[stockid + '']['price']);
+                    var total = qty * price;
+                    $scope.model.content.initstorage[stockid + '']['total'] = total;
+                }
+            };
+
+            $scope.totalChange = function (stockid) {
+                if ($scope.model.content.initstorage[stockid + '']['qty'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['qty'] !== null
+                    && $scope.model.content.initstorage[stockid + '']['total'] !== undefined
+                    && $scope.model.content.initstorage[stockid + '']['total'] !== null) {
+
+                    var qty = parseFloat($scope.model.content.initstorage[stockid + '']['qty']);
+                    var total = parseFloat($scope.model.content.initstorage[stockid + '']['total']);
+                    if (qty != 0) {
+                        var price = total / qty;
+                        $scope.model.content.initstorage[stockid + '']['price'] = parseFloat(price.toFixed(4));
+                    }
+                }
+            };
+             
+        });
+
+    </script>
+}

@@ -1,0 +1,313 @@
+﻿@{
+    ViewBag.Title = "采购补货分析";
+}
+<div data-pagelimit="purchasesupplement">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcpurchase/vendorchoice");}
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>采购补货分析</span></li>
+        </ol> 
+        <div class="panel panel-info">
+            <div class="panel-body">    
+                <div class="form-group form-inline">
+                    <label>供应商</label>
+                    <div class="input-group">
+                        <input type="text" autocomplete="off"  ng-model="vendor" placeholder="编号或名称模糊查询" uib-typeahead="vendor.content.name for vendor in updateVendors($viewValue)"
+                               typeahead-on-select="vendorSelected($item, $model, $label,$event)" typeahead-loading="loadingVendorLocations"
+                               typeahead-no-results="noVendorResults" typeahead-select-on-blur="true" class="form-control">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" ng-click="vendorClick()">...</button>
+                        </span>
+                    </div>
+                    <i ng-show="loadingVendorLocations" class="glyphicon glyphicon-refresh"></i>
+                    <span class="text-danger" ng-show="noVendorResults">没有匹配项</span>
+                    <label>销售区间</label>
+                    <select class="form-control" ng-model="filter.saledate">
+                        <option value="7">近7天</option>
+                        <option value="30">近30天</option>
+                        <option value="90">近90天</option>
+                    </select>
+                    <button class="btn btn-success" type="button" ng-click="btnstartClick()"><i class="fa fa-play fa-fw"></i>分析</button>
+                    <button class="btn btn-primary" type="button" ng-click="btnsaveClick()"><i class="fa fa-check fa-fw"></i>生成订单</button>
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                </div>             
+                 
+            </div>
+            <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" ng-dblclick="detailClick(m)" title="双击查看明细">
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'产品编号'" header-class="'bg-warning'">
+                        <span ng-bind=" m.content.code"></span>
+                    </td>
+                    <td data-title="'产品名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.name"></span>
+                    </td>
+                    <td data-title="'规格'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.standard"></span>
+                    </td>
+                    <td data-title="'型号'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.type"></span>
+                    </td>
+                    <td data-title="'单位'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.unit"></span>
+                    </td>
+                    <td data-title="'预设进价'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.buyprice | currency:'￥'"></span>
+                    </td>
+                    <td data-title="'最近进价'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.lastbuyprice | currency:'￥'"></span>
+                    </td>
+                    <td data-title="'库存数量'" header-class="'bg-warning'" >
+                        <span ng-bind="m.content.storage['0'].qty"></span>
+                    </td>
+                    <td data-title="'近期销售数量'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.saleqty"></span>
+                    </td>
+                    <td data-title="'本次采购数量'" header-class="'bg-warning'">
+                        <input type="number" class="form-control" ng-change="purchaseqtyChange()" ng-model="m.content.purchaseqty" />
+                    </td>
+                    
+                </tr>
+                <tr class="warning">
+                    <td colspan="8">
+                        合计：
+                    </td>
+                    <td ng-bind="storageqtysum"></td>
+                    <td ng-bind="saleqtysum"></td>
+                    <td ng-bind="purchaseqtysum"></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {saledate:'7'};
+            $scope.queryfilter = {};
+            $scope.tableParams = new NgTableParams({ count: 99999 });
+             
+            $http.post('/purchasereportservice/RefreshMVWSaleBill', {})
+                    .success(function (data) {
+
+                    });
+             
+            $scope.updateVendors = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/vendorchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.vendorSelected = function ($item, $model, $label, $event) {
+                $scope.filter.vendorid = $item.id;
+            };
+
+            $scope.vendorClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'vendorchoice.html',
+                    controller: 'vendorchoiceModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.vendor = model.vendor.content.name;
+                    $scope.filter.vendorid = model.vendor.id;
+                });
+            };
+
+            $scope.purchaseqtyChange = function () {
+                var purchaseqtysum = 0;
+                angular.forEach($scope.datalist, function (item) {
+                    if (item.content.purchaseqty) {
+                        purchaseqtysum += item.content.purchaseqty;
+                    }
+                });
+
+                $scope.purchaseqtysum = purchaseqtysum;
+            };
+
+            var getData = function () {
+                var filter = $scope.queryfilter;
+                
+                $http.post('/purchasereportservice/purchasesupplement',
+                    { filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.datalist = data.data;
+
+                        $scope.storageqtysum = data.storageqtysum;
+                        $scope.saleqtysum = data.saleqtysum;
+                        
+                        $scope.tableParams.settings({
+                            counts: [],
+                            dataset: $scope.datalist
+                        });
+                        
+                        
+                        $scope.showwaiter = false;
+                    });
+            };
+
+            $scope.btnstartClick = function () {
+                if (!$scope.filter.vendorid) {
+                    SweetAlert.swal({ title: '请填写供应商', type: 'error' });
+                    return;
+                }
+
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                getData();
+            };
+
+            $scope.btnsaveClick = function () {
+                 
+                if (!$scope.purchaseqtysum) {
+                    SweetAlert.swal({ title: '请填写采购数量', type: 'error' });
+                    return;
+                }
+
+                var s = '';
+                angular.forEach($scope.datalist, function (item) {
+                    if (item.content.purchaseqty) {
+                        var price = 0;
+                        if (item.content.lastbuyprice) {
+                            price = item.content.lastbuyprice;
+                        } else if (item.content.buyprice) {
+                            price = item.content.buyprice;
+                        }
+                        s += item.id + ':' + item.content.purchaseqty+':'+price+',';
+                    }
+                });
+
+                $scope.showwaiter = true;
+                $http.post('/purchasereportservice/purchasesupplementsave',
+                     { vendorid: $scope.filter.vendorid,products:s })
+                     .success(function (data) {
+                         $scope.showwaiter = false;
+                         if (data.message === 'ok') {
+                             SweetAlert.swal({ title: '生成采购订单草稿成功！', type: 'success' });
+                         } else {
+                             SweetAlert.swal({ title: data.message, type: 'error' });
+                         }
+                     });
+            };
+             
+        });
+
+        app.controller('vendorchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, NgTableParams, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/commonservice/vendorcategorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.categoryid = '0';
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/commonservice/vendorlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.vendorSelected = function (vendor) {
+                model.vendor = vendor;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "操作员权限";
+}
+<div data-pagelimit="userlist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcsystem/userlist">操作员与权限</a></li>
+            <li><span>设置权限</span></li>
+        </ol>
+        <div class="form-group form-inline">
+            <label>员工姓名：<span ng-bind="model.content.name"></span></label>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-9 col-lg-10">
+                    <div ng-repeat="g in limits" class="panel panel-default" id="{{g.groupname}}">
+                        <div class="panel-heading">
+                            <label>{{g.groupname}}</label>
+                            <label class="checkbox-inline" style="margin-left:40px;">
+                                <input type="checkbox" ng-model="groupcheck[g.groupname]" ng-change="groupcheckChange(g.groupname)" />全选
+                            </label>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div ng-repeat="item in g.items | orderBy:'id'">
+                                    <div class="form-group col-lg-3 col-md-4 checkbox">
+                                        <label>
+                                            <input type="checkbox" ng-model="userlimit[item.id]" />{{item.title}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click="btnsaveClick()">
+                            <i class="fa fa-save fa-fw"></i>保存
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3 col-lg-2">
+                    <div id="rightmenu">
+                        <ul class="nav">
+                            <li ng-repeat="g in limits"><a ng-href="#{{g.groupname}}" ng-bind="g.groupname"></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <style>
+        label {
+            min-width: 80px;
+        } 
+         
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert) {
+
+            var id=@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("id")) ;
+
+            $scope.groupcheck = {};
+
+            angular.element($window).bind("scroll", function(e) { 
+                var scrolltop=angular.element($window).scrollTop();
+                angular.element('#rightmenu').offset({top:scrolltop+150});
+            })
+
+            $scope.groupcheckChange = function (groupname) {
+                var checked = $scope.groupcheck[groupname];
+                angular.forEach($scope.limits, function (item, index) {
+                    if (item.groupname === groupname) {
+                        for (var i = 0; i < item.items.length; i++) {
+                            $scope.userlimit[item.items[i].id] = checked;
+                        }
+
+                        return;
+                    }
+                });
+            };
+
+            var limitsort=function(limits){
+                var rank={"期初建账":1,"采购管理":2,"销售管理":3,"库存管理":4,"往来管理":5,"财务管理":6,"单据中心":7,"基础资料":8,"系统设置":9};
+                limits.sort(function(a,b){
+                    return rank[a.groupname]-rank[b.groupname];
+                }); 
+                return limits;
+            };
+
+            $http.post('/userservice/edit', { id: id })
+                        .success(function (data) {
+                            $scope.limits = limitsort(data.limits);
+                            $scope.userlimit = data.userlimit;
+                            $scope.model = data.data;
+
+                            angular.forEach($scope.limits,function(item){
+                                item.items=JSON.parse(item.items);
+                            });
+                        });
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/userservice/editsave', { id: id, userlimit: angular.toJson($scope.userlimit) })
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '设置权限成功!', type: 'success' }, function () {
+                                window.location.href = '/jxcsystem/userlist';
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+        });
+
+    </script>
+}

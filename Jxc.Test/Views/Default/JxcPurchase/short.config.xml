@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="vendorproductservice" path="service/jxcpurchase/jxcpurchase/vendorproduct"></short>
+  <short name="purchaseorderservice" path="service/jxcpurchase/jxcpurchase/purchaseorder"></short>
+  <short name="purchasebillservice" path="service/jxcpurchase/jxcpurchase/purchasebill"></short>
+  <short name="purchasebackbillservice" path="service/jxcpurchase/jxcpurchase/purchasebackbill"></short>
+  <short name="commonservice" path="service/jxcpurchase/jxcpurchase/common"></short>
+  <short name="purchasereportservice" path="service/jxcpurchase/jxcpurchase/purchasereport"></short>
+</shorts>

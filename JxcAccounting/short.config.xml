@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="commonservice" path="service/jxcaccounting/jxcaccounting/common"></short>
+  <short name="feebillservice" path="service/jxcaccounting/jxcaccounting/feebill"></short>
+  <short name="earningbillservice" path="service/jxcaccounting/jxcaccounting/earningbill"></short>
+  <short name="transferbillservice" path="service/jxcaccounting/jxcaccounting/transferbill"></short>
+  <short name="saleinvoicebillservice" path="service/jxcaccounting/jxcaccounting/saleinvoicebill"></short>
+  <short name="purchaseinvoicebillservice" path="service/jxcaccounting/jxcaccounting/purchaseinvoicebill"></short>
+  <short name="feereportservice" path="service/jxcaccounting/jxcaccounting/feereport"></short>
+</shorts>

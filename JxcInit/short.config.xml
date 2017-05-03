@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="initstorageservice" path="service/jxcinit/jxcinit/initstorage"></short>
+  <short name="initreceivableservice" path="service/jxcinit/jxcinit/initreceivable"></short>
+  <short name="initpayableservice" path="service/jxcinit/jxcinit/initpayable"></short>
+  <short name="initbankservice" path="service/jxcinit/jxcinit/initbank"></short>
+  <short name="initoverservice" path="service/jxcinit/jxcinit/initover"></short>
+</shorts>

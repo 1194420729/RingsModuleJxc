@@ -1,0 +1,239 @@
+﻿<div class="modal fade" id="printdesignermodal" role="dialog" aria-labelledby="edittitle">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="edittitle">
+                    打印模版设计器
+                </h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="printeditor" name="content" style="width: 750px; height: 500px;">@if (ViewBag.Template != null) { @Html.Raw(ViewBag.Template.Content)}</textarea>
+            </div>
+            <div class="modal-footer">
+                <img src="~/Content/images/loader.gif" alt="" style="display: none; margin-left: 10px;" />
+                <button type="button" class="btn btn-default" id="btncancel">
+                    关闭</button>
+                <button type="button" class="btn btn-primary" id="btnsaveprinttemplate">
+                    保存</button>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->
+<input type="hidden" id="pagewidth" value="@ViewBag.Width"/>
+<input type="hidden" id="pageheight" value="@ViewBag.Height"/>
+<input type="hidden" id="pagepadding" value="@ViewBag.Padding" />
+<input type="hidden" id="pagerepeatheader" value="@(ViewBag.RepeatHeader?"true":"false")" />
+<input type="hidden" id="pagefixedlines" value="@ViewBag.FixedLines" />
+<input type="hidden" id="pagemaxlines" value="@ViewBag.MaxLines" />
+<style>
+    .ke-icon-pagesetup {
+        background-image: url(@Url.Content("~/Content/kindeditor/themes/default/pagesetup.png"));
+        width: 16px;
+        height: 16px;
+    }
+    .ke-icon-fieldsetup {
+        background-image: url(@Url.Content("~/Content/kindeditor/themes/default/fieldsetup.png"));
+        width: 16px;
+        height: 16px;
+    }
+</style>
+<script>
+    $(function () {
+
+        KindEditor.plugin('pagesetup', function (K) {
+            var self = this, name = 'pagesetup';
+            // 点击图标时执行
+            self.clickToolbar(name, function () {
+                var dialog = KindEditor.dialog({
+                    width: 200,
+                    title: '页面设置',
+                    body: '<div style="margin:10px;">'
+                            + '<div><label>页面宽度(mm):</label><input type="number" value="@ViewBag.Width" id="printpagewidth"/></div>'
+                            + '<div><label>页面高度(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Height" id="printpageheight"/></div>'
+                            + '<div><label>页边距(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Padding" id="printpagepadding"/></div>'
+                            + '<div><label>重复表头:</label><input type="checkbox" style="margin-top:5px;" id="printpagerepeatheader" @Html.Raw(ViewBag.RepeatHeader?"checked=\"checked\"":"")/></div>'
+                            + '<div><label>固定行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.FixedLines" id="printpagefixedlines"/></div>'
+                            + '<div><label>最大行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.MaxLines" id="printpagemaxlines"/></div>'
+                            +'</div>',
+                    closeBtn: {
+                        name: '关闭',
+                        click: function (e) {
+                            dialog.remove();
+                        }
+                    },
+                    yesBtn: {
+                        name: '确定',
+                        click: function (e) {
+                            if ($('#printpagewidth').val()) {
+                                $('#pagewidth').val($('#printpagewidth').val());
+                            }
+                            if ($('#printpageheight').val()) {
+                                $('#pageheight').val($('#printpageheight').val());
+                            }
+                            if ($('#printpagepadding').val()) {
+                                $('#pagepadding').val($('#printpagepadding').val());
+                            }
+                            $('#pagerepeatheader').val($('#printpagerepeatheader').prop('checked'));
+                            $('#pagefixedlines').val($('#printpagefixedlines').val());
+                            $('#pagemaxlines').val($('#printpagemaxlines').val());
+                            dialog.remove();
+                        }
+                    },
+                    noBtn: {
+                        name: '取消',
+                        click: function (e) {
+                            dialog.remove();
+                        }
+                    }
+                });
+
+            });
+        });
+
+        KindEditor.plugin('fieldsetup', function (K) {
+            var self = this, name = 'fieldsetup';
+            // 点击图标时执行
+            self.clickToolbar(name, function () {
+                var dialog = KindEditor.dialog({
+                    width: 300,
+                    title: '插入字段',
+                    body: '<div style="margin:10px;"><div><label>'
+                            + '字段类型'
+                            + '</label></div><div><select id="fieldtype">'
+                            + '<option value="">请选择</option>'
+                            + '<option value="header">表头表尾字段</option>'
+                            + '<option value="detail">明细字段</option>'
+                            + '</select></div><div><label>'
+                            + '字段名称'
+                            + '</label></div><div><select id="fieldname">'
+                            + '<option value="">请选择</option>'
+                            +'</select></div></div>',
+                    closeBtn: {
+                        name: '关闭',
+                        click: function (e) {
+                            dialog.remove();
+                        }
+                    },
+                    yesBtn: {
+                        name: '确定',
+                        click: function (e) {
+                            if ($('#fieldname').val()) {
+                                editor.insertHtml($('#fieldname').val());
+                            }
+
+                            dialog.remove();
+                        }
+                    },
+                    noBtn: {
+                        name: '取消',
+                        click: function (e) {
+                            dialog.remove();
+                        }
+                    }
+                });
+
+            });
+        });
+
+        KindEditor.lang({
+            pagesetup: '页面设置',
+            fieldsetup: '插入字段'
+        });
+
+        var editor = KindEditor.create('#printeditor', {
+            uploadJson: '@Url.Action("UploadImage", "service")',
+            filterMode: false,
+            items: ['source', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'code', 'cut', 'copy', 'paste',
+                        'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                        'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+                        'superscript', 'clearhtml', 'quickformat', 'selectall', '|', 'fullscreen', '/',
+                        'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+                        'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
+                        'flash', 'media', 'insertfile', 'table', 'hr', 'emoticons', 'baidumap', 'pagebreak',
+                        'anchor', 'link', 'unlink', '|', 'pagesetup', 'fieldsetup']
+        });
+
+        $('#printdesignermodal').modal({});
+
+        $('#btncancel').click(function () {
+            window.location.href = window.location.href;
+        });
+
+        $('#btnsaveprinttemplate').click(function () {
+            if (!$('#pagefixedlines').val() && !$('#pagemaxlines').val()) {
+                alertify.alert('固定行数和最大行数至少填写一个！');
+                return;
+            }
+
+            alertify.prompt('请填写模版名称', function (e, str) {
+                if (e) {
+                    $(this).parent().find('img').show();
+                    $.ajax({
+                        url: '@Html.Raw(Url.Action("printdesignersave","print"))',
+                        type: 'post',
+                        dataType: 'json',
+                        data: {
+                            id: '@ViewBag.TemplateId',
+                            category: '@ViewBag.Category',
+                            content: editor.html(),
+                            width: $('#pagewidth').val(),
+                            height: $('#pageheight').val(),
+                            padding: $('#pagepadding').val(),
+                            repeatheader: $('#pagerepeatheader').val(),
+                            fixedlines: $('#pagefixedlines').val(),
+                            maxlines: $('#pagemaxlines').val(),
+                            name: str
+                        },
+                        success: function (data) {
+                            $(this).parent().find('img').hide();
+                            if (data.message == 'ok') {
+                                alertify.alert('执行成功！', function () {
+                                    $('#printdesignermodal').modal('hide');
+                                    window.location.href = window.location.href;
+                                });
+                            } else {
+                                alertify.alert(data.message);
+                            }
+                        }
+                    });
+                }
+            }, '@(ViewBag.Template==null?"":ViewBag.Template.Name)');
+
+
+        });
+
+        var fields1 = [];
+        var fields2 = [];
+
+        @foreach(string item in ViewBag.PrintData.HeaderField){
+            <text>
+        fields1.push('@item');
+        </text>
+        }
+        @foreach(string item in ViewBag.PrintData.DetailField){
+            <text>
+        fields2.push('@item');
+        </text>
+        }
+
+        $('body').on('change', '#fieldtype', function () {
+            if ($('#fieldtype').val() == 'header') {
+                $('#fieldname').empty();
+                for (var i = 0; i < fields1.length; i++) {
+                    $('#fieldname').append('<option value="{' + fields1[i] + '}">' + fields1[i] + '</option>');
+                }
+            } else if ($('#fieldtype').val() == 'detail') {
+                $('#fieldname').empty();
+                for (var i = 0; i < fields2.length; i++) {
+                    $('#fieldname').append('<option value="[' + fields2[i] + ']">' + fields2[i] + '</option>');
+                }
+            }
+
+        });
+    });
+
+</script>

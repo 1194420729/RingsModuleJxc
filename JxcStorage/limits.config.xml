@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="stockinbilladd" title="录入入库单" groupname="库存管理"></limit>
+  <limit name="stockinbillaudit" title="入库单审核" groupname="库存管理"></limit>
+  <limit name="stockoutbilladd" title="录入出库单" groupname="库存管理"></limit>
+  <limit name="stockoutbillaudit" title="出库单审核" groupname="库存管理"></limit>
+  <limit name="stockmovebilladd" title="录入调拨单" groupname="库存管理"></limit>
+  <limit name="stockmovebillaudit" title="调拨单审核" groupname="库存管理"></limit>
+  <limit name="stockinventorybilladd" title="录入库存盘点单" groupname="库存管理"></limit>
+  <limit name="stockinventorybillaudit" title="库存盘点单审核" groupname="库存管理"></limit>
+  <limit name="storagestatusreport" title="库存状况表" groupname="库存管理"></limit>
+  <limit name="storagestatushistoryreport" title="历史库存状况表" groupname="库存管理"></limit>
+  <limit name="storagedistributereport" title="库存分布表" groupname="库存管理"></limit>
+  <limit name="virtualstoragestatusreport" title="虚拟库存状况表" groupname="库存管理"></limit> 
+  <limit name="storageinoutreport" title="出入库流水账" groupname="库存管理"></limit>
+  <limit name="storagesummaryreport" title="进销存汇总表" groupname="库存管理"></limit>
+  
+</limits>

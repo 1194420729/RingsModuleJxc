@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "类别搬移";
+}
+<div>
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a ng-href="/jxcbaseinfo/categorymanage?classname={{category.classname}}">分类管理</a></li>
+            <li><span>类别搬移</span></li>
+        </ol>
+        <div class="form-group form-inline">
+            <span class="help-block">类别搬移将把该类别及其所有子类别、包括其中的数据都搬移到新的父类别下</span>
+            <button type="button" class="btn btn-primary" ng-click="btnsaveClick()">
+                <i class="fa fa-save fa-fw">
+                </i>开始搬移
+            </button>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">请选择要搬移的类别</div>
+                        <div class="panel-body">
+                            <div>
+                                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">请选择新的父类别</div>
+                        <div class="panel-body">
+                            <div>
+                                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+            max-width: 200px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert, $uibModal) {
+            var classname = '@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("classname"))';
+
+            $scope.category = { classname: classname };
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": [
+                            "dnd", "search",
+                            "state", "types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/categoryservice/categorys', { classname: $scope.category.classname })
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.btnsaveClick = function () {
+                var nodes = angular.element('#treeInstance').jstree(true).get_selected(true);
+                if (nodes.length == 0) { 
+                    SweetAlert.swal({ title: '请选择要搬移的类别！', type: 'error' });
+                    return;
+                }
+
+                var nodes2 = angular.element('#treeInstance2').jstree(true).get_selected(true);
+                if (nodes2.length == 0) { 
+                    SweetAlert.swal({ title: '请选择目标父类别！', type: 'error' });
+                    return;
+                }
+
+                $http.post('/categoryservice/move', { id:nodes[0].id,parentid:nodes[0].id })
+                    .success(function (data) {
+                        if (data.message == 'ok') {
+                            window.location.href = window.location.href;
+                        }
+                    });
+
+            };
+
+        });
+
+    </script>
+}

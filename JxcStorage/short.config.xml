@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="storagereportservice" path="service/jxcstorage/jxcstorage/storagereport"></short>
+  <short name="stockinbillservice" path="service/jxcstorage/jxcstorage/stockinbill"></short>
+  <short name="stockoutbillservice" path="service/jxcstorage/jxcstorage/stockoutbill"></short>
+  <short name="stockmovebillservice" path="service/jxcstorage/jxcstorage/stockmovebill"></short>
+  <short name="stockinventorybillservice" path="service/jxcstorage/jxcstorage/stockinventorybill"></short>
+  <short name="commonservice" path="service/jxcstorage/jxcstorage/common"></short>
+</shorts>

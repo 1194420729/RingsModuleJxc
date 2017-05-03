@@ -1,0 +1,28 @@
+﻿<script type="text/ng-template" id="excelimport.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            Excel导入
+        </h3>
+    </div>
+    <div class="modal-body">
+        <ol style="line-height:30px;">
+            <li>下载数据导入模板：<a href="http://139.196.218.9/cdn/采购单据导入.xls" download="采购退货单导入">Excel模板</a></li>
+            <li>在Excel模板中填充要导入的数据</li>
+            <li>
+                <div class="form-group form-inline">
+                    <input type="file" class="form-control" id="excelfile" />
+                    <button type="button" class="btn btn-primary" ng-disabled="uploadwaiter" ng-click="uploadClick()">上传并导入</button>
+                    <img src="/content/images/loader.gif" alt="" ng-show="uploadwaiter" style="margin-left:10px;" />
+                </div>
+            </li>
+        </ol>
+        <div class="alert alert-danger" role="alert" id="excelerrors" style="display: none;">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            关闭
+        </button>
+    </div>
+
+</script>

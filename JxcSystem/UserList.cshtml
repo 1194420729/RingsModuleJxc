@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "操作员与权限";
+}
+<div data-pagelimit="userlist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="ng-table/filters/departmentfilter.html">
+            <select class="form-control"
+                    name="{{name}}"
+                    ng-disabled="$filterRow.disabled"
+                    ng-model="params.filter()[name]"
+                    ng-options="p.id as p.content.name for p in departments">
+                <option value="">全部</option>
+            </select>
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>操作员与权限</span></li>
+        </ol>
+        <div class="form-group form-inline pull-right">
+            <label class="checkbox-inline" style="min-width:100px;">
+                <input type="checkbox" ng-model="isFiltersVisible" />查询
+            </label>
+            <a class="btn btn-primary" href="/jxcsystem/useradd">
+                <i class="fa fa-plus fa-fw"></i>
+                新增操作员
+            </a>
+        </div>
+        <div style="width:100%;overflow-x:auto;">
+            <table ng-table="tableParams" export-csv="csv" class="table table-bordered table-condensed table-striped"
+                   show-filter="isFiltersVisible">
+                <tr ng-repeat="m in $data">
+                    <td header-class="'bg-warning'" style="width:150px;">
+                        <a ng-href="/jxcsystem/useredit?id={{m.id}}" title="权限设置">
+                            <i class="fa fa-pencil fa-fw"></i>
+                        </a>
+                        <a ng-href="/jxcsystem/userscope?id={{m.id}}" title="数据授权">
+                            <i class="fa fa-object-group fa-fw"></i>
+                        </a>
+                        <a ng-href="/jxcsystem/usercopy?id={{m.id}}" title="复制权限">
+                            <i class="fa fa-copy fa-fw">
+                            </i>
+                        </a>
+                        <a ng-click="deleteClick(m.id)" class="text-danger" href="javascript:;" title="删除">
+                            <i class="fa fa-trash fa-fw">
+                            </i>
+                        </a>
+                        <a class="text-danger" ng-href="/jxcsystem/userreset?id={{m.id}}" title="重置密码">
+                            <i class="fa fa-key fa-fw">
+                            </i>
+                        </a>
+                    </td>
+                    <td data-title="'No.'" header-class="'bg-warning'" style="width:100px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'员工编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}"
+                        data-sortable="'code'">
+                        <span ng-bind="m.content.code"></span>
+                    </td>
+                    <td data-title="'员工姓名'" header-class="'bg-warning'" data-filter="{name: 'text'}"
+                        data-sortable="'name'">
+                        <span ng-bind="m.content.name"></span>
+                    </td>
+                    <td data-title="'部门'" header-class="'bg-warning'" data-filter="{'department.name': 'departmentfilter'}"
+                        data-sortable="'department.name'">
+                        <span ng-bind="m.content.department.name"></span>
+                    </td>
+                    <td data-title="'职务'" header-class="'bg-warning'" data-filter="{'job': 'text'}"
+                        data-sortable="'job'">
+                        <span ng-bind="m.content.job"></span>
+                    </td>
+                    <td data-title="'联系电话'" header-class="'bg-warning'" data-filter="{mobile: 'text'}"
+                        data-sortable="'mobile'">
+                        <span ng-bind="m.content.mobile"></span>
+                    </td>
+                    <td data-title="'E-mail'" header-class="'bg-warning'" data-filter="{email: 'text'}">
+                        <span ng-bind="m.content.email"></span>
+                    </td>
+                    <td data-title="'备注'" header-class="'bg-warning'" data-filter="{comment: 'text'}">
+                        <span ng-bind="m.content.comment"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td>
+                        合计
+                    </td>
+                    <td>
+                        <span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal) {
+
+            $http.post('/userservice/getdepartments', {})
+                    .success(function (data) {
+                        $scope.departments = data.data;
+                    });
+
+            var getData = function ($defer, params) {
+                var filter = params.filter();
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/userservice/list',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+
+            $scope.deleteClick = function (id) {
+                SweetAlert.swal({
+                    title: '确定要删除吗？',
+                    text: '删除操作员仅是让该员工无法登录，没有其他影响',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '删除',
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    $http.post('/userservice/delete', { id: id }).success(function (data) {
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '删除成功', type: 'success' }, function () {
+                                $scope.tableParams.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+                });
+            };
+
+        });
+
+
+    </script>
+}

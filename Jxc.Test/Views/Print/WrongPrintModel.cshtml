@@ -1,0 +1,28 @@
+﻿<div class="modal fade" id="printwrongmodal" role="dialog" aria-labelledby="edittitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="edittitle">
+                    打印管理器
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">打印数据不正确或者网页过期！请刷新后重试</div> 
+            </div>
+            <div class="modal-footer"> 
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    关闭</button> 
+            </div>
+        </div>
+    </div>
+    <!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->
+<script>
+    $(function () {
+        $('#printwrongmodal').modal({});         
+    });
+    
+</script>

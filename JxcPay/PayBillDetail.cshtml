@@ -1,0 +1,65 @@
+﻿<script type="text/ng-template" id="billdetail.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            单据明细
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="form-group form-inline">
+            <label>
+                资金账户
+            </label>
+            <div class="input-group">
+                <input type="text" autocomplete="off" ng-next="true" autofocus="autofocus" ng-model="bank" placeholder="编号或名称模糊查询" uib-typeahead="bank.content.name for bank in updateBanks($viewValue)"
+                       typeahead-on-select="bankSelected($item, $model, $label,$event)" typeahead-loading="loadingBankLocations"
+                       typeahead-no-results="noBankResults" typeahead-select-on-blur="true" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="bankClick()">...</button>
+                </span>
+            </div>
+            <i ng-show="loadingBankLocations" class="glyphicon glyphicon-refresh"></i>
+            <span class="text-danger" ng-show="noBankResults">没有匹配项</span>
+        </div>
+        <div ng-show="showbankchoice">
+            <div>
+                <table ng-table="tableParams" show-filter="true" class="table table-bordered table-condensed table-hover">
+                    <tr ng-repeat="m in $data" ng-dblclick="bankChoice(m)" style="cursor:pointer;">
+                        <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                            <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                        </td>
+                        <td data-title="'账户编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}">
+                            <span ng-bind="m.content.code"></span>
+                        </td>
+                        <td data-title="'账户名称'" header-class="'bg-warning'" data-filter="{ name: 'text'}">
+                            <span ng-bind="m.content.name"></span>
+                        </td>
+
+                    </tr>
+                </table>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+
+        <div ng-hide="showbankchoice">
+
+            <div class="form-group form-inline">
+                <label>金额</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.total" ng-model-options="{ updateOn:'blur'}" ng-change="totalChange()" />
+            </div>
+
+            <div class="form-group form-inline">
+                <label>备注</label>
+                <input type="text" class="form-control" ng-next="true" ng-model="model.content.comment" />
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">
+            确定
+        </button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

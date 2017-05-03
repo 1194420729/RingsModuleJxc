@@ -1,0 +1,251 @@
+﻿@{
+    ViewBag.Title = "库存状况表";
+}
+<div data-pagelimit="storagestatusreport">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcstorage/datechoice");}
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>库存状况表</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                库存状况表
+            </div>
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>仓库名称</label>
+                    <select class="form-control" ng-model="filter.stockid">
+                        <option value="0">全部仓库</option>
+                        <option ng-repeat="s in stocks" value="{{s.id}}">{{s.content.name}}</option>
+                    </select>
+                    <label>产品名称</label>
+                    <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="filter.showzero" />显示库存为零的产品
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
+                    <button type="button" class="btn btn-primary" ng-click="csv.generate($event, '库存状况表.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                    <span class="help-block" style="display:inline;margin-left:40px;">双击某行查看库存明细</span>
+                </div>
+            </div>
+            <div class="pull-left" style="margin-right:20px;">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <div style="width:100%;overflow-x:auto;">
+                    <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                        <tr ng-repeat="m in $data" ng-dblclick="detailClick(m)" title="双击查看明细">
+                            <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                                <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                            </td>
+                            <td data-title="'产品编号'" header-class="'bg-warning'" data-sortable="'code'">
+                                <span ng-bind=" m.content.code"></span>
+                            </td>
+                            <td data-title="'产品名称'" header-class="'bg-warning'" data-sortable="'name'">
+                                <span ng-bind="m.content.name"></span>
+                            </td>
+                            <td data-title="'规格'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.standard"></span>
+                            </td>
+                            <td data-title="'型号'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.type"></span>
+                            </td>
+                            <td data-title="'单位'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.unit"></span>
+                            </td>
+                            <td data-title="'库存数量'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.storage[queryfilter.stockid+'']['qty']"></span>
+                            </td>
+                            <td data-title="'成本均价'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.storage[queryfilter.stockid+'']['price'] | number:digit | cost:showcost"></span>
+                            </td>
+                            <td data-title="'成本金额'" header-class="'bg-warning'">
+                                <span ng-bind="m.content.storage[queryfilter.stockid+'']['total'] | number:digit | cost:showcost"></span>
+                            </td>
+                        </tr>
+                        <tr class="warning">
+                            <td colspan="6">
+                                合计：<span ng-bind="totalrecordes"></span>条记录
+                            </td>
+                            <td ng-bind="qtysum"></td>
+                            <td></td>
+                            <td ng-bind="totalsum | number:digit | cost:showcost"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+
+        .deliverywarning {
+            color: red;
+            font-weight: bold;
+        }
+
+        .abortbill {
+            color: #CC6633;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = { showzero: false, stockid: '0' };
+            $scope.queryfilter = {};
+            $scope.showcost = false;
+            $scope.digit = 2;
+
+            $scope.category = {};
+            $scope.categoryid = '0';
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"],
+                "version": 1
+            };
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                if ($scope.tableParams) $scope.tableParams.reload();
+            };
+
+            $http.post('/storagereportservice/initstatusreport', {})
+                    .success(function (data) {
+                        $scope.showcost = data.showcost;
+                        $scope.digit = data.digit;
+                        $scope.stocks = data.stocks;
+
+                        $scope.category.treeData = data.categorys;
+                        $scope.category.treeConfig.version++;
+                    });
+
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/storagereportservice/storagestatusreport',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+
+                        $scope.qtysum = data.qtysum;
+                        $scope.totalsum = data.totalsum;
+
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+
+                        $scope.showwaiter = false;
+                    });
+            };
+
+            $scope.btnqueryClick = function () {
+
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            };
+
+            $scope.btnqueryClick();
+
+            $scope.detailClick = function (row) {
+
+
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'datechoice.html',
+                    controller: 'datechoiceModalCtrl'
+                });
+
+                modalInstance.result.then(function (filter) {
+                    var prodcutid = row.id;
+                    var url = '/jxcstorage/storagestatusreportdetail?productid=' + prodcutid + '&stockid=' + $scope.filter.stockid
+                           + '&startdate=' + filter.startdate + '&enddate=' + filter.enddate;
+
+                    $window.open(url);
+                });
+            };
+        });
+
+        app.controller('datechoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert) {
+            $scope.filter = {};
+
+            $scope.ok = function () {
+
+                if (!$scope.filter.startdate || !$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请选择日期范围！', type: 'error' });
+                    return;
+                }
+
+                $uibModalInstance.close($scope.filter);
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+
+    </script>
+}

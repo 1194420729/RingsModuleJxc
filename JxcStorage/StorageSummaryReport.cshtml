@@ -1,0 +1,403 @@
+﻿@{
+    ViewBag.Title = "进销存汇总表";
+}
+<div data-pagelimit="storagesummaryreport">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="configchoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    表格配置
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">入库</div>
+                                <div class="panel-body">
+                                    <div ng-repeat="item in initems" class="checkbox">
+                                        <label>
+                                            <input type="checkbox" ng-model="item.visible" />{{item.name}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">出库</div>
+                                <div class="panel-body">
+                                    <div ng-repeat="item in outitems" class="checkbox">
+                                        <label>
+                                            <input type="checkbox" ng-model="item.visible" />{{item.name}}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>进销存汇总表</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                进销存汇总表
+            </div>
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>起止日期<span style="color:red;">*</span></label>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle startdate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="startdate" ng-model="filter.startdate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.startdate" data-datetimepicker-config="{ dropdownSelector: '.startdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <span>-</span>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <div style="margin-left:40px;" class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="isCostVisible" ng-change="costvisibleChange()" />显示金额
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" ng-model="filter.shownochange" />显示库存未变的产品
+                        </label>
+                    </div>
+                    <div class="pull-right">
+                        <span style="background-color:#d9edf7;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">蓝色代表入库</span>
+                        <span style="background-color:#f2dede;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">红色代表出库</span>
+                    </div>
+                </div>
+                <div class="form-group form-inline">
+                    <label>仓库名称</label>
+                    <select class="form-control" ng-model="filter.stockid">
+                        <option value="0">全部仓库</option>
+                        <option ng-repeat="s in stocks" value="{{s.id}}">{{s.content.name}}</option>
+                    </select>
+                    <label>产品名称</label>
+                    <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
+                    <button class="btn btn-primary" type="button" ng-click="btnconfigClick()"><i class="fa fa-gear fa-fw"></i>表格配置</button>
+                    <button type="button" class="btn btn-primary" ng-click="csv.generate($event, '进销存汇总表.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+
+                </div>
+            </div>
+            <div class="pull-left" style="margin-right:20px;">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <div style="width:100%;overflow-x:auto;">
+                    <table ng-table-dynamic="tableParams with cols" export-csv="csv" class="table table-bordered table-condensed table-striped"
+                           show-filter="false">
+                        <tr ng-repeat="m in $data" ng-init="outerIndex = $index">
+                            <td ng-repeat="col in $columns" my-bind-compiled-html="col.getValue(outerIndex, m,col.field)"></td>
+                        </tr>
+                        <tr class="warning">
+                            <td>
+                                合计
+                            </td>
+                            <td colspan="2">
+                                <span ng-bind="totalrecordes"></span>条记录
+                            </td>
+                            <td ng-bind="lastqtysum"></td>
+                            <td ng-bind="lasttotalsum | currency:'￥' | cost:showcost"></td>
+                            <td colspan="{{changecolcount}}"></td>
+                            <td ng-bind="nowqtysum"></td>
+                            <td ng-bind="nowtotalsum | currency:'￥' | cost:showcost"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngtablebindhtml.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngTableBindHtml']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal, $sce) {
+
+            $scope.filter = { shownochange: false, stockid: '0' };
+            $scope.queryfilter = {};
+            $scope.showcost = false;
+            $scope.digit = 2;
+            $scope.showwaiter = false;
+
+            $scope.category = {};
+            $scope.categoryid = '0';
+
+            $scope.isCostVisible = false;
+            $scope.cols = [];
+            $scope.changecolcount = 0;
+
+            var initcolumns = function () {
+                $scope.cols = [];
+
+                $scope.cols.push({ field: "no", title: "No.", "class": "bg-warning", show: true, getValue: noValue });
+                $scope.cols.push({ field: "code", title: "产品编号", sortable: "code", filter: { code: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "name", title: "产品名称", sortable: "name", filter: { name: "text" }, "class": "bg-warning", show: true, getValue: contentValue });
+                $scope.cols.push({ field: "lastqty", title: "上期数量", "class": "bg-warning", show: true, getValue: qtyValue });
+                $scope.cols.push({ field: "lasttotal", title: "上期金额", "class": "bg-warning", show: true, getValue: costValue });
+                angular.forEach($scope.changeitems, function (item) {
+                    if (item.inout === '入库') {
+                        $scope.cols.push({ field: 'qty' + item.id, title: item.name, "class": "bg-info", show: true, getValue: qtyValue });
+                        $scope.cols.push({ field: "total" + item.id, title: item.name + '金额', "class": "bg-info", show: false, getValue: costValue });
+                    } else {
+                        $scope.cols.push({ field: 'qty' + item.id, title: item.name, "class": "bg-danger", show: true, getValue: qtyValue });
+                        $scope.cols.push({ field: "total" + item.id, title: item.name + '金额', "class": "bg-danger", show: false, getValue: costValue });
+                    }
+                });
+
+                $scope.cols.push({ field: "nowqty", title: "本期数量", "class": "bg-warning", show: true, getValue: qtyValue });
+                $scope.cols.push({ field: "nowtotal", title: "本期金额", "class": "bg-warning", show: true, getValue: costValue });
+
+            };
+
+            $scope.costvisibleChange = function () {
+                $scope.changecolcount = 0;
+                angular.forEach($scope.changeitems, function (item) {
+                    angular.forEach($scope.cols, function (col) {
+                        if (col.field === 'qty' + item.id) {
+                            col.show = item.visible;
+                            if (col.show) $scope.changecolcount = $scope.changecolcount + 1;
+                        } else if (col.field === 'total' + item.id) {
+                            col.show = $scope.isCostVisible && item.visible;
+                            if (col.show) $scope.changecolcount = $scope.changecolcount + 1;
+                        }
+                    });
+                });
+            };
+
+            var noValue = function (index, row) {
+                return '<span ng-bind="(tableParams.page() - 1) * tableParams.count() + outerIndex + 1"></span>';
+            };
+
+            var contentValue = function (index, row, field) {
+                if (field === 'categoryname') {
+                    return '<span ng-bind="m.content.category.name"></span>';
+                } else {
+                    return '<span ng-bind="m.content.' + field + '"></span>';
+                }
+            };
+
+            var qtyValue = function (index, row, field) {
+                return '<span ng-bind="m.content.' + field + '"></span>';
+            };
+
+            var costValue = function (index, row, field) {
+                return '<span ng-bind="m.content.' + field + ' | currency:\'￥\' | cost:showcost"></span>';
+            }
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/storagereportservice/initsummaryreport', {})
+                    .success(function (data) {
+                        $scope.showcost = data.showcost;
+                        $scope.digit = data.digit;
+                        $scope.stocks = data.stocks;
+                        $scope.changeitems = data.changeitems;
+
+                        $scope.category.treeData = data.categorys;
+                        $scope.category.treeConfig.version++;
+
+                        if (localStorage.changeitems) {
+                            var changeitems = JSON.parse(localStorage.changeitems);
+                            angular.forEach(changeitems, function (item) {
+                                angular.forEach($scope.changeitems, function (item2) {
+                                    if (item.id === item2.id) {
+                                        item2.visible = item.visible;
+                                    }
+                                });
+                            });
+
+                            $scope.changeitems = changeitems;
+                        }
+
+                        initcolumns();
+                        $scope.costvisibleChange();
+                    });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/storagereportservice/storagesummaryreport',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $scope.lastqtysum = data.lastqtysum;
+                        $scope.lasttotalsum = data.lasttotalsum;
+                        $scope.nowqtysum = data.nowqtysum;
+                        $scope.nowtotalsum = data.nowtotalsum;
+                        $defer.resolve(data.data);
+
+                        $scope.showwaiter = false;
+                    });
+            };
+
+            $scope.btnqueryClick = function () {
+                if (!$scope.filter.startdate || !$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请完整填写起止日期', type: 'error' });
+                    return;
+                }
+
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            };
+
+            $scope.btnconfigClick = function () {
+                var model = { changeitems: $scope.changeitems };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'configchoice.html',
+                    controller: 'configchoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.changeitems = model.changeitems;
+                    localStorage.changeitems = angular.toJson($scope.changeitems);
+                    $scope.costvisibleChange();
+                    //$scope.tableParams.reload();
+                });
+            };
+
+        });
+
+        app.controller('configchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.initems = [];
+            $scope.outitems = [];
+
+            var changeitems = JSON.parse(angular.toJson(model.changeitems));
+
+            angular.forEach(changeitems, function (item) {
+                if (item.inout === '入库') {
+                    $scope.initems.push(item);
+                } else {
+                    $scope.outitems.push(item);
+                }
+            });
+
+            $scope.ok = function () {
+                model.changeitems = changeitems;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+
+    </script>
+}

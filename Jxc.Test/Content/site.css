@@ -1,0 +1,97 @@
+﻿html, body
+{
+    padding: 0;
+    margin: 0;
+}
+/*nav:not(.mm-menu)
+{
+    display: none;
+}*/
+.pageheader
+{
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 40px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    padding: 0 50px;
+}
+.pageheader.fixed
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.pageheader a:not(.headerdropdown)
+{
+    background: center center no-repeat transparent;
+    background-image: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAYAAADE6YVjAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADhJREFUeNpi/P//PwOtARMDHQBdLGFBYtMq3BiHT3DRPU4YR4NrNAmPJuHRJDyahEeT8Ii3BCDAAF0WBj5Er5idAAAAAElFTkSuQmCC );
+    display: block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    left: 10px;
+}
+
+.pageheader ul
+{
+    font-size: 14px;
+    list-style: none;
+    float: right;
+}
+
+.pageheader ul li
+{
+    float: left;
+    padding: 0 5px 0 0;
+}
+
+.pageheader ul li a
+{
+    color: #fff;
+}
+
+.dropdown-user
+{
+    right: 0;
+    left: auto;
+}
+
+.dropdown-user .headerdropdown
+{
+    color: #000;
+}
+
+.menutitle
+{
+    margin-left: 30px;
+}
+
+.pagecontent
+{
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+i
+{
+    margin-right: 5px;
+}
+ 
+.introjs-fixParent
+{
+    position: relative !important;
+}
+
+.tableinput
+{
+    width:100%;
+    border:none;
+    background-color:transparent;
+    text-align:center;
+}

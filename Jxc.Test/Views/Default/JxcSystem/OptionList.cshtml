@@ -1,0 +1,143 @@
+﻿@{
+    ViewBag.Title = "参数配置";
+}
+<div data-pagelimit="userlist">
+    <div ng-app="myApp" ng-controller="myCtrl">        
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>参数配置</span></li>
+        </ol>         
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom:10px;">
+            <li role="presentation" ng-class="{true:'active'}[tabshow['billoption']]"><a href="javascript:;" ng-click="switchTab('billoption')">单据配置</a></li> 
+            <li role="presentation" ng-class="{true:'active'}[tabshow['costmethod']]"><a href="javascript:;" ng-click="switchTab('costmethod')">成本算法</a></li> 
+        </ul>
+        <div ng-show="tabshow['billoption']">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.strictordermanage" ng-disabled="initovered">
+                    启用严格订单管理及虚拟库存(开账后不能更改)
+                </label>
+                <a href="javascript:;" title="严格订单管理是指采购入库和销售发货必须引用相关订单才能进行；&#13;虚拟库存是将在途部分的库存纳入统计，即采购订单未到货的，销售订单未发货的"><i class="fa fa-question-circle fa-fw"></i></a>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.nodraftprint">
+                    禁止打印草稿单据
+                </label>                
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.noeditbillcode">
+                    禁止修改单据编号
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.noeditbilldate">
+                    禁止修改单据日期
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.purchasepricekeep" >
+                    启用采购价格追踪
+                </label>
+                <a href="javascript:;" title="启用采购价格追踪是指采购订单或采购入库单审核后，会自动更新产品价格表"><i class="fa fa-question-circle fa-fw"></i></a>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.salepricekeep">
+                    启用销售价格追踪
+                </label>
+                <a href="javascript:;" title="启用销售价格追踪是指销售订单或销售入库单审核后，会自动更新产品售价表"><i class="fa fa-question-circle fa-fw"></i></a>
+            </div>
+            <div class="form-group form-inline">
+                <label>小数位数</label>
+                <input type="number" style="width:65px;" class="form-control" ng-model="model.digit"/>
+            </div>
+        </div>
+        <div ng-show="tabshow['costmethod']">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="costmethod" ng-disabled="initovered" value="ydjqpj" ng-model="model.costmethod">
+                    移动加权平均
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="costmethod" ng-disabled="initovered" value="xjxc" ng-model="model.costmethod">
+                    先进先出
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="costmethod" ng-disabled="initovered" value="gbzd" ng-model="model.costmethod">
+                    个别指定
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" ng-disabled="savedisabled"
+                    ng-click="btnsaveClick()">
+                <i class="fa fa-save fa-fw"></i>保存
+            </button> 
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert) {
+
+            $scope.tabshow = { billoption:true,costmethod: false };
+
+            $scope.switchTab = function (name) {
+                $scope.tabshow = { billoption: false, costmethod: false };
+                $scope.tabshow[name] = true;
+            };
+
+            $http.post('/optionservice/list', {})
+                    .success(function (data) {
+                        $scope.initovered = data.initovered;
+                        $scope.model = data.data;
+                    });
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                 
+                $http.post('/optionservice/save', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+ 
+        });
+
+
+    </script>
+}

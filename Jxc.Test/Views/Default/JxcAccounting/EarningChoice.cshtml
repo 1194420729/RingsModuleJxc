@@ -1,0 +1,37 @@
+﻿<script type="text/ng-template" id="earningchoice.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            选择收入类型
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="pull-left" style="margin-right:20px;">
+            <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                 tree-events="select_node:selectNode">
+            </div>
+        </div>
+        <div style="overflow-x:hidden;">
+            <table ng-table="tableParams" show-filter="true" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" ng-dblclick="earningClick(m)" style="cursor:pointer;">
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'类型编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}">
+                        <span ng-bind="m.content.code"></span>
+                    </td>
+                    <td data-title="'类型名称'" header-class="'bg-warning'" data-filter="{ name: 'text'}">
+                        <span ng-bind="m.content.name"></span>
+                    </td>                    
+                </tr>
+            </table>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div class="modal-footer">
+        <span class="help-block" style="display:inline;margin-right:40px;">鼠标双击选中</span>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>
