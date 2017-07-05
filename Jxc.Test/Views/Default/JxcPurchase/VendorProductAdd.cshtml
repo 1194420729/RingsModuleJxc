@@ -135,7 +135,7 @@
                         $scope.savedisabled = false;
                         if (data.message == 'ok') {
                             SweetAlert.swal({ title: '保存成功!可以继续新增', type: 'success' }, function () {
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

@@ -50,10 +50,11 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
-
+                    
                     <button type="button" class="btn btn-primary" ng-click="btnreportClick()"><i class="fa fa-search fa-fw"></i>查询</button>
                     <button type="button" class="btn btn-primary" ng-click="csv.generate($event, '库存状况表明细.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
                     <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                    
                 </div>
             </div>
             <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
@@ -91,7 +92,7 @@
                     <td data-title="'成本金额'" header-class="'bg-warning'">
                         <span ng-bind="m.content.costtotal | number:digit | cost:showcost"></span>
                     </td>
-                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;">
+                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;text-align:left;">
                         <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
                     </td>
 
@@ -144,9 +145,10 @@
     <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
 
@@ -162,7 +164,7 @@
                         $scope.showcost = data.showcost;
                         $scope.digit = data.digit;
                         $scope.stockname = data.stockname;
-                        $scope.product = data.product;                        
+                        $scope.product = data.product;
                     });
 
             var getData = function ($defer, params) {
@@ -201,7 +203,7 @@
 
             $scope.btnreportClick();
 
-             
+
         });
 
     </script>

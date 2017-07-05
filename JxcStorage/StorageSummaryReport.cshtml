@@ -89,7 +89,8 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
-                    <div style="margin-left:40px;" class="checkbox">
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
+                    <div style="margin-left:20px;" class="checkbox">
                         <label>
                             <input type="checkbox" ng-model="isCostVisible" ng-change="costvisibleChange()" />显示金额
                         </label>
@@ -98,12 +99,6 @@
                         <label>
                             <input type="checkbox" ng-model="filter.shownochange" />显示库存未变的产品
                         </label>
-                    </div>
-                    <div class="pull-right">
-                        <span style="background-color:#d9edf7;"><i class="fa fa-fw"></i></span>
-                        <span class="help-block" style="display:inline;margin-right:20px;">蓝色代表入库</span>
-                        <span style="background-color:#f2dede;"><i class="fa fa-fw"></i></span>
-                        <span class="help-block" style="display:inline;margin-right:20px;">红色代表出库</span>
                     </div>
                 </div>
                 <div class="form-group form-inline">
@@ -119,7 +114,13 @@
                     <button type="button" class="btn btn-primary" ng-click="csv.generate($event, '进销存汇总表.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
 
                     <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
-
+                    
+                    <div style="display:inline;margin-left:20px;">
+                        <span style="background-color:#d9edf7;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">蓝色代表入库</span>
+                        <span style="background-color:#f2dede;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">红色代表出库</span>
+                    </div>
                 </div>
             </div>
             <div class="pull-left" style="margin-right:20px;">
@@ -191,9 +192,10 @@
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
     <script src="//139.196.218.9/cdn/ngtablebindhtml.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngTableBindHtml']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngTableBindHtml', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal, $sce) {
 

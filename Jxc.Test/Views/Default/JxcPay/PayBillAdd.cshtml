@@ -42,7 +42,7 @@
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                                    <datetimepicker ng-model="model.content.billdate" data-datetimepicker-config="{ dropdownSelector: '.billdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                                    <datetimepicker ng-model="model.content.billdate" data-datetimepicker-config="{dropdownSelector: '.billdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                                 </ul>
                             </div>
                         </div>
@@ -243,6 +243,12 @@
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.tableParams2 = new NgTableParams({ count: 10 });
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             $http.post('/paybillservice/init', {})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -366,6 +372,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload = null;
                     window.location.href = '/jxcpay/paybilledit?id=' + billid;
                 });
             };
@@ -397,7 +404,8 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    $window.onbeforeunload = null;
+                                    window.location.reload();
                                 });
                                 return;
                             }
@@ -416,7 +424,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpay/paybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
 
                             });
                         } else {
@@ -464,7 +473,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpay/paybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

@@ -16,6 +16,8 @@
                 转款单
                 <span style="margin-left:200px;">制单人：{{makername}}</span>
                 <span style="margin-left:20px;" ng-bind="model.content.auditorid?'【已审核】':'【草稿】'"></span>
+                <img src="~/Content/images/redword.png" ng-if="model.content.auditstatus===3" alt="" class="blueredword" />
+                <img src="~/Content/images/blueword.png" ng-if="model.content.auditstatus===2" alt="" class="blueredword" />
             </div>
             <div class="panel-body">
                 <div class="container-fluid">

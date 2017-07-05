@@ -91,7 +91,7 @@
                             <td data-title="'单位'" header-class="'bg-warning'" data-filter="{unit: 'text'}">
                                 <span ng-bind="m.content.unit"></span>
                             </td>
-                            <td data-title="'备注'" header-class="'bg-warning'" data-filter="{comment: 'text'}">
+                            <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;text-align:left;" data-filter="{comment: 'text'}">
                                 <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
                             </td>
                         </tr>
@@ -147,7 +147,7 @@
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport', 'ngJsTree']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport', 'ngJsTree', 'myfilter']);
 
         app.controller('myCtrl', function ($scope, $http, $window, NgTableParams, SweetAlert, $uibModal) {
 

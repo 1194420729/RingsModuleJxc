@@ -1,17 +1,17 @@
 ﻿@{
-    ViewBag.Title = "采购订单统计明细";
+    ViewBag.Title = "费用统计明细";
 }
-<div data-pagelimit="purchaseorderreport">
+<div data-pagelimit="feereport">
     <div ng-app="myApp" ng-controller="myCtrl">
 
         <ol class="breadcrumb">
             <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
-            <li><a href="/jxcpurchase/purchaseorderproductreport">采购订单统计</a></li>
-            <li><span>采购订单统计明细</span></li>
+            <li><a href="/jxcaccounting/feereport">费用统计</a></li>
+            <li><span>费用统计明细</span></li>
         </ol>
 
         <div class="panel panel-info">
-            <div class="panel-heading">采购订单统计明细<span ng-bind="tip" style="margin-left:200px;"></span></div>
+            <div class="panel-heading">费用统计明细<span ng-bind="tip" style="margin-left:200px;"></span></div>
             <div class="panel-body">
                 <div class="form-group form-inline">
                     <label>起止日期<span style="color:red;">*</span></label>
@@ -45,17 +45,15 @@
                         </ul>
                     </div>
                 </div>
-                <div class="form-group form-inline">
-                    <label>产品名称</label>
-                    <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
+                <div class="form-group form-inline">    
+                    <label>费用科目</label>
+                    <input type="text" class="form-control" ng-model="filter.feename" ng-disabled="filter.type=='byfee'" placeholder="按编号或名称模糊查询" />                               
                     <label>供应商名称</label>
-                    <input type="text" class="form-control" ng-model="filter.vendorname" placeholder="按编号或名称模糊查询" />
+                    <input type="text" class="form-control" ng-model="filter.vendorname" ng-disabled="filter.type=='byvendor'" placeholder="按编号或名称模糊查询" />
                     <label>经手人</label>
-                    <input type="text" class="form-control" ng-model="filter.employeename" placeholder="按编号或名称模糊查询" />
-                    <label>仓库名称</label>
-                    <input type="text" class="form-control" ng-model="filter.stockname" placeholder="按编号或名称模糊查询" />
+                    <input type="text" class="form-control" ng-model="filter.employeename" ng-disabled="filter.type=='byemployee'" placeholder="按编号或名称模糊查询" />                   
                     <button type="button" class="btn btn-primary" ng-click="btnreportClick()"><i class="fa fa-play fa-fw"></i>开始统计</button>
-                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '采购订单统计明细.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '费用统计明细.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
                     <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
                 </div>
             </div>
@@ -65,37 +63,38 @@
                         <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
                     </td>
                     <td data-title="'单据编号'" header-class="'bg-warning'" data-sortable="'billcode'">
-                        <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.content.billcode" title="查看原始单据"></a>
+                        <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.billcode" title="查看原始单据"></a>
                     </td>
                     <td data-title="'单据日期'" header-class="'bg-warning'" data-sortable="'billdate'">
-                        <span ng-bind="m.content.billdate"></span>
+                        <span ng-bind="m.billdate"></span>
+                    </td>
+                    <td data-title="'科目编号'" header-class="'bg-warning'">
+                        <span ng-bind="m.feecode"></span>
+                    </td>
+                    <td data-title="'科目名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.feename"></span>
                     </td>
                     <td data-title="'供应商'" header-class="'bg-warning'">
-                        <span ng-bind="m.content.vendorname"></span>
+                        <span ng-bind="m.vendorname"></span>
                     </td>
                     <td data-title="'经手人'" header-class="'bg-warning'">
-                        <span ng-bind="m.content.employeename"></span>
+                        <span ng-bind="m.employeename"></span>
+                    </td>                    
+                    <td data-title="'金额'" header-class="'bg-warning'">
+                        <span ng-bind="m.total | number:digit"></span>
                     </td>
-                    <td data-title="'仓库名称'" header-class="'bg-warning'">
-                        <span ng-bind="m.content.stockname"></span>
-                    </td>
-                    <td data-title="'订单数量'" header-class="'bg-warning'">
-                        <span ng-bind="m.content.qty"></span>
-                    </td>
-                    <td data-title="'订单金额'" header-class="'bg-warning'">
-                        <span ng-bind="m.content.total | number:digit | cost:showcost"></span>
-                    </td>
-                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;">
-                        <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
+                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;text-align:left;">
+                        <span ng-bind="m.comment | comment:15" title="{{m.content.comment}}"></span>
                     </td>
 
                 </tr>
                 <tr class="warning">
-                    <td colspan="6">
+                    <td colspan="5">
                         合计：<span ng-bind="totalrecordes"></span>条记录
-                    </td>
-                    <td ng-bind="qtysum"></td>
-                    <td ng-bind="totalsum | number:digit | cost:showcost"></td>
+                    </td> 
+                    <td></td>
+                    <td></td>
+                    <td ng-bind="totalsum | number:digit"></td>
                     <td></td>
 
                 </tr>
@@ -149,14 +148,13 @@
             $scope.showcost = false;
             $scope.digit = 2;
 
-            $http.post('/purchaseorderservice/RefreshMVWPurchaseOrder', {})
+            $http.post('/feereportservice/RefreshMVWFeeBill', {})
                     .success(function (data) {
 
                     });
 
-            $http.post('/purchaseorderservice/initdetailreport', $scope.filter)
-                    .success(function (data) {
-                        $scope.showcost = data.showcost;
+            $http.post('/feereportservice/initdetailreport', $scope.filter)
+                    .success(function (data) { 
                         $scope.digit = data.digit;
                         $scope.tip = data.tip;
                     });
@@ -166,13 +164,12 @@
                 var sorting = params.sorting();
                 var count = params.count();
                 var page = params.page();
-                $http.post('/purchaseorderservice/purchaseorderdetailreport',
+                $http.post('/feereportservice/feebilldetailreport',
                     { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
                     .success(function (data) {
 
                         $scope.tableParams.total(data.resulttotal);
-                        $scope.totalrecordes = data.resulttotal;
-                        $scope.qtysum = data.qtysum;
+                        $scope.totalrecordes = data.resulttotal; 
                         $scope.totalsum = data.totalsum;
 
                         $scope.datalist = data.data;
@@ -195,13 +192,7 @@
             };
 
             $scope.btnreportClick();
-
-            $scope.detailClick = function (row) {
-                var billid = row.id;
-                var url = '/jxcpurchase/purchaseorderedit?id=' + billid;
-
-                $window.open(url);
-            };
+             
         });
 
     </script>

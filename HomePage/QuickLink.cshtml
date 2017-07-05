@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "常用功能";
+}
+<div data-component="quicklink" style="height:100%;">
+    <div class="quicklink">
+        <div style="display:none;" class="alert alert-warning" role="alert">
+            <a href="javascript:;" class="quicklinkconfig">点击这里添加快捷方式</a>
+            <span style="display:none;"><i class="fa fa-spinner fa-spin"></i></span>
+        </div>
+        <div class="divaddicon">
+            <label>常用功能</label>
+            <a href="javascript:;" title="添加快捷方式" class="quicklinkconfig pull-right"><i class="fa fa-plus"></i></a>
+            <div style="clear:both;"></div>
+        </div>
+        <div class="list-group">
+
+        </div>
+    </div>
+
+</div>
+@section scripts{
+
+    <script data-define="quicklink">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.quicklink) {
+            componentloader.quicklink = function (id) {
+                var selector = '#' + id + ' .quicklink';
+                if (!id) selector = '.quicklink';
+                if (!componentloader.quicklinkevent) {
+                    componentloader.quicklinkevent = {};
+                    componentloader.quicklinkevent.addlink = function (obj,cid) {
+                        var linkobj = $(obj).data();
+                        linkobj.id = cid;
+
+                        $.post('/homepageservice/quicklinkaddsave', linkobj, function (data) {
+                            $(obj).parent().html('<i class="fa fa-check"></i>');
+                        }, 'json');
+                    };
+
+                    componentloader.quicklinkevent.removelink = function (obj,cid) {
+                        var linkobj = $(obj).data();
+                        linkobj.id = cid;
+
+                        $.post('/homepageservice/quicklinkremovesave', linkobj, function (data) {
+                            init();
+                        }, 'json');
+                    };
+                }
+
+                var init = function () {
+                    $.post('/homepageservice/quicklinkinit', { id: id }, function (data) {
+
+                        $(selector + ' .list-group').empty();
+
+                        if (data.myquicklinks.length == 0) {
+                            $(selector + ' .alert').show();
+                            $(selector + ' .divaddicon').hide();
+                        } else {
+                            $(selector + ' .alert').hide();
+                            $(selector + ' .divaddicon').show();
+                            $.each(data.myquicklinks, function (index, item) {
+                                $(selector + ' .list-group').append('<div class="list-group-item"><a href="' + item.link
+                                    + '" class="">' + item.title
+                                    + '</a><a href="javascript:;" title="删除快捷方式" data-index="' + index
+                                    + '" onclick="javscript:componentloader.quicklinkevent.removelink(this,'+"'"+id+"'"+')" class="pull-right"><i class="fa fa-trash"></i></a></div>');
+                            });
+                        }
+                    }, 'json');
+
+                    if ($('.modal.quicklinkmodal'+id).length == 0) {
+                        var modal = '<div class="modal fade quicklinkmodal'+id+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
+                                        '<div class="modal-dialog" role="document">' +
+                                            '<div class="modal-content">' +
+                                                '<div class="modal-header">' +
+                                                    '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                                    '<h4 class="modal-title" id="myModalLabel">常用功能配置</h4>' +
+                                                '</div>' +
+                                                '<div class="modal-body">' +
+                                                    '<div class="form-group form-inline">' +
+                                                        '<input type="text" class="form-control" />' +
+                                                        '<button type="button" class="btn btn-primary btnquerylink">查询</button>' +
+                                                        '<span class="help-block">输入关键字查询功能模块，例如“采购”</span>' +
+                                                    '</div>' +
+                                                    '<div>' +
+                                                        '<ul class="queryresult"></ul>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                                '<div class="modal-footer">' +
+                                                    '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>';
+
+                        $('body').append(modal);
+                        $('.modal.quicklinkmodal'+id).on('hidden.bs.modal', function (e) {
+                            init();
+                        });
+
+                        $('.modal.quicklinkmodal'+id+' .btnquerylink').click(function () {
+                            var key = $(this).parent().find('input').val();
+                            if (!key) return;
+
+                            var div = $(this).parent().parent().find('.queryresult');
+                            div.empty();
+                            
+                            var links = componentloader['allquicklink' + id];
+                            for (var i = 0; i < links.length; i++) {
+                                if (links[i].title.indexOf(key) >= 0) {
+                                    div.append('<li>' + links[i].title
+                                        + '<span style="margin-left:20px;"><a class="btn btn-sm btn-info" href="javascript:;" data-link="' + links[i].link
+                                        + '" data-title="' + links[i].title
+                                        + '" onclick="javscript:componentloader.quicklinkevent.addlink(this,'+"'"+id+"'"+')">添加</a></span></li>');
+                                }
+                            }
+                        });
+                    }
+                };
+
+                init();
+
+                $(selector + ' .quicklinkconfig').click(function () {
+                    if (!componentloader['allquicklink' + id]) {
+                        var waiter = $(this).parent().find('.fa-spinner').parent();
+                        waiter.show();
+                        $.post('/homepageservice/getallquicklinks', {}, function (data) {
+                            waiter.hide();
+
+                            componentloader['allquicklink' + id] = data.quicklinks;
+
+                            $('.modal.quicklinkmodal'+id).modal();
+                        }, 'json');
+                    } else {
+                        $('.modal.quicklinkmodal'+id).modal();
+                    }
+
+                });
+                 
+            };
+        }
+    </script>
+    <script>
+        $(function () {
+            componentloader.quicklink('');
+        });
+    </script>
+}

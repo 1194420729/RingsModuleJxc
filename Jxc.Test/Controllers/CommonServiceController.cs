@@ -12,12 +12,12 @@ namespace Baseingfo.Test.Controllers
     { 
         public ActionResult RenderTemplate()
         {
-            var account = User.Identity.GetAccount();
+            //var account = User.Identity.GetAccount();
 
             var virtualPath = Request.Path;//获取虚拟路径
              
             ViewBag.QueryString = Request.QueryString;
-            ViewBag.QueryStringDictionary = ToDictionary(Request.QueryString);
+            ViewBag.QueryStringDictionary = Request.QueryString.ToDictionary();
 
             string[] ss = virtualPath.Split(new char[]{'/'},StringSplitOptions.RemoveEmptyEntries);
             if (ss.Length==0)
@@ -39,23 +39,26 @@ namespace Baseingfo.Test.Controllers
             
         }
 
-        private IDictionary<string, object> ToDictionary(System.Collections.Specialized.NameValueCollection nv)
+        public ActionResult RenderComponent()
         {
-            var result = new Dictionary<string, object>();
-            foreach (string key in nv.Keys)
-            {
-                string[] values = nv.GetValues(key);
-                if (values.Length == 1)
-                {
-                    result.Add(key, values[0]);
-                }
-                else
-                {
-                    result.Add(key, values);
-                }
-            }
+            var virtualPath = Request.Path;//获取虚拟路径
 
-            return result;
+            ViewBag.QueryString = Request.QueryString;
+            ViewBag.QueryStringDictionary = Request.QueryString.ToDictionary();
+
+            string[] ss = virtualPath.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            string path = "";
+            for (int i = 1; i < ss.Length;i++ )
+            {
+                //忽略ss[0]:"component"
+                path += ss[i] + "/";
+            }
+            path = path.Substring(0, path.Length - 1);
+
+            return this.MyPartialView(path);
+
         }
+         
     }
 }

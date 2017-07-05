@@ -70,8 +70,8 @@
       <HintPath>..\packages\NPOI.2.2.1\lib\net40\NPOI.OpenXmlFormats.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rings.Models, Version=1.0.6332.28505, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rings.Models.1.0.6332.28505\lib\net40\Rings.Models.dll</HintPath>
+    <Reference Include="Rings.Models, Version=1.0.6382.26601, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rings.Models.1.0.6382.26601\lib\net40\Rings.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -93,8 +93,6 @@
     <Compile Include="Stock.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Vendor.cs" />
-    <Compile Include="Employee.cs" />
-    <Compile Include="Department.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -205,24 +203,6 @@
     <None Include="VendorList.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="EmployeeEdit.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="EmployeeImport.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="EmployeeAdd.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="DepartmentEdit.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="DepartmentImport.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="EmployeeList.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Menu.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -234,11 +214,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DepartmentList.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Rings.Utility\Jxc.Utility.csproj">
       <Project>{55e3f600-0565-46a9-948d-de52c760b94a}</Project>
       <Name>Jxc.Utility</Name>
@@ -246,11 +221,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="short.config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DepartmentAdd.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

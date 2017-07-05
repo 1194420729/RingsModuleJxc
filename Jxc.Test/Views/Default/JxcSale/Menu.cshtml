@@ -1,4 +1,4 @@
-﻿<ul data-sort="300">    
+﻿<ul data-sort="300" data-group="进销存" data-groupsort="100" data-groupicon="fa fa-newspaper-o fa-fw">    
     <li>
         <span><i class="fa fa-truck fa-fw"></i><span class="menutitle">销售管理</span></span>
         <ul>            
@@ -8,6 +8,8 @@
             <li ng-limit="saleorderreport"><a href="/jxcsale/saleorderproductreport"><i class="fa fa-line-chart fa-fw"></i><span class="menutitle">销售订单统计</span></a></li> 
             <li ng-limit="salebilladd"><a href="/jxcsale/salebilladd"><i class="fa fa-cubes fa-fw"></i><span class="menutitle">销售出库单</span></a></li>
             <li ng-limit="salebackbilladd"><a href="/jxcsale/salebackbilladd"><i class="fa fa-mail-reply fa-fw"></i><span class="menutitle">销售退货单</span></a></li>
+            <li ng-limit="saleorderflow"><a href="/jxcsale/saleorderflow"><i class="fa fa-list-alt fa-fw"></i><span class="menutitle">销售订单流水</span></a></li>
+            <li ng-limit="salebillflow"><a href="/jxcsale/salebillflow"><i class="fa fa-list-ol fa-fw"></i><span class="menutitle">销售出库流水</span></a></li> 
             <li>
                 <span><i class="fa fa-pie-chart fa-fw"></i><span class="menutitle">销售统计分析</span></span>
                 <ul>
@@ -18,6 +20,7 @@
                     <li ng-limit="employeesalereport"><a href="/jxcsale/employeesalereport"><i class="fa fa-list-ol fa-fw"></i><span class="menutitle">经手人销售排行</span></a></li>
                     <li ng-limit="customersalereport"><a href="/jxcsale/customersalereport"><i class="fa fa-list-ul fa-fw"></i><span class="menutitle">客户销售排行</span></a></li>
                     <li ng-limit="stocksalereport"><a href="/jxcsale/stocksalereport"><i class="fa fa-th-list fa-fw"></i><span class="menutitle">仓库销售排行</span></a></li>
+                    <li ng-limit="myselfsalereport"><a href="/jxcsale/myselfsalereport"><i class="fa fa-bar-chart fa-fw"></i><span class="menutitle">个人业绩统计</span></a></li>
                 </ul>
             </li>
             

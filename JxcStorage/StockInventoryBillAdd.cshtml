@@ -321,6 +321,12 @@
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.showwaiter = false;
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             var loademployeeandstock = function () {
 
                 if ($scope.billconfig.content.keepemployeeandstock && localStorage.stockinventorybill) {
@@ -548,6 +554,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload = null;
                     window.location.href = '/jxcstorage/stockinventorybilledit?id=' + billid;
                 });
             };
@@ -569,7 +576,8 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    $window.onbeforeunload = null;
+                                    window.location.reload();
                                 });
                                 return;
                             }
@@ -588,7 +596,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
 
                             });
                         } else {
@@ -626,7 +635,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
                             });
                         } else if (data.message === 'needcost') {
                             SweetAlert.swal({ title: '部分产品库存为零，无法取得当前成本，请手工指定成本价', type: 'error' }, function () {

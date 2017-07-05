@@ -38,6 +38,10 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MimeTypeMap, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaTypeMap.2.1.0.0\lib\net40\MimeTypeMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Mono.Security.dll</HintPath>
       <Private>True</Private>
@@ -66,11 +70,12 @@
       <HintPath>..\packages\NPOI.2.2.1\lib\net40\NPOI.OpenXmlFormats.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rings.Models, Version=1.0.6332.28505, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rings.Models.1.0.6332.28505\lib\net40\Rings.Models.dll</HintPath>
+    <Reference Include="Rings.Models, Version=1.0.6382.26601, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rings.Models.1.0.6382.26601\lib\net40\Rings.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -83,16 +88,18 @@
     <Compile Include="BillCore.cs" />
     <Compile Include="BillHelper.cs" />
     <Compile Include="CategoryHelper.cs" />
-    <Compile Include="ContextServiceHelper.cs" />
     <Compile Include="CostHelper.cs" />
     <Compile Include="DBHelper.cs" />
     <Compile Include="ExcelDisplayAttribute.cs" />
+    <Compile Include="InitOverHelper.cs" />
     <Compile Include="MoneyHelper.cs" />
     <Compile Include="MyHelper.cs" />
     <Compile Include="NPOIHelper.cs" />
     <Compile Include="ParameterHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PyConverter.cs" />
+    <Compile Include="YearBalance.cs" />
+    <Compile Include="ZtHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

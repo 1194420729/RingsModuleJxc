@@ -1,6 +1,7 @@
 using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Security.Principal;
@@ -12,10 +13,31 @@ namespace Rings.Models
 {
     public static class MyHelper
     {
+        public static IDictionary<string, object> ToDictionary(this System.Collections.Specialized.NameValueCollection nv)
+        {
+            var result = new Dictionary<string, object>();
+            foreach (string key in nv.Keys)
+            {
+                string[] values = nv.GetValues(key);
+                if (values.Length == 1)
+                {
+                    result.Add(key, values[0]);
+                }
+                else
+                {
+                    result.Add(key, values);
+                }
+            }
+
+            return result;
+        }
+    
+
         public static Account GetAccount(this IIdentity identity)
         {
             string[] ss = identity.Name.Split(new char[] { '`' }, StringSplitOptions.RemoveEmptyEntries);
             string applicationid = ss[0];
+            string rootapplicationid = ss[4];
 
             DataContext db = new DataContext(applicationid);
             DataTable dt = new DataTable(); 
@@ -53,6 +75,7 @@ namespace Rings.Models
             Account account = new Account()
             {
                 ApplicationId=applicationid,
+                RootApplicationId = rootapplicationid,
                 Id=Convert.ToInt32(dt.Rows[0]["id"]),
                 Name=dt.Rows[0]["name"].ToString(),
                 UserName=ss[2],

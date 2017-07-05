@@ -60,7 +60,7 @@ namespace Rings.Models
             {
                 #region 权限不符   
                 CQ limitcq2 = limitelment.First().Html("<div class=\"alert alert-danger\" role=\"alert\">" 
-                    + StringHelper.GetString("您没有相关权限，请和系统管理员联系！",context.HttpContext.User.Identity.GetAccount().ApplicationId) + "</div>");
+                    + StringHelper.GetString("您没有相关权限，请和系统管理员联系！",context.HttpContext.User.Identity.GetAccount().Language) + "</div>");
 
                 s = (limitcq2.Render());
                 #endregion

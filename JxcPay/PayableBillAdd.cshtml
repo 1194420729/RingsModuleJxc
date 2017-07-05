@@ -204,6 +204,12 @@
             $scope.model = { id: 0, content: {} }; 
             $scope.tableParams2 = new NgTableParams({ count: 10 });
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams2.total() > 0) {
+                    return ' ';
+                }
+            };
+
             $http.post('/payablebillservice/init', {})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -317,6 +323,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload = null;
                     window.location.href = '/jxcpay/payablebilledit?id=' + billid;
                 });
             };
@@ -348,7 +355,8 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    $window.onbeforeunload = null;
+                                    window.location.reload();
                                 });
                                 return;
                             }
@@ -367,7 +375,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpay/payablebillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
 
                             });
                         } else {
@@ -415,7 +424,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpay/payablebillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

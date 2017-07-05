@@ -43,7 +43,8 @@
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
-                    </div>                    
+                    </div>
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
                 </div>
                 <div class="form-group form-inline">
                     <label>客户名称</label>
@@ -62,7 +63,7 @@
                     </td>
                     <td data-title="'单据编号'" header-class="'bg-warning'">
                         <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.content.billcode" title="查看原始单据"></a>
-                    </td> 
+                    </td>
                     <td data-title="'单据日期'" header-class="'bg-warning'">
                         <span ng-bind="m.content.billdate"></span>
                     </td>
@@ -138,62 +139,62 @@
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
     <script src="//139.196.218.9/cdn/gbk.js"></script>
     <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-    var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter', 'ngDateScope']);
 
-    app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
-         
-        $scope.filter = {};
-        $scope.queryfilter = {};
+        app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
 
-        $scope.digit = 2;
-          
-        $http.post('/payreportservice/RefreshMVWReceivableCheckout', {})
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            $scope.digit = 2;
+
+            $http.post('/payreportservice/RefreshMVWReceivableCheckout', {})
+                        .success(function (data) {
+
+                        });
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/payreportservice/returnedmoneyreport',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
                     .success(function (data) {
 
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+
+                        $scope.totalsum = data.totalsum;
+                        $scope.checkouttotalsum = data.checkouttotalsum;
+                        $scope.receivabletotalsum = data.receivabletotalsum;
+                        $scope.returnedtotalsum = data.returnedtotalsum;
+                        $scope.adjustedtotalsum = data.adjustedtotalsum;
+
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+
+                        $scope.showwaiter = false;
                     });
-        
-        var getData = function ($defer, params) {
-            var filter = $scope.queryfilter;
-            var sorting = params.sorting();
-            var count = params.count();
-            var page = params.page();
-            $http.post('/payreportservice/returnedmoneyreport',
-                { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
-                .success(function (data) {
-                      
-                    $scope.tableParams.total(data.resulttotal);
-                    $scope.totalrecordes = data.resulttotal;
-                     
-                    $scope.totalsum = data.totalsum;
-                    $scope.checkouttotalsum = data.checkouttotalsum;
-                    $scope.receivabletotalsum = data.receivabletotalsum;
-                    $scope.returnedtotalsum = data.returnedtotalsum;
-                    $scope.adjustedtotalsum = data.adjustedtotalsum;
+            };
 
-                    $scope.datalist = data.data;
-                    $defer.resolve(data.data);
+            $scope.btnreportClick = function () {
+                if (!$scope.filter.startdate || !$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请完整填写起止日期', type: 'error' });
+                    return;
+                }
 
-                    $scope.showwaiter = false;
-                });
-        };
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
 
-        $scope.btnreportClick = function () {
-            if (!$scope.filter.startdate || !$scope.filter.enddate) {
-                SweetAlert.swal({ title: '请完整填写起止日期', type: 'error' });
-                return;
-            }
+            };
 
-            $scope.showwaiter = true;
-            $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
-            $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
 
-        };
-         
+        });
 
-    });
-
-</script>
-
+    </script>
 }

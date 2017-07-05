@@ -143,8 +143,7 @@ namespace JxcSale
         {
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
             string path = dic["path"].ToString();
-            path = ContextServiceHelper.MapPath(path);
-
+             
             bool cover = Convert.ToBoolean(dic["cover"]);
 
             int rowno = 0;

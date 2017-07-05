@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<components>
+  <component name="saleuninvoicecomponent" title="待开销项票" path="/jxcaccounting/saleuninvoicecomponent" limit="saleuninvoicereport" width="200" height="200">
+  </component>
+  <component name="purchaseuninvoicecomponent" title="待开进项票" path="/jxcaccounting/purchaseuninvoicecomponent" limit="purchaseuninvoicereport" width="200" height="200">
+  </component>
+</components>

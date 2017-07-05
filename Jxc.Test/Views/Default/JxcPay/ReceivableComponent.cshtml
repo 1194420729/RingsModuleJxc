@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "应收账款";
+}
+<div data-component="receivablecomponent" style="height:100%;">
+    <div class="receivablecomponent">
+        <div>
+            <label>应收账款</label>
+        </div>
+        <ul class="list-group">                         
+            <li class="list-group-item"><a href="/jxcpay/receivablequery">查看完整应收列表...</a></li>
+        </ul>
+    </div>
+</div>
+@section scripts{
+    
+    <script data-define="receivablecomponent">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.receivablecomponent) {
+            componentloader.receivablecomponent = function (id) {
+                var selector = '#' + id + ' .receivablecomponent';
+                if (!id) selector = '.receivablecomponent';
+                
+                $.post('/payreportservice/receivablecomponentquery',
+                        {},
+                        function (data) {
+                            $.each(data.data, function (index,item) {
+                                $(selector + ' .list-group').prepend('<li class="list-group-item"><span>'
+                                    + item.name + '</span><span style="margin-left:10px;">'
+                                    + item.total + '</span></li>');
+                            });
+                        }, 'json');
+            };
+        }
+</script>
+    <script>
+        $(function () {
+            componentloader.receivablecomponent('');
+        });
+    </script>
+}

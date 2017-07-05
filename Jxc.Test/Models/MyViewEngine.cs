@@ -29,8 +29,8 @@ namespace Rings.Models
 
                 PartialViewLocationFormats = new[]
                 {
-                    "~/Views/"+account.ApplicationId+"/"+account.Language+"/{0}.cshtml",
-                    "~/Views/"+account.ApplicationId+"/{0}.cshtml", 
+                    "~/Views/"+account.RootApplicationId+"/"+account.Language+"/{0}.cshtml",
+                    "~/Views/"+account.RootApplicationId+"/{0}.cshtml", 
                     "~/Views/Default/"+account.Language+"/{0}.cshtml" ,
                     "~/Views/Default/{0}.cshtml" ,
                     "~/Views/{1}/"+account.Language+"/{0}.cshtml",
@@ -59,8 +59,8 @@ namespace Rings.Models
                  
                 ViewLocationFormats = new[]
                 {
-                    "~/Views/"+account.ApplicationId+"/"+account.Language+"/{0}.cshtml",
-                    "~/Views/"+account.ApplicationId+"/{0}.cshtml", 
+                    "~/Views/"+account.RootApplicationId+"/"+account.Language+"/{0}.cshtml",
+                    "~/Views/"+account.RootApplicationId+"/{0}.cshtml", 
                     "~/Views/Default/"+account.Language+"/{0}.cshtml" ,
                     "~/Views/Default/{0}.cshtml" ,
                     "~/Views/{1}/"+account.Language+"/{0}.cshtml",

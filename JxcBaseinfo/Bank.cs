@@ -80,8 +80,7 @@ namespace JxcBaseinfo
         {
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
             string path = dic["path"].ToString();
-            path = ContextServiceHelper.MapPath(path);
-
+            
             bool cover = Convert.ToBoolean(dic["cover"]);
 
             int rowno = 0;
@@ -303,6 +302,11 @@ namespace JxcBaseinfo
             using (DBHelper db = new DBHelper())
             {
                 var model = db.First("select * from \"" + tablename + "\" where id=" + id);
+                if (model.content.Value<decimal>("total") != decimal.Zero)
+                {
+                    return new { message = "账户余额不为零，不能停用！" };
+                }
+
                 model.content["stop"] = "t";
                 db.Edit(this.tablename, model);
                 db.SaveChanges();

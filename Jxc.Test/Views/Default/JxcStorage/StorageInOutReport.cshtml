@@ -43,8 +43,7 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
-
-
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
                 </div>
                 <div class="form-group form-inline">
                     <label>仓库名称</label>
@@ -99,7 +98,7 @@
                     <td data-title="'成本金额'" header-class="'bg-warning'">
                         <span ng-bind="m.content.costtotal | number:digit | cost:showcost"></span>
                     </td>
-                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;">
+                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;text-align:left;">
                         <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
                     </td>
 
@@ -151,13 +150,14 @@
     <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngSanitize', 'myfilter', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
 
-            $scope.filter = { stockid: '0',employeeid:'0' };
+            $scope.filter = { stockid: '0', employeeid: '0' };
             $scope.queryfilter = {};
             $scope.showcost = false;
             $scope.digit = 2;

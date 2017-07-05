@@ -142,7 +142,7 @@ namespace JxcInit
             byte[] bytes = dt.GetExcelStream();
 
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string path = Path.Combine(ContextServiceHelper.MapPath("~/temporary"), PluginContext.Current.Account.ApplicationId, date);
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temporary", PluginContext.Current.Account.ApplicationId, date);
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
@@ -154,7 +154,7 @@ namespace JxcInit
             fs.Write(bytes, 0, bytes.Length);
             fs.Close();
 
-            return new { url = "/temporary/" + PluginContext.Current.Account.ApplicationId + "/" + date + "/" + filename };
+            return new { url = "/upload/temporary?filename=" + filename + "&appid=" + PluginContext.Current.Account.ApplicationId + "&date=" + date };
         }
 
         [MyLog("批量导入期初应付")]
@@ -171,8 +171,7 @@ namespace JxcInit
 
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
             string path = dic["path"].ToString();
-            path = ContextServiceHelper.MapPath(path);
-
+             
             int rowno = 0;
 
             try

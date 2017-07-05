@@ -45,14 +45,8 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
-                    <div class="pull-right">
-                        <span style="background-color:#dff0d8;"><i class="fa fa-fw"></i></span>
-                        <span class="help-block" style="display:inline;margin-right:20px;">绿色代表草稿</span>
-                        <span style="background-color:red;"><i class="fa fa-fw"></i></span>
-                        <span class="help-block" style="display:inline;margin-right:20px;">红色到货日期代表未按时到货</span>
-                        <span style="background-color:#CC6633;"><i class="fa fa-fw"></i></span>
-                        <span class="help-block" style="display:inline;margin-right:20px;">橘色单号代表已中止</span> 
-                    </div>
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
+                    
                 </div>
                 <div class="form-group form-inline">
                     <label>单据编号</label>
@@ -61,14 +55,17 @@
                     <input type="text" class="form-control" ng-model="filter.vendorname" placeholder="按编号或名称模糊查询" />
                     <label>经手人</label>
                     <input type="text" class="form-control" ng-model="filter.employeename" placeholder="按编号或名称模糊查询" />
-                    <label>仓库名称</label>
-                    <input type="text" class="form-control" ng-model="filter.stockname" placeholder="按编号或名称模糊查询" />
+                    
                 </div>
                 <div class="form-group form-inline">
+                    <label>仓库名称</label>
+                    <input type="text" class="form-control" ng-model="filter.stockname" placeholder="按编号或名称模糊查询" />
                     <label>产品名称</label>
                     <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
                     <label>制单人</label>
                     <input type="text" class="form-control" ng-model="filter.makername" placeholder="按编号或名称模糊查询" />
+                </div>
+                <div class="form-group form-inline">
                     <label>单据备注</label>
                     <input type="text" class="form-control" ng-model="filter.comment" />
                     <label>审核状态</label>
@@ -85,13 +82,20 @@
                         <option value="aborted">已中止</option>
                     </select>
                     <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
-
+                    <div class="pull-right">
+                        <span style="background-color:#dff0d8;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">绿色代表草稿</span>
+                        <span style="background-color:red;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">红色到货日期代表未按时到货</span>
+                        <span style="background-color:#CC6633;"><i class="fa fa-fw"></i></span>
+                        <span class="help-block" style="display:inline;margin-right:20px;">橘色单号代表已中止</span>
+                    </div>
                 </div>
             </div>
             <table ng-table="tableParams" show-filter="false" class="table table-bordered table-condensed table-hover">
                 <tr ng-repeat="m in $data" ng-class="{true:'success',false:''}[m.content.auditorid===undefined]" style="cursor:pointer;">
                     <td header-class="'bg-warning'" style="width:60px;">
-                         
+
                         <a href="javascript:;" ng-click="btncommentClick(m)" title="修改备注">
                             <i class="fa fa-comment-o fa-fw"></i>
                         </a>
@@ -105,7 +109,7 @@
 
                     <td data-title="'单据编号'" header-class="'bg-warning'">
                         <a ng-class="{true:'abortbill',false:''}[m.content.abort]" ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.content.billcode" title="查看原始单据"></a>
-                        
+
                     </td>
                     <td data-title="'单据日期'" header-class="'bg-warning'">
                         <span ng-bind="m.content.billdate"></span>
@@ -135,7 +139,7 @@
                         <span ng-class="{true:'deliverywarning',false:''}[m.content.deliverydate<=today && m.content.auditorid && m.content.deliveryqty<m.content.qty && !m.content.abort]"
                               ng-bind="m.content.deliverydate"></span>
                     </td>
-                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;">
+                    <td data-title="'备注'" header-class="'bg-warning'" style="max-width:200px;text-align:left;">
                         <span ng-bind="m.content.comment | comment:15" title="{{m.content.comment}}"></span>
                     </td>
                 </tr>
@@ -206,9 +210,10 @@
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'myfilter', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, $uibModal) {
 

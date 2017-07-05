@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <shorts>
-  <short name="departmentservice" path="service/jxcbaseinfo/jxcbaseinfo/department"></short>
-  <short name="employeeservice" path="service/jxcbaseinfo/jxcbaseinfo/employee"></short>
-  <short name="vendorservice" path="service/jxcbaseinfo/jxcbaseinfo/vendor"></short>
+   <short name="vendorservice" path="service/jxcbaseinfo/jxcbaseinfo/vendor"></short>
   <short name="categoryservice" path="service/jxcbaseinfo/jxcbaseinfo/category"></short>
   <short name="stockservice" path="service/jxcbaseinfo/jxcbaseinfo/stock"></short>
   <short name="customerservice" path="service/jxcbaseinfo/jxcbaseinfo/customer"></short>

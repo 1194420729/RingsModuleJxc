@@ -351,7 +351,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    window.location.reload();
                                 });
                                 return;
                             }
@@ -370,7 +370,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockoutbillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                window.location.reload();
 
                             });
                         } else {
@@ -408,7 +408,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockoutbillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

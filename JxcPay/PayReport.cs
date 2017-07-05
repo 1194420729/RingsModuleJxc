@@ -285,17 +285,7 @@ namespace JxcPay
             decimal totalbefore = Convert.ToDecimal(db.Scalar(sqlTotalBefore));
 
             DataTable list = db.QueryTable(sql);
-            list.Columns.Add("billcode",typeof(string));
-            list.Columns.Add("billname", typeof(string));
-            list.Columns.Add("comment", typeof(string));
-            foreach (DataRow item in list.Rows)
-            {
-                var bill = db.First("bill",Convert.ToInt32(item["billid"])); 
-                item["billcode"]=bill.content.Value<string>("billcode");
-                item["billname"] = bill.content.Value<string>("billname");
-                item["comment"] = bill.content.Value<string>("comment"); 
-            }
-
+             
             var customer = db.First("customer",Convert.ToInt32(myfilter["customerid"]));
 
             return new
@@ -682,6 +672,70 @@ namespace JxcPay
                 returnedtotalsum = returnedtotalsum,
                 adjustedtotalsum = adjustedtotalsum,
                 data = list,
+            };
+        }
+
+        public Object ReceivableComponentQuery(string parameters)
+        {
+  
+
+            DBHelper db = new DBHelper();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" where coalesce(content->>'receivable','0')::decimal<>0");
+             
+            StringBuilder sborder = new StringBuilder();
+            sborder.Append(" order by (coalesce(content->>'receivable','0')::decimal) desc ");
+             
+            sborder.AppendFormat(" limit {0} ", 5);
+
+            string sql = "select *  from customer "
+                        + sb.ToString()
+                        + sborder.ToString();
+              
+            List<TableModel> list = db.Where(sql);
+
+            var result = (from c in list
+                         select new
+                         {
+                             name=c.content.Value<string>("name"),
+                             total = c.content.Value<decimal>("receivable").ToString("c2")
+                         }).ToList();
+
+            return new
+            { 
+                data = result,
+            };
+        }
+
+        public Object PayableComponentQuery(string parameters)
+        { 
+            DBHelper db = new DBHelper();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" where coalesce(content->>'payable','0')::decimal<>0");
+             
+            StringBuilder sborder = new StringBuilder();
+            sborder.Append(" order by (coalesce(content->>'payable','0')::decimal) desc ");
+
+
+            sborder.AppendFormat(" limit {0} ", 5);
+
+            string sql = "select *  from vendor "
+                        + sb.ToString()
+                        + sborder.ToString();
+
+            
+            List<TableModel> list = db.Where(sql);
+
+            var result = (from c in list
+                          select new
+                          {
+                              name = c.content.Value<string>("name"),
+                              total = c.content.Value<decimal>("payable").ToString("c2")
+                          }).ToList();
+
+            return new
+            { 
+                data = result,
             };
         }
 

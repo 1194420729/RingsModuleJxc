@@ -181,6 +181,7 @@
                         $('#ajaxloader').hide();
                         if (data.message == 'ok') {
                             localStorage.setItem('rings_company', $('#company').val());
+                            localStorage.setItem('rings_zt', $('#zt').val());
                             window.location.href = '@Url.RouteUrl("Default", ((Route)RouteTable.Routes["Default"]).Defaults)';
                         } else {
                             alertify.alert(data.message);
@@ -229,6 +230,10 @@
                             $.each(data.list, function (index, item) {
                                 $('#zt').append('<option value="'+item.id+'">'+item.name+'</option>');
                             });
+
+                            if ($('#company').val() == localStorage.getItem('rings_company')) {
+                                $('#zt').val(localStorage.getItem('rings_zt'));
+                            }
                         }
                     }
                 });

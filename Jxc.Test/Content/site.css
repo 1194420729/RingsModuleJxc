@@ -95,3 +95,11 @@ i
     background-color:transparent;
     text-align:center;
 }
+
+.blueredword {
+    transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg); /* IE 9 */
+    -moz-transform: rotate(-45deg); /* Firefox */
+    -webkit-transform: rotate(-45deg); /* Safari 和 Chrome */
+    -o-transform: rotate(-45deg); /* Opera */
+}

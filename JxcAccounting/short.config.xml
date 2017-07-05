@@ -7,4 +7,8 @@
   <short name="saleinvoicebillservice" path="service/jxcaccounting/jxcaccounting/saleinvoicebill"></short>
   <short name="purchaseinvoicebillservice" path="service/jxcaccounting/jxcaccounting/purchaseinvoicebill"></short>
   <short name="feereportservice" path="service/jxcaccounting/jxcaccounting/feereport"></short>
+  <short name="earningreportservice" path="service/jxcaccounting/jxcaccounting/earningreport"></short>
+  <short name="bankreportservice" path="service/jxcaccounting/jxcaccounting/bankreport"></short>
+  <short name="saleinvoicereportservice" path="service/jxcaccounting/jxcaccounting/saleinvoicereport"></short>
+  <short name="purchaseinvoicereportservice" path="service/jxcaccounting/jxcaccounting/purchaseinvoicereport"></short>
 </shorts>

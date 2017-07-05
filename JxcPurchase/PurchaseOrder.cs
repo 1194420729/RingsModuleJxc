@@ -162,27 +162,37 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select *  from bill "
+            string cte = "with cte as (select bill.* from bill "
+                        + "inner join vendor on (bill.content->>'vendorid')::int=vendor.id "
+                        + "inner join stock on (bill.content->>'stockid')::int=stock.id) ";
+
+
+            string sql = cte
+                        +"select *  from cte "
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = cte
+                        +"select count(*) as cnt from cte "
                         + sb.ToString();
 
-            string sqlQtySum = "select coalesce(sum(qty),0) as qty " +
+            string sqlQtySum = cte
+                                +"select coalesce(sum(qty),0) as qty " +
                                 "from  " +
                                 "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'qty')::decimal) as qty from bill " + sb.ToString() +
+                                "select  ((jsonb_array_elements(content->'details')->>'qty')::decimal) as qty from cte " + sb.ToString() +
                                 ") as t";
-            string sqlTotalSum = "select coalesce(sum(total),0) as total " +
+            string sqlTotalSum = cte
+                                +"select coalesce(sum(total),0) as total " +
                                 "from  " +
                                 "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'discounttotal')::decimal) as total from bill " + sb.ToString() +
+                                "select  ((jsonb_array_elements(content->'details')->>'discounttotal')::decimal) as total from cte " + sb.ToString() +
                                 ") as t";
-            string sqlDeliveryQtySum = "select coalesce(sum(deliveryqty),0) as deliveryqty " +
+            string sqlDeliveryQtySum = cte
+                                +"select coalesce(sum(deliveryqty),0) as deliveryqty " +
                                 "from  " +
                                 "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'deliveryqty')::decimal) as deliveryqty from bill " + sb.ToString() +
+                                "select  ((jsonb_array_elements(content->'details')->>'deliveryqty')::decimal) as deliveryqty from cte " + sb.ToString() +
                                 ") as t";
 
             int recordcount = db.Count(sqlCount);
@@ -389,8 +399,7 @@ namespace JxcPurchase
             ParameterHelper ph = new ParameterHelper(parameters);
             string path = ph.GetParameterValue<string>("path");
             decimal taxrate = ph.GetParameterValue<decimal>("taxrate");
-            path = ContextServiceHelper.MapPath(path);
-
+             
             int rowno = 0;
 
             try
@@ -1173,7 +1182,7 @@ namespace JxcPurchase
                         var ids = CategoryHelper.GetChildrenIds(Convert.ToInt32(f));
                         ids.Add(Convert.ToInt32(f));
                         string idsfilter = ids.Select(c => c.ToString()).Aggregate((a, b) => a + "," + b);
-                        DataTable dt = db.QueryTable("select id,'{}'::jsonb as content from product where (content->>'categoryid')::int in (" + idsfilter + ")");
+                        DataTable dt = db.QueryTable("select id from product where (content->>'categoryid')::int in (" + idsfilter + ")");
                         idsfilter = dt.GetIds();
                         sb.AppendFormat(" and productid in ({0})", idsfilter);
                     }
@@ -1216,23 +1225,35 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select productid,productcode,productname,producttype,productstandard," +
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+
+            string sql = cte
+                            +"select productid,productcode,productname,producttype,productstandard," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString() +
                             "group by productid,productcode,productname,producttype,productstandard " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_purchaseorder "
-                                + sb.ToString()
-                                + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
+            //string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_purchaseorder "
+            //                    + sb.ToString()
+            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
 
-            string sqlSum = "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+            string sqlCount = cte
+                            + "select count(*) from (select productid,productcode,productname,producttype,productstandard from cte "
+                            + sb.ToString() 
+                            + " group by productid,productcode,productname,producttype,productstandard) as t";
+
+            string sqlSum = cte
+                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -1310,7 +1331,7 @@ namespace JxcPurchase
                         var ids = CategoryHelper.GetChildrenIds(Convert.ToInt32(f));
                         ids.Add(Convert.ToInt32(f));
                         string idsfilter = ids.Select(c => c.ToString()).Aggregate((a, b) => a + "," + b);
-                        DataTable dt = db.QueryTable("select id,'{}'::jsonb as content from vendor where (content->>'categoryid')::int in (" + idsfilter + ")");
+                        DataTable dt = db.QueryTable("select id from vendor where (content->>'categoryid')::int in (" + idsfilter + ")");
                         idsfilter = dt.GetIds();
                         sb.AppendFormat(" and vendorid in ({0})", idsfilter);
                     }
@@ -1352,23 +1373,37 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select vendorid,vendorcode,vendorname," +
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+
+
+            string sql = cte 
+                            + "select vendorid,vendorcode,vendorname," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString() +
                             "group by vendorid,vendorcode,vendorname " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select vendorid,vendorcode,vendorname from mvw_purchaseorder "
-                                + sb.ToString()
-                                + " group by vendorid,vendorcode,vendorname) select count(*) from cte";
+            //string sqlCount = "with cte as (select vendorid,vendorcode,vendorname from mvw_purchaseorder "
+            //                    + sb.ToString()
+            //                    + " group by vendorid,vendorcode,vendorname) select count(*) from cte";
 
-            string sqlSum = "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+            string sqlCount = cte
+                            + "select count(*) from (select vendorid,vendorcode,vendorname from cte "
+                            + sb.ToString()
+                            + " group by vendorid,vendorcode,vendorname) as t";
+
+
+            string sqlSum = cte
+                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -1474,23 +1509,33 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select employeeid,employeecode,employeename," +
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+
+
+            string sql = cte+
+                        "select employeeid,employeecode,employeename," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString() +
                             "group by employeeid,employeecode,employeename " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select employeeid,employeecode,employeename from mvw_purchaseorder "
-                                + sb.ToString()
-                                + " group by employeeid,employeecode,employeename) select count(*) from cte";
+             
+            string sqlCount = cte
+                            + "select count(*) from (select employeeid from cte "
+                            + sb.ToString()
+                            + " group by employeeid) as t";
 
-            string sqlSum = "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+            string sqlSum = cte
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -1595,23 +1640,35 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select stockid,stockcode,stockname," +
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+             
+            string sql = cte
+                            +"select stockid,stockcode,stockname," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString() +
                             "group by stockid,stockcode,stockname " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select stockid,stockcode,stockname from mvw_purchaseorder "
-                                + sb.ToString()
-                                + " group by stockid,stockcode,stockname) select count(*) from cte";
+            //string sqlCount = "with cte as (select stockid,stockcode,stockname from mvw_purchaseorder "
+            //                    + sb.ToString()
+            //                    + " group by stockid,stockcode,stockname) select count(*) from cte";
 
-            string sqlSum = "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+            string sqlCount = cte
+                            + "select count(*) from (select stockid,stockcode,stockname from cte "
+                            + sb.ToString()
+                            + " group by stockid,stockcode,stockname) as t";
+
+            string sqlSum = cte
+                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
-                            "from mvw_purchaseorder " +
+                            "from cte " +
                             sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -1645,25 +1702,25 @@ namespace JxcPurchase
             {
                 int productid = ph.GetParameterValue<int>("productid");
                 var product = db.First("product", productid);
-                tip = StringHelper.GetString("按产品") + ":" + product.content.Value<string>("code") + " " + product.content.Value<string>("name");
+                tip = product.content.Value<string>("code") + " " + product.content.Value<string>("name");
             }
             else if (reporttype == "byvendor")
             {
                 int vendorid = ph.GetParameterValue<int>("vendorid");
                 var vendor = db.First("vendor", vendorid);
-                tip = StringHelper.GetString("按供应商") + ":" + vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
+                tip =  vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
             }
             else if (reporttype == "byemployee")
             {
                 int employeeid = ph.GetParameterValue<int>("employeeid");
                 var employee = db.First("employee", employeeid);
-                tip = StringHelper.GetString("按经手人") + ":" + employee.content.Value<string>("code") + " " + employee.content.Value<string>("name");
+                tip = employee.content.Value<string>("code") + " " + employee.content.Value<string>("name");
             }
             else if (reporttype == "bystock")
             {
                 int stockid = ph.GetParameterValue<int>("stockid");
                 var stock = db.First("stock", stockid);
-                tip = StringHelper.GetString("按仓库") + ":" + stock.content.Value<string>("code") + " " + stock.content.Value<string>("name");
+                tip = stock.content.Value<string>("code") + " " + stock.content.Value<string>("name");
             }
 
             bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
@@ -1709,103 +1766,119 @@ namespace JxcPurchase
                 {
                     sb.AppendFormat(" and billdate<='{0}'", f);
                 }
-                else if (field == "productname")
-                {
-                    DataTable dt = db.QueryTable("select id from product where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and productid in ({0})", ids);
-                }
-                else if (field == "vendorname")
-                {
-                    DataTable dt = db.QueryTable("select id from vendor where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and vendorid in ({0})", ids);
-                }
-                else if (field == "employeename")
-                {
-                    DataTable dt = db.QueryTable("select id from employee where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and employeeid in ({0})", ids);
-                }
-                else if (field == "stockname")
-                {
-                    DataTable dt = db.QueryTable("select id from stock where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and stockid in ({0})", ids);
-                }
                 else if (field == "productid")
                 {
-                    sb.AppendFormat(" and productid={0}", f);
+                    sb.AppendFormat(" and productid ={0}", f);
                 }
                 else if (field == "vendorid")
                 {
-                    sb.AppendFormat(" and vendorid={0}", f);
+                    sb.AppendFormat(" and vendorid ={0}", f);
                 }
                 else if (field == "employeeid")
                 {
-                    sb.AppendFormat(" and employeeid={0}", f);
+                    sb.AppendFormat(" and employeeid ={0}", f);
                 }
                 else if (field == "stockid")
                 {
-                    sb.AppendFormat(" and stockid={0}", f);
+                    sb.AppendFormat(" and stockid ={0}", f);
                 }
+                else if (field == "billcode")
+                {
+                    sb.AppendFormat(" and billcode ilike '%{0}%'", f);
+                }
+                else if (field == "vendorname")
+                {
 
+                    sb.AppendFormat(" and (vendorname ilike '%{0}%' or vendorcode ilike '%{0}%')", f);
+                }
+                else if (field == "employeename")
+                {
+                    sb.AppendFormat(" and (employeename ilike '%{0}%' or employeecode ilike '%{0}%')", f);
+                }
+                else if (field == "stockname")
+                {
+                    sb.AppendFormat(" and (stockname ilike '%{0}%' or stockcode ilike '%{0}%')", f);
+                }
+                else if (field == "productname")
+                {
+                    sb.AppendFormat(" and (productname ilike '%{0}%' or productcode ilike '%{0}%')", f);
+                }
+                else if (field == "makername")
+                {
+                    sb.AppendFormat(" and (makername ilike '%{0}%' or makercode ilike '%{0}%')", f);
+                }
+                else if (field == "comment")
+                {
+                    sb.AppendFormat(" and comment ilike '%{0}%'", f);
+                }
+                else if (field == "finish")
+                {
+                    if (f == "aborted")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=true");
+                    }
+                    else if (f == "finished")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=false and deliveryqty>=qty");
+                    }
+                    else if (f == "unfinish")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=false  and deliveryqty<qty");
+                    }
+                }
             }
 
             StringBuilder sborder = new StringBuilder();
-            if (mysorting.Count > 0) sborder.Append(" order by ");
-            int i = 0;
-            foreach (string field in mysorting.Keys)
-            {
-                i++;
-                sborder.AppendFormat(" content->>'{0}' {1} {2}", field.ToLower(), mysorting[field], i == mysorting.Count ? "" : ",");
-            }
-
-            if (mysorting.Count == 0)
-            {
-                sborder.Append(" order by id ");
-            }
-
-
+            sborder.Append(" order by id,productcode ");
+             
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select id " +
-                            "from mvw_purchaseorder " +
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+
+            string sql = cte
+                            + "select * " +
+                            "from cte " +
                             sb.ToString() +
-                            "group by id ";
-            DataTable dtIds = db.QueryTable(sql);
-            string filterids = dtIds.GetIds();
-            sql = string.Format("select * from bill where id in ({0}) " + sborder, filterids);
+                            sborder.ToString();
 
-            string sqlQtySum = "select coalesce(sum(qty),0) as qty " +
-                                "from  " +
-                                "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'qty')::decimal) as qty from bill where id in (" + filterids + ")) as t";
-            string sqlTotalSum = "select coalesce(sum(total),0) as total " +
-                                "from  " +
-                                "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'discounttotal')::decimal) as total from bill where id in (" + filterids + ")) as t";
+             
+            string sqlCount = cte
+                            + "select count(*) from cte "
+                            + sb.ToString();
 
-            int recordcount = dtIds.Rows.Count;
-            decimal qtysum = Convert.ToDecimal(db.Scalar(sqlQtySum));
-            decimal totalsum = Convert.ToDecimal(db.Scalar(sqlTotalSum));
+            string sqlSum = cte
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(deliveryqty),0) as deliveryqty," +
+                            "coalesce(sum(total),0) as total," +
+                            "coalesce(sum(discounttotal),0) as discounttotal," +
+                            "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
+                            "from cte " +
+                            sb.ToString();
 
-            var list = db.Where(sql);
-            foreach (var item in list)
-            {
-                item.content.Add("makername", db.First("employee", item.content.Value<int>("makerid")).content.Value<string>("name"));
-                item.content.Add("vendorname", db.First("vendor", item.content.Value<int>("vendorid")).content.Value<string>("name"));
-                item.content.Add("employeename", db.First("employee", item.content.Value<int>("employeeid")).content.Value<string>("name"));
-                item.content.Add("stockname", db.First("stock", item.content.Value<int>("stockid")).content.Value<string>("name"));
-                item.content.Add("qty", item.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("qty")));
-               
-            }
+            int recordcount = db.Count(sqlCount);
+            DataTable dtSum = db.QueryTable(sqlSum);
+
+            decimal qtysum = Convert.ToDecimal(dtSum.Rows[0]["qty"]);
+            decimal deliveryqtysum = Convert.ToDecimal(dtSum.Rows[0]["deliveryqty"]);
+            decimal totalsum = Convert.ToDecimal(dtSum.Rows[0]["total"]);
+            decimal discounttotalsum = Convert.ToDecimal(dtSum.Rows[0]["discounttotal"]);
+            decimal taxtotalsum = Convert.ToDecimal(dtSum.Rows[0]["taxtotal"]);
+
+            DataTable list = db.QueryTable(sql);
+
+            bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
 
             return new
             {
+                showcost = showcost,
                 resulttotal = recordcount,
                 qtysum = qtysum,
+                deliveryqtysum = deliveryqtysum,
                 totalsum = totalsum,
+                discounttotalsum = discounttotalsum,
+                taxtotalsum = taxtotalsum,
                 data = list
             };
         }

@@ -29,6 +29,12 @@ namespace Jxc.Utility
 
         }
 
+        public DBHelper(DataContext dc, bool mockadmin)
+        {
+            this.dc = dc;
+            this.connectionstring = mockadmin ? dc.PostgresConnectionString : dc.ConnectionString;
+        }
+
         public DataContext CurrentDataContext { get { return dc; } }
 
         public List<TableModel> Query(string tablename, string condition, string orderby, out int recordcount)
@@ -437,9 +443,18 @@ namespace Jxc.Utility
             this.transaction = null;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Discard();
+            }
+        }
+
         public void Dispose()
         {
-            Discard();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 

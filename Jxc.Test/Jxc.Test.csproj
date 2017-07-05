@@ -52,6 +52,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MimeTypeMap, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaTypeMap.2.1.0.0\lib\net40\MimeTypeMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Mono.Security.dll</HintPath>
       <Private>True</Private>
@@ -64,8 +68,8 @@
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Npgsql.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rings.Models, Version=1.0.6332.28505, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rings.Models.1.0.6332.28505\lib\net40\Rings.Models.dll</HintPath>
+    <Reference Include="Rings.Models, Version=1.0.6382.26601, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rings.Models.1.0.6382.26601\lib\net40\Rings.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -143,7 +147,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CommonServiceController.cs" />
-    <Compile Include="Controllers\ContextServiceController.cs" />
     <Compile Include="Controllers\PrintController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
@@ -160,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Readme\Elmah.txt" />
+    <Content Include="Content\images\blueword.png" />
     <Content Include="Content\images\cart.png" />
     <Content Include="Content\images\closeall.png" />
     <Content Include="Content\images\down.png" />
@@ -174,6 +178,7 @@
     <Content Include="Content\images\mail.png" />
     <Content Include="Content\images\mslogo.png" />
     <Content Include="Content\images\nopic.gif" />
+    <Content Include="Content\images\redword.png" />
     <Content Include="Content\images\toggle.png" />
     <Content Include="Content\images\toggle_expand.png" />
     <Content Include="Content\images\up.png" />
@@ -377,6 +382,7 @@
     <Content Include="Content\kindeditor\themes\qq\editor.gif" />
     <Content Include="Content\kindeditor\themes\qq\qq.css" />
     <Content Include="Content\kindeditor\themes\simple\simple.css" />
+    <Content Include="Content\leftmenu.css" />
     <Content Include="Content\site.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -396,7 +402,16 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\Default\Home\index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Print\WrongPrintModel.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Print\PrintPreview.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Print\PrintPage.cshtml" />
@@ -406,15 +421,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Print\PrintDesigner.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Print\WrongPrintModel.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Print\PrintPreview.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Default\Home\index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Account\Login.cshtml" />

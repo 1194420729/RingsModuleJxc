@@ -16,7 +16,7 @@
                         <label>系统开账后，期初数据将不能再修改，可以开始录入业务单据。请注意开账日期的选择：业务单据的单据日期不能在开账日期之前。</label>
                     </div>
                     <div class="form-group" ng-hide="notinitover">
-                        <label>系统已经开账，开账日期：<span ng-bind="initoverdate | date:'yyyy-MM-dd'"></span>。如果需要反开账，“主菜单》系统设置》重建系统”。</label>
+                        <label>系统已经开账，开账日期：<span ng-bind="initoverdate | date:'yyyy-MM-dd'"></span>。如果需要反开账，“主菜单》系统设置》系统重建”。</label>
                     </div>
                     <div class="form-group form-inline" ng-show="notinitover">
                         <label>开账日期</label>
@@ -86,7 +86,7 @@
                         $scope.savedisabled = false;
                         if (data.message == 'ok') {
                             SweetAlert.swal({ title: '开账成功!', type: 'success' }, function () {
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

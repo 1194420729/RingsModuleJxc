@@ -1,0 +1,174 @@
+﻿<error errorId="6eb2abfe-8faa-4e11-8f95-01ff5f17f9b9" application="/LM/W3SVC/37/ROOT" host="DESKTOP-ILND2OB" type="System.ArgumentException" message="路径不能为空字符串或全为空白。" source="mscorlib" detail="System.Reflection.TargetInvocationException: 调用的目标发生了异常。 ---&gt; System.ArgumentException: 路径不能为空字符串或全为空白。&#xD;&#xA;   在 System.IO.Directory.CreateDirectory(String path)&#xD;&#xA;   在 Elmah.XmlFileErrorLog.Log(Error error)&#xD;&#xA;   在 JxcSystem.Balance.YearBalanceSave(String parameters) 位置 d:\myproject\RingsModule\Jxc\JxcSystem\Balance.cs:行号 120&#xD;&#xA;   --- 内部异常堆栈跟踪的结尾 ---&#xD;&#xA;&#xD;&#xA;Server stack trace: &#xD;&#xA;   在 System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)&#xD;&#xA;   在 System.Reflection.RuntimeMethodInfo.UnsafeInvokeInternal(Object obj, Object[] parameters, Object[] arguments)&#xD;&#xA;   在 System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;&#xA;   在 Rings.Models.PluginLoader.Run(String assemblypath, String classname, String methodname, String parameters, Account account, String contextserviceurl)&#xD;&#xA;   在 System.Runtime.Remoting.Messaging.StackBuilderSink._PrivateProcessMessage(IntPtr md, Object[] args, Object server, Object[]&amp; outArgs)&#xD;&#xA;   在 System.Runtime.Remoting.Messaging.StackBuilderSink.SyncProcessMessage(IMessage msg)&#xD;&#xA;&#xD;&#xA;Exception rethrown at [0]: &#xD;&#xA;   在 System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)&#xD;&#xA;   在 System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData&amp; msgData, Int32 type)&#xD;&#xA;   在 Rings.Models.PluginLoader.Run(String assemblypath, String classname, String methodname, String parameters, Account account, String contextserviceurl)&#xD;&#xA;   在 Baseingfo.Test.Controllers.ServiceController.ServiceFactory() 位置 d:\myproject\RingsModule\Jxc\Jxc.Test\Controllers\ServiceController.cs:行号 81" user="7DE52858-00B9-4982-A5FE-F450328EF5AE`上海亿彤信息科技发展有限公司`1001`zh-CN" time="2017-05-15T01:43:03.5077316Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:46&#xD;&#xA;HTTP_CONTENT_TYPE:application/json;charset=UTF-8&#xD;&#xA;HTTP_ACCEPT:application/json, text/plain, */*&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:zh-CN,zh;q=0.8&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=dtiycuhqh1uyk2p144nuvqgu; .baseinfotest=7DB8398B2F744E20A8695EDD906AAB457CF2430FE24E12942D63AE7204A834A481707210F7397DE0ABCCC73FF92BFD05B4ED4DC46854A2802F5FB61AADBC989B644FE2AA8E7DB9A411143EDBAB28395F335D60CF4C5066174C56D1674724DD324B06B33963FF7DE8AAED416A5A9A1037984922109765F76E47C397264AB814DB309A7366033351B28E663EA03A7D841E3D8EB0B1A9ECCC1FDC6E934E50D76FDCFBA608317231491184AE3204C26E73D5A9D5AE0985D0AEF59CA7E37E105BE107F13AC27A3B227BA1EA17BBE56759E7E248842032F85B554AABB6DC8B6DA050E620A664FE6724520CB54E288AD8F96496&#xD;&#xA;HTTP_HOST:localhost:59422&#xD;&#xA;HTTP_REFERER:http://localhost:59422/jxcsystem/yearbalance&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36&#xD;&#xA;HTTP_ORIGIN:http://localhost:59422&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Content-Length: 46&#xD;&#xA;Content-Type: application/json;charset=UTF-8&#xD;&#xA;Accept: application/json, text/plain, */*&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: zh-CN,zh;q=0.8&#xD;&#xA;Cookie: ASP.NET_SessionId=dtiycuhqh1uyk2p144nuvqgu; .baseinfotest=7DB8398B2F744E20A8695EDD906AAB457CF2430FE24E12942D63AE7204A834A481707210F7397DE0ABCCC73FF92BFD05B4ED4DC46854A2802F5FB61AADBC989B644FE2AA8E7DB9A411143EDBAB28395F335D60CF4C5066174C56D1674724DD324B06B33963FF7DE8AAED416A5A9A1037984922109765F76E47C397264AB814DB309A7366033351B28E663EA03A7D841E3D8EB0B1A9ECCC1FDC6E934E50D76FDCFBA608317231491184AE3204C26E73D5A9D5AE0985D0AEF59CA7E37E105BE107F13AC27A3B227BA1EA17BBE56759E7E248842032F85B554AABB6DC8B6DA050E620A664FE6724520CB54E288AD8F96496&#xD;&#xA;Host: localhost:59422&#xD;&#xA;Referer: http://localhost:59422/jxcsystem/yearbalance&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36&#xD;&#xA;Origin: http://localhost:59422&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/37/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\myproject\RingsModule\Jxc\Jxc.Test\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="7DE52858-00B9-4982-A5FE-F450328EF5AE`上海亿彤信息科技发展有限公司`1001`zh-CN" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="7DE52858-00B9-4982-A5FE-F450328EF5AE`上海亿彤信息科技发展有限公司`1001`zh-CN" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="7DE52858-00B9-4982-A5FE-F450328EF5AE`上海亿彤信息科技发展有限公司`1001`zh-CN" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="46" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="application/json;charset=UTF-8" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="37" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/37" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/service/jxcsystem/jxcsystem/balance/yearbalancesave" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\myproject\RingsModule\Jxc\Jxc.Test\service\jxcsystem\jxcsystem\balance\yearbalancesave" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="52458" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/service/jxcsystem/jxcsystem/balance/yearbalancesave" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="59422" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/8.0" />
+    </item>
+    <item name="URL">
+      <value string="/service/jxcsystem/jxcsystem/balance/yearbalancesave" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="46" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="application/json;charset=UTF-8" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="application/json, text/plain, */*" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="zh-CN,zh;q=0.8" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=dtiycuhqh1uyk2p144nuvqgu; .baseinfotest=7DB8398B2F744E20A8695EDD906AAB457CF2430FE24E12942D63AE7204A834A481707210F7397DE0ABCCC73FF92BFD05B4ED4DC46854A2802F5FB61AADBC989B644FE2AA8E7DB9A411143EDBAB28395F335D60CF4C5066174C56D1674724DD324B06B33963FF7DE8AAED416A5A9A1037984922109765F76E47C397264AB814DB309A7366033351B28E663EA03A7D841E3D8EB0B1A9ECCC1FDC6E934E50D76FDCFBA608317231491184AE3204C26E73D5A9D5AE0985D0AEF59CA7E37E105BE107F13AC27A3B227BA1EA17BBE56759E7E248842032F85B554AABB6DC8B6DA050E620A664FE6724520CB54E288AD8F96496" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:59422" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:59422/jxcsystem/yearbalance" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:59422" />
+    </item>
+  </serverVariables>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="dtiycuhqh1uyk2p144nuvqgu" />
+    </item>
+    <item name=".baseinfotest">
+      <value string="7DB8398B2F744E20A8695EDD906AAB457CF2430FE24E12942D63AE7204A834A481707210F7397DE0ABCCC73FF92BFD05B4ED4DC46854A2802F5FB61AADBC989B644FE2AA8E7DB9A411143EDBAB28395F335D60CF4C5066174C56D1674724DD324B06B33963FF7DE8AAED416A5A9A1037984922109765F76E47C397264AB814DB309A7366033351B28E663EA03A7D841E3D8EB0B1A9ECCC1FDC6E934E50D76FDCFBA608317231491184AE3204C26E73D5A9D5AE0985D0AEF59CA7E37E105BE107F13AC27A3B227BA1EA17BBE56759E7E248842032F85B554AABB6DC8B6DA050E620A664FE6724520CB54E288AD8F96496" />
+    </item>
+  </cookies>
+</error>

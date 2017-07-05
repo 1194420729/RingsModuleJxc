@@ -473,7 +473,7 @@ namespace JxcBillCenter
             ParameterHelper ph = new ParameterHelper(parameters);
             int id = ph.GetParameterValue<int>("id");
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 var bill = db.First("bill", id);
 
@@ -494,20 +494,23 @@ namespace JxcBillCenter
                 {
                     bill.content["total"] = -bill.content.Value<decimal>("total");
                 }
-                foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
+                if (bill.content["details"] != null)
                 {
-                    if (item["qty"] != null)
-                        item["qty"] = -item.Value<decimal>("qty");
-                    if (item["total"] != null)
-                        item["total"] = -item.Value<decimal>("total");
-                    if (item["taxtotal"] != null)
-                        item["taxtotal"] = -item.Value<decimal>("taxtotal");
-                    if (item["discounttotal"] != null)
-                        item["discounttotal"] = -item.Value<decimal>("discounttotal");
-                    if (item["costtotal"] != null)
-                        item["costtotal"] = -item.Value<decimal>("costtotal");
+                    foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
+                    {
+                        if (item["qty"] != null)
+                            item["qty"] = -item.Value<decimal>("qty");
+                        if (item["total"] != null)
+                            item["total"] = -item.Value<decimal>("total");
+                        if (item["taxtotal"] != null)
+                            item["taxtotal"] = -item.Value<decimal>("taxtotal");
+                        if (item["discounttotal"] != null)
+                            item["discounttotal"] = -item.Value<decimal>("discounttotal");
+                        if (item["costtotal"] != null)
+                            item["costtotal"] = -item.Value<decimal>("costtotal");
 
-                    item["uuid"] = Guid.NewGuid().ToString("N");
+                        item["uuid"] = Guid.NewGuid().ToString("N");
+                    }
                 }
                 db.Add("bill", bill);
 

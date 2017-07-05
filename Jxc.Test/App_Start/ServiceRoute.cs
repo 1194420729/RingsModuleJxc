@@ -27,18 +27,28 @@ namespace Baseingfo.Test
             {
                 return null;
             }
-            
+
             //上传文件，不处理
             if (ss.Length > 0 && ss[0].ToLower() == "upload")
             {
                 return null;
             }
-            
-            //httpcontext服务，不处理
-            if (ss.Length > 0 && ss[0].ToLower() == "contextservice")
+
+            //页面小组件，全部转到RenderComponent
+            if (ss.Length > 0 && ss[0].ToLower() == "component")
             {
-                return null;
+                var data = new RouteData(this, new MvcRouteHandler());//声明一个RouteData，添加相应的路由值
+                data.Values.Add("controller", "CommonService");
+                data.Values.Add("action", "RenderComponent");
+
+                return data;
             }
+
+            //httpcontext服务，不处理
+            //if (ss.Length > 0 && ss[0].ToLower() == "contextservice")
+            //{
+            //    return null;
+            //}
 
             //数据接口，全部转到ServiceFactory
             if (ss.Length > 0 && ss[0].ToLower() == "service")

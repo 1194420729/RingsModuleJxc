@@ -292,6 +292,12 @@
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.global = {};
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             var loademployeeandstock = function () {
 
                 if ($scope.billconfig.content.keepemployeeandstock && localStorage.saleorder) {
@@ -420,6 +426,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload = null;
                     window.location.href = '/jxcsale/saleorderedit?id=' + billid;
                 });
             };
@@ -441,7 +448,8 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    $window.onbeforeunload = null;
+                                    window.location.reload();
                                 });                                
                                 return;
                             }
@@ -460,7 +468,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcsale/saleorderprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
 
                             });
                         } else {
@@ -498,7 +507,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcsale/saleorderprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload = null;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

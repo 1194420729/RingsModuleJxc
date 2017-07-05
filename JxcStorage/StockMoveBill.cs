@@ -238,9 +238,7 @@ namespace JxcStorage
         {
             ParameterHelper ph = new ParameterHelper(parameters);
             string path = ph.GetParameterValue<string>("path");
-
-            path = ContextServiceHelper.MapPath(path);
-
+ 
             int rowno = 0;
 
             try

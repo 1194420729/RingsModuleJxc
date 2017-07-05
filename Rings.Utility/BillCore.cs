@@ -1760,6 +1760,14 @@ namespace Jxc.Utility
             {
                 return new TransferBillAudit(bill, db);
             }
+            else if (billname == "saleinvoicebill")
+            {
+                return null;
+            }
+            else if (billname == "purchaseinvoicebill")
+            {
+                return null;
+            }
             else
             {
                 throw new NotImplementedException();

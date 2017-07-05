@@ -241,8 +241,7 @@ namespace JxcSale
             ParameterHelper ph = new ParameterHelper(parameters);
             string path = ph.GetParameterValue<string>("path");
             decimal taxrate = ph.GetParameterValue<decimal>("taxrate");
-            path = ContextServiceHelper.MapPath(path);
-
+             
             int rowno = 0;
 
             try

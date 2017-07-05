@@ -1,16 +1,18 @@
-﻿<ul data-sort="300">    
+﻿<ul data-sort="300" data-group="进销存" data-groupsort="100" data-groupicon="fa fa-newspaper-o fa-fw">
     <li>
         <span><i class="fa fa-truck fa-fw"></i><span class="menutitle">采购管理</span></span>
-        <ul>            
-            <li ng-limit="vendorproductlist"><a href="/jxcpurchase/vendorproductlist"><i class="fa fa-list fa-fw"></i><span class="menutitle">产品价格表</span></a></li> 
+        <ul>
+            <li ng-limit="vendorproductlist"><a href="/jxcpurchase/vendorproductlist"><i class="fa fa-list fa-fw"></i><span class="menutitle">产品价格表</span></a></li>
             <li ng-limit="purchaseorderadd"><a href="/jxcpurchase/purchaseorderadd"><i class="fa fa-file-text-o fa-fw"></i><span class="menutitle">采购订单</span></a></li>
-            <li ng-limit="purchaseorderquery"><a href="/jxcpurchase/purchaseorderquery"><i class="fa fa-search fa-fw"></i><span class="menutitle">采购订单查询</span></a></li> 
-            <li ng-limit="purchaseorderreport"><a href="/jxcpurchase/purchaseorderproductreport"><i class="fa fa-line-chart fa-fw"></i><span class="menutitle">采购订单统计</span></a></li> 
+            <li ng-limit="purchaseorderquery"><a href="/jxcpurchase/purchaseorderquery"><i class="fa fa-search fa-fw"></i><span class="menutitle">采购订单查询</span></a></li>
+            <li ng-limit="purchaseorderreport"><a href="/jxcpurchase/purchaseorderproductreport"><i class="fa fa-line-chart fa-fw"></i><span class="menutitle">采购订单统计</span></a></li>
             <li ng-limit="purchasebilladd"><a href="/jxcpurchase/purchasebilladd"><i class="fa fa-cubes fa-fw"></i><span class="menutitle">采购入库单</span></a></li>
             <li ng-limit="purchasebackbilladd"><a href="/jxcpurchase/purchasebackbilladd"><i class="fa fa-mail-reply fa-fw"></i><span class="menutitle">采购退货单</span></a></li>
             <li ng-limit="purchasesupplement"><a href="/jxcpurchase/purchasesupplement"><i class="fa fa-calculator fa-fw"></i><span class="menutitle">采购补货分析</span></a></li>
             <li ng-limit="timespanpurchasereport"><a href="/jxcpurchase/timespanpurchasereport"><i class="fa fa-area-chart fa-fw"></i><span class="menutitle">采购报表</span></a></li>
-            <li ng-limit="vendorpurchasereport"><a href="/jxcpurchase/vendorpurchasereport"><i class="fa fa-list-ul fa-fw"></i><span class="menutitle">供应商采购统计</span></a></li> 
+            <li ng-limit="vendorpurchasereport"><a href="/jxcpurchase/vendorpurchasereport"><i class="fa fa-list-ul fa-fw"></i><span class="menutitle">供应商采购统计</span></a></li>
+            <li ng-limit="purchaseorderflow"><a href="/jxcpurchase/purchaseorderflow"><i class="fa fa-list-alt fa-fw"></i><span class="menutitle">采购订单流水</span></a></li>
+            <li ng-limit="purchasebillflow"><a href="/jxcpurchase/purchasebillflow"><i class="fa fa-list-ol fa-fw"></i><span class="menutitle">采购入库流水</span></a></li>
         </ul>
-    </li>             
+    </li>
 </ul>

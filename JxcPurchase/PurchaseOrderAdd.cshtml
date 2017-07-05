@@ -282,7 +282,14 @@
     <script src="//139.196.218.9/cdn/myservice.js"></script>
     <script src="//139.196.218.9/cdn/ngnext.js"></script>
     <script src="//cdn.bootcss.com/node-uuid/1.4.7/uuid.min.js"></script>
-
+    <script>
+        //var confirmunload = true;
+        //window.onbeforeunload = function (e) {
+        //    if (confirmunload) {
+        //        return " ";
+        //    }
+        //};
+    </script>
     <script>
         var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree', 'ngNext', 'ui.bootstrap.datetimepicker', 'myservice']);
 
@@ -291,6 +298,12 @@
             $scope.model = { id: 0, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.global = {};
+
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
 
             var loademployeeandstock = function () {
 
@@ -420,6 +433,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload=null;
                     window.location.href = '/jxcpurchase/purchaseorderedit?id=' + billid;
                 });
             };
@@ -441,7 +455,8 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    $window.onbeforeunload=null;
+                                    window.location.reload();
                                 });                                
                                 return;
                             }
@@ -460,7 +475,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpurchase/purchaseorderprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload=null;
+                                window.location.reload();
 
                             });
                         } else {
@@ -498,7 +514,8 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpurchase/purchaseorderprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                $window.onbeforeunload=null;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

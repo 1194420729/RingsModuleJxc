@@ -1,0 +1,14 @@
+﻿.mm-slideout {
+    width: auto !important;
+    margin-left: 260px !important;
+    padding-right: 0px;
+}
+
+.mm-menu.mm-widescreen {
+    width: 260px !important;    
+}
+
+.pageheader a:not(.headerdropdown)
+{
+    display: none;
+}

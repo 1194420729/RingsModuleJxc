@@ -1,0 +1,215 @@
+﻿@{
+    ViewBag.Title = "销售发票明细查询";
+}
+<div data-pagelimit="saleinvoicereport">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcaccounting/checkboxheader");}
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>销售发票明细查询</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                销售发票明细查询
+
+            </div>
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>单据日期<span style="color:red;">*</span></label>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle startdate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="startdate" ng-model="filter.startdate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.startdate" data-datetimepicker-config="{ dropdownSelector: '.startdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <span>-</span>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
+                </div>
+                <div class="form-group form-inline">                     
+                    <label>发票编号</label>
+                    <input type="text" class="form-control" ng-model="filter.invoicecode" />                    
+                    <label>发票类型</label>
+                    <select class="form-control" ng-model="filter.invoicetype">
+                        <option value="">全部</option>
+                        <option value="增值税发票">增值税发票</option>
+                        <option value="普通发票">普通发票</option>
+                        <option value="收据">收据</option>
+                    </select>                
+
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
+                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '销售发票明细查询.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+
+                </div>
+            </div>
+            <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" style="cursor:pointer;">
+
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+
+                    <td data-title="'单据编号'" header-class="'bg-warning'">
+                        <a ng-href="/jxcbillcenter/billdetail?billid={{m.id}}" target="_blank" ng-bind=" m.billcode" title="查看原始单据"></a>
+                    </td>
+                    <td data-title="'单据日期'" header-class="'bg-warning'">
+                        <span ng-bind="m.billdate"></span>
+                    </td>
+                    <td data-title="'销售单号'" header-class="'bg-warning'">
+                        <a ng-href="/jxcbillcenter/billdetail?billid={{m.salebillid}}" target="_blank" ng-bind=" m.salebillcode" title="查看原始单据"></a>
+                    </td>         
+                    <td data-title="'客户名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.customername"></span>
+                    </td>            
+                    <td data-title="'销售金额'" header-class="'bg-warning'">
+                        <span ng-bind="m.saletotal | currency:'￥'"></span>
+                    </td>
+                    <td data-title="'发票金额'" header-class="'bg-warning'">
+                        <span ng-bind="m.invoicetotal | currency:'￥'"></span>
+                    </td>
+                    <td data-title="'发票编号'" header-class="'bg-warning'">
+                        <span ng-bind="m.invoicecode"></span>
+                    </td>
+                    <td data-title="'发票类型'" header-class="'bg-warning'">
+                        <span ng-bind="m.invoicetype"></span>
+                    </td>
+                    
+                    <td data-title="'经手人'" header-class="'bg-warning'">
+                        <span ng-bind="m.employeename"></span>
+                    </td>
+                    <td data-title="'制单人'" header-class="'bg-warning'">
+                        <span ng-bind="m.makername"></span>
+                    </td> 
+                </tr>
+                <tr class="warning">
+                    <td colspan="5">
+                        合计：<span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td></td>
+                    <td ng-bind="invoicetotalsum | currency:'￥'"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+
+        .deliverywarning {
+            color: red;
+            font-weight: bold;
+        }
+
+        .abortbill {
+            color: #CC6633;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'myfilter', 'ngDateScope']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, $uibModal) {
+
+            var querystring = '@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.QueryStringDictionary)))';
+            $scope.filter = JSON.parse(querystring);
+             
+            $scope.queryfilter = {};
+
+            $http.post('/saleinvoicereportservice/RefreshMVWSaleInvoiceBill', {})
+                    .success(function (data) {
+
+                    });
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/saleinvoicereportservice/saleinvoicebillreportdetail',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+
+                        $scope.invoicetotalsum = data.invoicetotalsum;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+
+                        $scope.showwaiter = false;
+                    });
+            };
+
+            $scope.btnqueryClick = function () {
+                if (!$scope.filter.startdate || !$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请完整填写起止日期', type: 'error' });
+                    return;
+                }
+
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+            };
+
+            $scope.btnqueryClick();
+        });
+
+
+    </script>
+}

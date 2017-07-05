@@ -41,7 +41,7 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
-
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
                 </div>
                 <div class="form-group form-inline">
                     <label>产品名称</label>
@@ -172,9 +172,10 @@
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
 
@@ -267,7 +268,7 @@
                             + ($scope.filter.employeename ? ('&employeename=' + encodeURIComponent($scope.filter.employeename)) : '')
                             + ($scope.filter.stockname ? ('&stockname=' + encodeURIComponent($scope.filter.stockname)) : '')
                             + ($scope.filter.productname ? ('&productname=' + encodeURIComponent($scope.filter.productname)) : '');
-                
+
                 $window.open(url);
             };
         });

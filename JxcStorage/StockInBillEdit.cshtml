@@ -23,6 +23,8 @@
                 入库单
                 <span style="margin-left:200px;">制单人：{{makername}}</span>
                 <span style="margin-left:20px;" ng-bind="model.content.auditorid?'【已审核】':'【草稿】'"></span>
+                <img src="~/Content/images/redword.png" ng-if="model.content.auditstatus===3" alt="" class="blueredword" />
+                <img src="~/Content/images/blueword.png" ng-if="model.content.auditstatus===2" alt="" class="blueredword" />
                 <a class="pull-right" href="javascript:;" ng-click="billconfigClick()"><i class="fa fa-gear fa-fw"></i></a>
             </div>
             <div class="panel-body">
@@ -235,6 +237,12 @@
             $scope.model = { id: id, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 }); 
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             $http.post('/stockinbillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -323,6 +331,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload=null;
                     window.location.href = '/jxcstorage/stockinbilledit?id=' + billid;
                 });
             };
@@ -344,6 +353,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
+                                    $window.onbeforeunload=null;
                                     window.location.href = '/jxcstorage/stockinbilladd';
                                 });
                                 return;
@@ -363,6 +373,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinbillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcstorage/stockinbilladd';
 
                             });
@@ -401,6 +412,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinbillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcstorage/stockinbilladd';
                             });
                         } else if (data.message === 'needcost') {

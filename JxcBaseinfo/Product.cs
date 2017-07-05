@@ -104,8 +104,7 @@ namespace JxcBaseinfo
         {
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
             string path = dic["path"].ToString();
-            path = ContextServiceHelper.MapPath(path);
-
+             
             bool cover = Convert.ToBoolean(dic["cover"]);
 
             int rowno = 0;
@@ -240,7 +239,7 @@ namespace JxcBaseinfo
 
         public Object GetCode(string parameters)
         {
-            DBHelper db = new DBHelper();
+            DBHelper db = new DBHelper(true);
 
             string code = string.Empty;
             var model = db.FirstOrDefault("select * from \"" + tablename + "\" order by content->>'code' desc");
@@ -284,7 +283,7 @@ namespace JxcBaseinfo
         {
             TableModel model = JsonConvert.DeserializeObject<TableModel>(parameters);
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
                 int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where content->>'code'='" + model.content.Value<string>("code") + "'");
@@ -301,6 +300,20 @@ namespace JxcBaseinfo
                     }
                 }
 
+                //有授权范围的情况下，检查产品类别
+                var employee = db.First("employee", PluginContext.Current.Account.Id);
+                if (employee.content.Value<JObject>("scope") != null)
+                {
+                    var scope = employee.content.Value<JObject>("scope").Value<JArray>("product").Values<int>().ToList();
+                    if (!(scope.Count == 1 && scope[0] == 0))
+                    {
+                        if (scope.Contains(model.content.Value<int>("categoryid")) == false)
+                        {
+                            return new { message = StringHelper.GetString("您没有填写类别或者您没有该类别的权限！") };
+                        }
+                    }
+                }
+
                 model.content["pycode"] = PyConverter.IndexCode(model.content.Value<string>("name"));
                 db.Add(this.tablename, model);
                 db.SaveChanges();
@@ -313,7 +326,7 @@ namespace JxcBaseinfo
         public Object EditSave(string parameters)
         {
             TableModel model = JsonConvert.DeserializeObject<TableModel>(parameters);
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
                 int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where id<>" + model.id + " and content->>'code'='" + model.content.Value<string>("code") + "'");
@@ -329,6 +342,20 @@ namespace JxcBaseinfo
                         return new { message = StringHelper.GetString("条码有重复") };
                     }
                 }
+                //有授权范围的情况下，检查产品类别
+                var employee = db.First("employee", PluginContext.Current.Account.Id);
+                if (employee.content.Value<JObject>("scope") != null)
+                {
+                    var scope = employee.content.Value<JObject>("scope").Value<JArray>("product").Values<int>().ToList();
+                    if (!(scope.Count == 1 && scope[0] == 0))
+                    {
+                        if (scope.Contains(model.content.Value<int>("categoryid")) == false)
+                        {
+                            return new { message = StringHelper.GetString("您没有填写类别或者您没有该类别的权限！") };
+                        }
+                    }
+                }
+
                 model.content["pycode"] = PyConverter.IndexCode(model.content.Value<string>("name"));
                 db.Edit(this.tablename, model);
                 db.SaveChanges();

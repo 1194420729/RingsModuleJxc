@@ -569,7 +569,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    window.location.reload();
                                 });
                                 return;
                             }
@@ -588,7 +588,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                window.location.reload();
 
                             });
                         } else {
@@ -626,7 +626,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
                                 }
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else if (data.message === 'needcost') {
                             SweetAlert.swal({ title: '部分产品库存为零，无法取得当前成本，请手工指定成本价', type: 'error' }, function () {

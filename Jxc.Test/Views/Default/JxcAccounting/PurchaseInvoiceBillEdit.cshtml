@@ -18,6 +18,8 @@
                 采购发票
                 <span style="margin-left:200px;">制单人：{{makername}}</span>
                 <span style="margin-left:20px;" ng-bind="model.content.auditorid?'【已审核】':'【草稿】'"></span>
+                <img src="~/Content/images/redword.png" ng-if="model.content.auditstatus===3" alt="" class="blueredword" />
+                <img src="~/Content/images/blueword.png" ng-if="model.content.auditstatus===2" alt="" class="blueredword" />
             </div>
             <div class="panel-body">
                 <div class="container-fluid">
@@ -212,6 +214,12 @@
             $scope.model = { id: id, content: {} }; 
             $scope.tableParams = new NgTableParams({ count: 99999 });
 
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             $http.post('/purchaseinvoicebillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -321,10 +329,11 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload=null;
                     window.location.href = '/jxcaccounting/purchaseinvoicebilledit?id=' + billid;
                 });
             };
-
+            
             $scope.btnsaveClick = function () {
                 if (savecheck() === false) return;
 
@@ -353,6 +362,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
+                                    $window.onbeforeunload=null;
                                     window.location.href = '/jxcaccounting/purchaseinvoicebilladd';
                                 });
                                 return;
@@ -372,6 +382,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcaccounting/purchaseinvoicebillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcaccounting/purchaseinvoicebilladd';
 
                             });
@@ -421,6 +432,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcaccounting/purchaseinvoicebillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcaccounting/purchaseinvoicebilladd';
                             });
                         } else {

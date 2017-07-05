@@ -109,7 +109,7 @@
                 $http.post('/categoryservice/move', { id:nodes[0].id,parentid:nodes[0].id })
                     .success(function (data) {
                         if (data.message == 'ok') {
-                            window.location.href = window.location.href;
+                            window.location.reload();
                         }
                     });
 

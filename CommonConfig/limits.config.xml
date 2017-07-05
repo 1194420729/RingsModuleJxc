@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="departmentlist" title="部门列表" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentadd" title="新增部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentedit" title="编辑部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentdelete" title="删除部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentstop" title="停用部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentunstop" title="启用部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentimport" title="导入部门" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="departmentexport" title="导出部门" groupname="操作员与权限" modulename="授权中心"></limit>
+
+  <limit name="employeelist" title="员工列表" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeeadd" title="新增员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeeedit" title="编辑员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeedelete" title="删除员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeestop" title="停用员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeeunstop" title="启用员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeeimport" title="导入员工" groupname="操作员与权限" modulename="授权中心"></limit>
+  <limit name="employeeexport" title="导出员工" groupname="操作员与权限" modulename="授权中心"></limit>
+
+  <limit name="userlist" title="操作员与权限" groupname="操作员与权限" modulename="授权中心"></limit>
+</limits>

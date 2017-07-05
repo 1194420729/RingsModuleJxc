@@ -224,9 +224,7 @@ namespace JxcStorage
             int stockid = ph.GetParameterValue<int>("stockid");
             int categoryid = ph.GetParameterValue<int>("categoryid");
             DateTime inventorydate = ph.GetParameterValue<DateTime>("inventorydate");
-
-            path = ContextServiceHelper.MapPath(path);
-
+ 
             int rowno = 0;
 
             try

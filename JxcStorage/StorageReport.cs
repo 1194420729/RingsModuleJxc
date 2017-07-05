@@ -453,13 +453,13 @@ namespace JxcStorage
                 {
                     sb.AppendFormat(" and (content->>'name' ilike '%{0}%' or content->>'code' ilike '%{0}%')", f);
                 }
-                else if (field == "showzero")
-                {
-                    if (f.ToLower() == "false")
-                    {
-                        sb.AppendFormat(" and coalesce((content->'storage'->'{0}'->>'qty')::decimal,0)<>0", stockid);
-                    }
-                }
+                //else if (field == "showzero")
+                //{
+                //    if (f.ToLower() == "false")
+                //    {
+                //        sb.AppendFormat(" and coalesce((content->'storage'->'{0}'->>'qty')::decimal,0)<>0", stockid);
+                //    }
+                //}
             }
 
             StringBuilder sborder = new StringBuilder();
@@ -497,14 +497,14 @@ namespace JxcStorage
                          "WHERE (bill.content ->> 'billname'::text) = 'purchaseorder'::text AND ((bill.content ->> 'auditstatus'::text)::integer) = 1 " +
                         ") " +
                         "select coalesce(sum((cte.detail->>'qty')::decimal),0)-coalesce(sum((cte.detail->>'deliveryqty')::decimal),0) as undeliveryqty " +
-                        "from cte " + (stockid == 0 ? "" : ("where cte.stockid=" + stockid));
+                        "from cte inner join (select id from product "+sb.ToString()+") as p on (cte.detail->>'productid')::int=p.id " + (stockid == 0 ? "" : ("where cte.stockid=" + stockid));
             string sqlSaleUndelivery = "WITH cte AS (" +
                          "SELECT jsonb_array_elements(bill.content -> 'details'::text) AS detail,(bill.content->>'stockid')::int as stockid " +
                          "FROM bill " +
                          "WHERE (bill.content ->> 'billname'::text) = 'saleorder'::text AND ((bill.content ->> 'auditstatus'::text)::integer) = 1 " +
                         ") " +
                         "select coalesce(sum((cte.detail->>'qty')::decimal),0)-coalesce(sum((cte.detail->>'deliveryqty')::decimal),0) as undeliveryqty " +
-                        "from cte " + (stockid == 0 ? "" : ("where cte.stockid=" + stockid));
+                        "from cte inner join (select id from product " + sb.ToString() + ") as p on (cte.detail->>'productid')::int=p.id  " + (stockid == 0 ? "" : ("where cte.stockid=" + stockid));
 
             int recordcount = db.Count(sqlCount);
             DataTable dtSum = db.QueryTable(sqlSum);
@@ -787,16 +787,20 @@ namespace JxcStorage
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select * " +
-                            "from storagedetail " +
+            string cte = "with cte as (select storagedetail.* from storagedetail "+
+                            "inner join product on (storagedetail.content->>'productid')::int=product.id "+
+                            "inner join stock on (storagedetail.content->>'stockid')::int=stock.id) ";
+
+            string sql = cte+"select * " +
+                            "from cte " +
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt " +
-                            "from storagedetail " +
+            string sqlCount = cte+"select count(*) as cnt " +
+                            "from cte " +
                             sb.ToString();
-            string sqlQtySum = "select coalesce(sum((content->>'qty')::decimal),0) as qty from storagedetail " + sb.ToString();
-            string sqlTotalSum = "select coalesce(sum((content->>'total')::decimal),0) as total from storagedetail " + sb.ToString();
+            string sqlQtySum = cte+"select coalesce(sum((content->>'qty')::decimal),0) as qty from cte " + sb.ToString();
+            string sqlTotalSum = cte+"select coalesce(sum((content->>'total')::decimal),0) as total from cte " + sb.ToString();
 
             int recordcount = Convert.ToInt32(db.Scalar(sqlCount));
             decimal qtysum = Convert.ToDecimal(db.Scalar(sqlQtySum));
@@ -917,38 +921,35 @@ namespace JxcStorage
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "with cte as " +
+            string cte = "with cte as " +
                         "( " +
                         "select (content->>'productid')::int as productid,(content->>'stockid')::int as stockid,(content->>'qty')::decimal as qty, " +
                         "	(content->>'total')::decimal as total " +
                         "from storagedetail " + sb.ToString() +
-                        ") " +
+                        ") ";
+
+            string sql = cte +
                         "select cte.productid,product.content->>'code' as code,product.content->>'name' as name, " +
                         "product.content->>'standard' as standard,product.content->>'type' as type, " +
                         "product.content->>'unit' as unit,product.content->>'barcode' as barcode,product.content->>'area' as area, " +
                         "sum(qty) as qty,sum(total) as total  " +
-                        "from cte left join product on cte.productid=product.id " +
+                        "from cte inner join product on cte.productid=product.id " +
                         "group by cte.productid,product.content->>'code',product.content->>'name', " +
                         "	product.content->>'standard',product.content->>'type', " +
                         "	product.content->>'unit',product.content->>'barcode',product.content->>'area' " +
                         sborder.ToString();
 
             string sqlCount = "select count(*) as cnt from (" +
-                        "with cte as " +
-                        "( " +
-                        "select (content->>'productid')::int as productid,(content->>'stockid')::int as stockid,(content->>'qty')::decimal as qty, " +
-                        "	(content->>'total')::decimal as total " +
-                        "from storagedetail " + sb.ToString() +
-                        ") " +
-                        "select productid " +
-                        "from cte " +
-                        "group by productid " +
+                            cte +
+                        "select cte.productid " +
+                        "from cte inner join product on cte.productid=product.id " +
+                        "group by cte.productid " +
                         ") as t";
 
 
-            string sqlSum = "select coalesce(sum((content->>'qty')::decimal),0) as qty, " +
-                        "	coalesce(sum((content->>'total')::decimal),0) as total " +
-                        "from storagedetail " + sb.ToString();
+            string sqlSum = cte+"select coalesce(sum(cte.qty),0) as qty, " +
+                        "	coalesce(sum(cte.total),0) as total " +
+                        "from cte inner join product on cte.productid=product.id ";
 
             int recordcount = db.Count(sqlCount);
             DataTable dtSum = db.QueryTable(sqlSum);

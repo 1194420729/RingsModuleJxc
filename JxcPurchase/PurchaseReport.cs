@@ -82,7 +82,7 @@ namespace JxcPurchase
                         var ids = CategoryHelper.GetChildrenIds(Convert.ToInt32(f));
                         ids.Add(Convert.ToInt32(f));
                         string idsfilter = ids.Select(c => c.ToString()).Aggregate((a, b) => a + "," + b);
-                        DataTable dt = db.QueryTable("select id,'{}'::jsonb as content from product where (content->>'categoryid')::int in (" + idsfilter + ")");
+                        DataTable dt = db.QueryTable("select id from product where (content->>'categoryid')::int in (" + idsfilter + ")");
                         idsfilter = dt.GetIds();
                         sb.AppendFormat(" and productid in ({0})", idsfilter);
                     }
@@ -130,27 +130,40 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select productid,productcode,productname,producttype,productstandard,productbarcode,productunit,productarea," +
+            string cte = "with cte as (select mvw_purchasebill.* from mvw_purchasebill "
+                            + "inner join stock on mvw_purchasebill.stockid=stock.id "
+                            + "inner join vendor on mvw_purchasebill.vendorid=vendor.id "
+                            + "inner join product on mvw_purchasebill.productid=product.id) ";
+
+            string sql = cte +
+                            "select productid,productcode,productname,producttype,productstandard,productbarcode,productunit,productarea," +
                             "sum(case when billname='purchasebill' then qty else -qty end)  as qty," +
                             "sum(case when billname='purchasebill' then total else -total end) as total," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end) as discounttotal," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end)-sum(case when billname='purchasebill' then total else -total end) as taxtotal," +
                             "sum(case when billname='purchasebill' then total else -total end) /sum(case when billname='purchasebill' then qty else -qty end) as price," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end) /sum(case when billname='purchasebill' then qty else -qty end) as discountprice " +
-                            "from mvw_purchasebill " +
+                            "from cte " +
                             sb.ToString() +
                             "group by productid,productcode,productname,producttype,productstandard,productbarcode,productunit,productarea " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select productid from mvw_purchasebill "
-                                + sb.ToString()
-                                + " group by productid) select count(*) from cte";
+            //string sqlCount = "with cte as (select productid from mvw_purchasebill "
+            //                    + sb.ToString()
+            //                    + " group by productid) select count(*) from cte";
 
-            string sqlSum = "select coalesce(sum(case when billname='purchasebill' then qty else -qty end),0) as qty," +
+            string sqlCount = cte
+                            + "select count(*) from (select productid from cte "
+                            + sb.ToString()
+                            + " group by productid) as t";
+
+
+            string sqlSum = cte+
+                            "select coalesce(sum(case when billname='purchasebill' then qty else -qty end),0) as qty," +
                             "coalesce(sum(case when billname='purchasebill' then total else -total end),0) as total," +
                             "coalesce(sum(case when billname='purchasebill' then discounttotal else -discounttotal end),0) as discounttotal," +
                             "coalesce(sum(case when billname='purchasebill' then discounttotal else -discounttotal end)-sum(case when billname='purchasebill' then total else -total end),0) as taxtotal " +
-                            "from mvw_purchasebill " +
+                            "from cte " +
                             sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -229,7 +242,7 @@ namespace JxcPurchase
                         var ids = CategoryHelper.GetChildrenIds(Convert.ToInt32(f));
                         ids.Add(Convert.ToInt32(f));
                         string idsfilter = ids.Select(c => c.ToString()).Aggregate((a, b) => a + "," + b);
-                        DataTable dt = db.QueryTable("select id,'{}'::jsonb as content from vendor where (content->>'categoryid')::int in (" + idsfilter + ")");
+                        DataTable dt = db.QueryTable("select id from vendor where (content->>'categoryid')::int in (" + idsfilter + ")");
                         idsfilter = dt.GetIds();
                         sb.AppendFormat(" and vendorid in ({0})", idsfilter);
                     }
@@ -277,26 +290,38 @@ namespace JxcPurchase
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select vendorid,vendorcode,vendorname," +
+            string cte = "with cte as (select mvw_purchasebill.* from mvw_purchasebill "
+                            + "inner join stock on mvw_purchasebill.stockid=stock.id "
+                            + "inner join vendor on mvw_purchasebill.vendorid=vendor.id "
+                            + "inner join product on mvw_purchasebill.productid=product.id) ";
+
+            string sql = cte+
+                            "select vendorid,vendorcode,vendorname," +
                             "sum(case when billname='purchasebill' then total else -total end) as total," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end) as discounttotal," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end)-sum(case when billname='purchasebill' then total else -total end) as taxtotal," +
                             "sum(case when billname='purchasebill' then total else -total end) /sum(case when billname='purchasebill' then qty else -qty end) as price," +
                             "sum(case when billname='purchasebill' then discounttotal else -discounttotal end) /sum(case when billname='purchasebill' then qty else -qty end) as discountprice " +
-                            "from mvw_purchasebill " +
+                            "from cte " +
                             sb.ToString() +
                             "group by vendorid,vendorcode,vendorname " +
                             sborder.ToString();
 
-            string sqlCount = "with cte as (select vendorid,vendorcode,vendorname from mvw_purchasebill "
-                                + sb.ToString()
-                                + " group by vendorid,vendorcode,vendorname) select count(*) from cte";
+            //string sqlCount = "with cte as (select vendorid,vendorcode,vendorname from mvw_purchasebill "
+            //                    + sb.ToString()
+            //                    + " group by vendorid,vendorcode,vendorname) select count(*) from cte";
 
-            string sqlSum = "select coalesce(sum(case when billname='purchasebill' then qty else -qty end),0) as qty," +
+            string sqlCount = cte
+                            + "select count(*) from (select vendorid,vendorcode,vendorname from cte "
+                            + sb.ToString()
+                            + " group by vendorid,vendorcode,vendorname) as t";
+
+            string sqlSum = cte+
+                            "select coalesce(sum(case when billname='purchasebill' then qty else -qty end),0) as qty," +
                            "coalesce(sum(case when billname='purchasebill' then total else -total end),0) as total," +
                            "coalesce(sum(case when billname='purchasebill' then discounttotal else -discounttotal end),0) as discounttotal," +
                            "coalesce(sum(case when billname='purchasebill' then discounttotal else -discounttotal end)-sum(case when billname='purchasebill' then total else -total end),0) as taxtotal " +
-                           "from mvw_purchasebill " +
+                           "from cte " +
                            sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -331,25 +356,25 @@ namespace JxcPurchase
             {
                 int productid = ph.GetParameterValue<int>("productid");
                 var product = db.First("product", productid);
-                tip = StringHelper.GetString("按产品") + ":" + product.content.Value<string>("code") + " " + product.content.Value<string>("name");
+                tip =  product.content.Value<string>("code") + " " + product.content.Value<string>("name");
             }
             else if (reporttype == "byvendor")
             {
                 int vendorid = ph.GetParameterValue<int>("vendorid");
                 var vendor = db.First("vendor", vendorid);
-                tip = StringHelper.GetString("按供应商") + ":" + vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
+                tip = vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
             }
             else if (reporttype == "byemployee")
             {
                 int employeeid = ph.GetParameterValue<int>("employeeid");
                 var employee = db.First("employee", employeeid);
-                tip = StringHelper.GetString("按经手人") + ":" + employee.content.Value<string>("code") + " " + employee.content.Value<string>("name");
+                tip = employee.content.Value<string>("code") + " " + employee.content.Value<string>("name");
             }
             else if (reporttype == "bystock")
             {
                 int stockid = ph.GetParameterValue<int>("stockid");
                 var stock = db.First("stock", stockid);
-                tip = StringHelper.GetString("按仓库") + ":" + stock.content.Value<string>("code") + " " + stock.content.Value<string>("name");
+                tip = stock.content.Value<string>("code") + " " + stock.content.Value<string>("name");
             }
 
             bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
@@ -395,30 +420,6 @@ namespace JxcPurchase
                 {
                     sb.AppendFormat(" and billdate<='{0}'", f);
                 }
-                else if (field == "productname")
-                {
-                    DataTable dt = db.QueryTable("select id from product where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and productid in ({0})", ids);
-                }
-                else if (field == "vendorname")
-                {
-                    DataTable dt = db.QueryTable("select id from vendor where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and vendorid in ({0})", ids);
-                }
-                else if (field == "employeename")
-                {
-                    DataTable dt = db.QueryTable("select id from employee where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and employeeid in ({0})", ids);
-                }
-                else if (field == "stockname")
-                {
-                    DataTable dt = db.QueryTable("select id from stock where content->>'name' ilike '%" + f + "%' or content->>'code' ilike '%" + f + "%'");
-                    string ids = dt.GetIds();
-                    sb.AppendFormat(" and stockid in ({0})", ids);
-                }
                 else if (field == "productid")
                 {
                     sb.AppendFormat(" and productid={0}", f);
@@ -435,66 +436,87 @@ namespace JxcPurchase
                 {
                     sb.AppendFormat(" and stockid={0}", f);
                 }
+                else if (field == "billcode")
+                {
+                    sb.AppendFormat(" and billcode ilike '%{0}%'", f);
+                }
+                else if (field == "vendorname")
+                {
 
+                    sb.AppendFormat(" and (vendorname ilike '%{0}%' or vendorcode ilike '%{0}%')", f);
+                }
+                else if (field == "employeename")
+                {
+                    sb.AppendFormat(" and (employeename ilike '%{0}%' or employeecode ilike '%{0}%')", f);
+                }
+                else if (field == "stockname")
+                {
+                    sb.AppendFormat(" and (stockname ilike '%{0}%' or stockcode ilike '%{0}%')", f);
+                }
+                else if (field == "productname")
+                {
+                    sb.AppendFormat(" and (productname ilike '%{0}%' or productcode ilike '%{0}%')", f);
+                }
+                else if (field == "makername")
+                {
+                    sb.AppendFormat(" and (makername ilike '%{0}%' or makercode ilike '%{0}%')", f);
+                }
+                else if (field == "comment")
+                {
+                    sb.AppendFormat(" and comment ilike '%{0}%'", f);
+                }
             }
 
             StringBuilder sborder = new StringBuilder();
-            if (mysorting.Count > 0) sborder.Append(" order by ");
-            int i = 0;
-            foreach (string field in mysorting.Keys)
-            {
-                i++;
-                sborder.AppendFormat(" content->>'{0}' {1} {2}", field.ToLower(), mysorting[field], i == mysorting.Count ? "" : ",");
-            }
-
-            if (mysorting.Count == 0)
-            {
-                sborder.Append(" order by id ");
-            }
+            sborder.Append(" order by id,productcode ");
 
 
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
-            string sql = "select id " +
-                            "from mvw_purchasebill " +
+            string cte = "with cte as (select mvw_purchasebill.* from mvw_purchasebill "
+                            + "inner join stock on mvw_purchasebill.stockid=stock.id "
+                            + "inner join vendor on mvw_purchasebill.vendorid=vendor.id "
+                            + "inner join product on mvw_purchasebill.productid=product.id) ";
+
+            string sql = cte
+                            + "select * " +
+                            "from cte " +
                             sb.ToString() +
-                            "group by id ";
-            DataTable dtIds = db.QueryTable(sql);
-            string filterids = dtIds.GetIds();
-            sql = string.Format("select * from bill where id in ({0}) " + sborder, filterids);
+                            sborder.ToString();
 
-            string sqlQtySum = "select coalesce(sum(case when billname='purchasebill' then qty else -qty end),0) as qty " +
-                                "from  " +
-                                "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'qty')::decimal) as qty,content->>'billname' as billname from bill where id in (" + filterids + ")) as t";
-            string sqlTotalSum = "select coalesce(sum(case when billname='purchasebill' then total else -total end),0) as total " +
-                                "from  " +
-                                "( " +
-                                "select  ((jsonb_array_elements(content->'details')->>'discounttotal')::decimal) as total,content->>'billname' as billname from bill where id in (" + filterids + ")) as t";
+            string sqlCount = cte
+                            + "select count(*) from cte "
+                            + sb.ToString();
 
-            int recordcount = dtIds.Rows.Count;
-            decimal qtysum = Convert.ToDecimal(db.Scalar(sqlQtySum));
-            decimal totalsum = Convert.ToDecimal(db.Scalar(sqlTotalSum));
 
-            var list = db.Where(sql);
-            foreach (var item in list)
-            {
-                item.content.Add("makername", db.First("employee", item.content.Value<int>("makerid")).content.Value<string>("name"));
-                item.content.Add("vendorname", db.First("vendor", item.content.Value<int>("vendorid")).content.Value<string>("name"));
-                item.content.Add("employeename", db.First("employee", item.content.Value<int>("employeeid")).content.Value<string>("name"));
-                item.content.Add("stockname", db.First("stock", item.content.Value<int>("stockid")).content.Value<string>("name"));
-                decimal qty = item.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("qty"));
-                decimal total = item.content.Value<decimal>("total");
-                string billname = item.content.Value<string>("billname");
-                item.content.Add("qty", billname == "purchasebill" ? qty : -qty);
-                item.content["total"]= billname == "purchasebill" ? total : -total;
-            }
+            string sqlSum = cte
+                            + "select coalesce(sum(qty) filter (where billname='purchasebill'),0)-coalesce(sum(qty) filter (where billname='purchasebackbill'),0) as qty," +
+                            "coalesce(sum(total) filter (where billname='purchasebill'),0)-coalesce(sum(total) filter (where billname='purchasebackbill'),0) as total," +
+                            "coalesce(sum(discounttotal) filter (where billname='purchasebill'),0)-coalesce(sum(discounttotal) filter (where billname='purchasebackbill'),0) as discounttotal " +
+                            "from cte " +
+                            sb.ToString();
+
+
+            int recordcount = db.Count(sqlCount);
+            DataTable dtSum = db.QueryTable(sqlSum);
+
+            decimal qtysum = Convert.ToDecimal(dtSum.Rows[0]["qty"]);
+            decimal totalsum = Convert.ToDecimal(dtSum.Rows[0]["total"]);
+            decimal discounttotalsum = Convert.ToDecimal(dtSum.Rows[0]["discounttotal"]);
+            decimal taxtotalsum = discounttotalsum - totalsum;
+
+            DataTable list = db.QueryTable(sql);
+
+            bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
 
             return new
             {
+                showcost = showcost,
                 resulttotal = recordcount,
                 qtysum = qtysum,
                 totalsum = totalsum,
+                discounttotalsum = discounttotalsum,
+                taxtotalsum = taxtotalsum,
                 data = list
             };
         }
@@ -514,7 +536,7 @@ namespace JxcPurchase
             QueryParameter para = ParameterHelper.GetQueryParameters(parameters);
 
             var myfilter = JsonConvert.DeserializeObject<Dictionary<string, string>>(para.filter);
-             
+
             StringBuilder sb = new StringBuilder();
             sb.Append(" and coalesce(content->>'stop','')=''");
 
@@ -531,7 +553,7 @@ namespace JxcPurchase
                 {
                     sb.AppendFormat(" and (content->>'vendorid')::int = {0}", f);
                 }
-               
+
             }
 
             StringBuilder sborder = new StringBuilder();
@@ -549,20 +571,20 @@ namespace JxcPurchase
             decimal saleqtysum = decimal.Zero;
             foreach (var item in list)
             {
-                string startdate=DateTime.Now.AddDays(-Convert.ToDouble(myfilter["saledate"])).ToString("yyyy-MM-dd");
-                var saleqty = db.Scalar("select coalesce(sum(qty),0) as qty from mvw_salebill  where productid=" + item.id + " and billdate>='" + startdate+"'");
+                string startdate = DateTime.Now.AddDays(-Convert.ToDouble(myfilter["saledate"])).ToString("yyyy-MM-dd");
+                var saleqty = db.Scalar("select coalesce(sum(qty),0) as qty from mvw_salebill  where productid=" + item.id + " and billdate>='" + startdate + "'");
                 item.content.Add("saleqty", Convert.ToDecimal(saleqty));
-                
+
                 saleqtysum += Convert.ToDecimal(saleqty);
                 if (item.content["storage"] != null)
                 {
                     storageqtysum += Convert.ToDecimal(item.content.Value<JObject>("storage").Value<JObject>("0").Value<decimal>("qty"));
                 }
 
-                var vp=db.FirstOrDefault("select * from vendorproduct where (content->>'vendorid')::int="+myfilter["vendorid"]+" and (content->>'productid')::int="+item.id);
+                var vp = db.FirstOrDefault("select * from vendorproduct where (content->>'vendorid')::int=" + myfilter["vendorid"] + " and (content->>'productid')::int=" + item.id);
                 if (vp != null)
                 {
-                    item.content.Add("lastbuyprice",vp.content["price"]);
+                    item.content.Add("lastbuyprice", vp.content["price"]);
                 }
             }
 
@@ -572,13 +594,13 @@ namespace JxcPurchase
         public Object PurchaseSupplementSave(string parameters)
         {
             ParameterHelper ph = new ParameterHelper(parameters);
-            int vendorid= ph.GetParameterValue<int>("vendorid");
+            int vendorid = ph.GetParameterValue<int>("vendorid");
             string products = ph.GetParameterValue<string>("products");
-             
+
             TableModel purchaseorder = new TableModel()
             {
-                id=0,
-                content=new JObject()
+                id = 0,
+                content = new JObject()
             };
 
             using (DBHelper db = new DBHelper())
@@ -635,6 +657,256 @@ namespace JxcPurchase
                 db.SaveChanges();
             }
             return new { message = "ok" };
+        }
+
+        public Object PurchaseOrderFlow(string parameters)
+        {
+            QueryParameter para = ParameterHelper.GetQueryParameters(parameters);
+             
+            var myfilter = JsonConvert.DeserializeObject<Dictionary<string, string>>(para.filter);
+
+            int pageindex = para.page ?? 1;
+            int pagesize = para.count ?? 25;
+
+            DBHelper db = new DBHelper();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" where 1=1 ");
+
+            foreach (string field in myfilter.Keys)
+            {
+                if (string.IsNullOrEmpty(myfilter[field]))
+                    continue;
+
+                string f = myfilter[field].Trim();
+                if (string.IsNullOrEmpty(f))
+                    continue;
+
+                if (field == "startdate")
+                {
+                    sb.AppendFormat(" and billdate>='{0}'", f);
+                }
+                else if (field == "enddate")
+                {
+                    sb.AppendFormat(" and billdate<='{0}'", f);
+                }
+                else if (field == "billcode")
+                {
+                    sb.AppendFormat(" and billcode ilike '%{0}%'", f);
+                }
+                else if (field == "vendorname")
+                {
+
+                    sb.AppendFormat(" and (vendorname ilike '%{0}%' or vendorcode ilike '%{0}%')", f);
+                }
+                else if (field == "employeename")
+                {
+                    sb.AppendFormat(" and (employeename ilike '%{0}%' or employeecode ilike '%{0}%')", f);
+                }
+                else if (field == "stockname")
+                {
+                    sb.AppendFormat(" and (stockname ilike '%{0}%' or stockcode ilike '%{0}%')", f);
+                }
+                else if (field == "productname")
+                {
+                    sb.AppendFormat(" and (productname ilike '%{0}%' or productcode ilike '%{0}%')", f);
+                }
+                else if (field == "makername")
+                {
+                    sb.AppendFormat(" and (makername ilike '%{0}%' or makercode ilike '%{0}%')", f);
+                }
+                else if (field == "comment")
+                {
+                    sb.AppendFormat(" and comment ilike '%{0}%'", f);
+                }
+                else if (field == "finish")
+                {
+                    if (f == "aborted")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=true");
+                    }
+                    else if (f == "finished")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=false and deliveryqty>=qty");
+                    }
+                    else if (f == "unfinish")
+                    {
+                        sb.Append(" and coalesce((content->>'abort')::boolean,false)=false  and deliveryqty<qty");
+                    }
+                }
+            }
+
+            StringBuilder sborder = new StringBuilder();
+            sborder.Append(" order by id,productcode ");
+
+
+            sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
+
+            string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
+                            + "inner join stock on mvw_purchaseorder.stockid=stock.id "
+                            + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
+                            + "inner join product on mvw_purchaseorder.productid=product.id) ";
+
+            string sql = cte
+                            + "select * " +
+                            "from cte " +
+                            sb.ToString() +
+                            sborder.ToString();
+
+            //string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_purchaseorder "
+            //                    + sb.ToString()
+            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
+
+            string sqlCount = cte
+                            + "select count(*) from cte "
+                            + sb.ToString();
+
+            string sqlSum = cte
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(deliveryqty),0) as deliveryqty,"+
+                            "coalesce(sum(total),0) as total," +
+                            "coalesce(sum(discounttotal),0) as discounttotal," +
+                            "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
+                            "from cte " +
+                            sb.ToString();
+
+            int recordcount = db.Count(sqlCount);
+            DataTable dtSum = db.QueryTable(sqlSum);
+
+            decimal qtysum = Convert.ToDecimal(dtSum.Rows[0]["qty"]);
+            decimal deliveryqtysum = Convert.ToDecimal(dtSum.Rows[0]["deliveryqty"]);
+            decimal totalsum = Convert.ToDecimal(dtSum.Rows[0]["total"]);
+            decimal discounttotalsum = Convert.ToDecimal(dtSum.Rows[0]["discounttotal"]);
+            decimal taxtotalsum = Convert.ToDecimal(dtSum.Rows[0]["taxtotal"]);
+
+            DataTable list = db.QueryTable(sql);
+
+            bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
+
+            return new
+            {
+                showcost=showcost,
+                resulttotal = recordcount,
+                qtysum = qtysum,
+                deliveryqtysum=deliveryqtysum,
+                totalsum = totalsum,
+                discounttotalsum = discounttotalsum,
+                taxtotalsum = taxtotalsum,
+                data = list
+            };
+        }
+
+        public Object PurchaseBillFlow(string parameters)
+        {
+            QueryParameter para = ParameterHelper.GetQueryParameters(parameters);
+
+            var myfilter = JsonConvert.DeserializeObject<Dictionary<string, string>>(para.filter);
+
+            int pageindex = para.page ?? 1;
+            int pagesize = para.count ?? 25;
+
+            DBHelper db = new DBHelper();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(" where 1=1 ");
+
+            foreach (string field in myfilter.Keys)
+            {
+                if (string.IsNullOrEmpty(myfilter[field]))
+                    continue;
+
+                string f = myfilter[field].Trim();
+                if (string.IsNullOrEmpty(f))
+                    continue;
+
+                if (field == "startdate")
+                {
+                    sb.AppendFormat(" and billdate>='{0}'", f);
+                }
+                else if (field == "enddate")
+                {
+                    sb.AppendFormat(" and billdate<='{0}'", f);
+                }
+                else if (field == "billcode")
+                {
+                    sb.AppendFormat(" and billcode ilike '%{0}%'", f);
+                }
+                else if (field == "vendorname")
+                {
+
+                    sb.AppendFormat(" and (vendorname ilike '%{0}%' or vendorcode ilike '%{0}%')", f);
+                }
+                else if (field == "employeename")
+                {
+                    sb.AppendFormat(" and (employeename ilike '%{0}%' or employeecode ilike '%{0}%')", f);
+                }
+                else if (field == "stockname")
+                {
+                    sb.AppendFormat(" and (stockname ilike '%{0}%' or stockcode ilike '%{0}%')", f);
+                }
+                else if (field == "productname")
+                {
+                    sb.AppendFormat(" and (productname ilike '%{0}%' or productcode ilike '%{0}%')", f);
+                }
+                else if (field == "makername")
+                {
+                    sb.AppendFormat(" and (makername ilike '%{0}%' or makercode ilike '%{0}%')", f);
+                }
+                else if (field == "comment")
+                {
+                    sb.AppendFormat(" and comment ilike '%{0}%'", f);
+                } 
+            }
+
+            StringBuilder sborder = new StringBuilder();
+            sborder.Append(" order by id,productcode ");
+
+
+            sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
+
+            string cte = "with cte as (select mvw_purchasebill.* from mvw_purchasebill "
+                            + "inner join stock on mvw_purchasebill.stockid=stock.id "
+                            + "inner join vendor on mvw_purchasebill.vendorid=vendor.id "
+                            + "inner join product on mvw_purchasebill.productid=product.id) ";
+
+            string sql = cte
+                            + "select * " +
+                            "from cte " +
+                            sb.ToString() +
+                            sborder.ToString();
+             
+            string sqlCount = cte
+                            + "select count(*) from cte "
+                            + sb.ToString();
+
+
+            string sqlSum = cte
+                            + "select coalesce(sum(qty) filter (where billname='purchasebill'),0)-coalesce(sum(qty) filter (where billname='purchasebackbill'),0) as qty," +
+                            "coalesce(sum(total) filter (where billname='purchasebill'),0)-coalesce(sum(total) filter (where billname='purchasebackbill'),0) as total," +
+                            "coalesce(sum(discounttotal) filter (where billname='purchasebill'),0)-coalesce(sum(discounttotal) filter (where billname='purchasebackbill'),0) as discounttotal " +
+                            "from cte " +
+                            sb.ToString();
+
+
+            int recordcount = db.Count(sqlCount);
+            DataTable dtSum = db.QueryTable(sqlSum);
+
+            decimal qtysum = Convert.ToDecimal(dtSum.Rows[0]["qty"]);
+            decimal totalsum = Convert.ToDecimal(dtSum.Rows[0]["total"]);
+            decimal discounttotalsum = Convert.ToDecimal(dtSum.Rows[0]["discounttotal"]);
+            decimal taxtotalsum = discounttotalsum - totalsum;
+
+            DataTable list = db.QueryTable(sql);
+
+            bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
+
+            return new
+            {
+                showcost = showcost,
+                resulttotal = recordcount,
+                qtysum = qtysum,
+                totalsum = totalsum,
+                discounttotalsum = discounttotalsum,
+                taxtotalsum = taxtotalsum,
+                data = list
+            };
         }
     }
 }

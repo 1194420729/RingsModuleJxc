@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<components>
+  <component name="calendar" title="日历" path="/home/calendar" limit="" width="200" height="200">
+  </component>
+  <component name="quicklink" title="常用功能" path="/home/quicklink" limit="" width="200" height="200">
+  </component>
+  <component name="blankcomponent" title="占位符" path="/home/blankcomponent" limit="" width="200" height="200">
+  </component>
+</components>

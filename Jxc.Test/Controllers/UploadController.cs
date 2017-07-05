@@ -5,21 +5,20 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Rings.Models;
+using System.Configuration;
+using Npgsql;
+using Newtonsoft.Json;
 
 namespace Baseingfo.Test.Controllers
 {
     [Authorize]
     public class UploadController : Controller
     {
-        //todo:upload url
-        private static string domain = "http://localhost/files";
-
-        //todo:存储空间根目录
-        private static string storageroot = "~/Files";
-
         [HttpPost]
         public ActionResult UploadPic(HttpPostedFileBase file)
         {
+            AppSettingsReader reader = new AppSettingsReader();
+            string storageroot = reader.GetValue("storageroot", typeof(string)).ToString();
 
             if (file.ContentLength == 0)
             {
@@ -40,8 +39,8 @@ namespace Baseingfo.Test.Controllers
             }
 
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string applicationid = User.Identity.GetAccount().ApplicationId;
-            string path = Path.Combine(Server.MapPath(storageroot), applicationid, date);
+            string applicationid = User.Identity.GetAccount().RootApplicationId;
+            string path = Path.Combine(storageroot, applicationid, date);
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
@@ -55,7 +54,18 @@ namespace Baseingfo.Test.Controllers
             {
                 file.SaveAs(fileName);
 
-                return Json(new { message = "ok", pic = domain + "/" + applicationid + "/" + date + "/" + newfilename });
+                //文件信息存入数据库
+                AttachmentInfo info = new AttachmentInfo()
+                {
+                    Name = newfilename,
+                    Path = fileName,
+                    Size = file.ContentLength
+                };
+
+                SaveAttachmentInfo(info);
+
+                //return Json(new { message = "ok", pic = domain + "/" + applicationid + "/" + date + "/" + newfilename });
+                return Json(new { message = "ok", pic = Url.Action("Transmit", "upload", new { id = info.Id }, Request.Url.Scheme) });
             }
             catch (Exception ex)
             {
@@ -68,6 +78,8 @@ namespace Baseingfo.Test.Controllers
         [HttpPost]
         public ActionResult UploadFile(HttpPostedFileBase file)
         {
+            AppSettingsReader reader = new AppSettingsReader();
+            string storageroot = reader.GetValue("storageroot", typeof(string)).ToString();
 
             if (file.ContentLength == 0)
             {
@@ -81,8 +93,8 @@ namespace Baseingfo.Test.Controllers
             }
 
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string applicationid = User.Identity.GetAccount().ApplicationId;
-            string path = Path.Combine(Server.MapPath(storageroot), applicationid, date);
+            string applicationid = User.Identity.GetAccount().RootApplicationId;
+            string path = Path.Combine(storageroot, applicationid, date);
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
@@ -95,7 +107,24 @@ namespace Baseingfo.Test.Controllers
             {
                 file.SaveAs(fileName);
 
-                return Json(new { message = "ok", url = domain + "/" + applicationid + "/" + date + "/" + newfilename, path = storageroot + "/" + applicationid + "/" + date + "/" + newfilename });
+                //文件信息存入数据库
+                AttachmentInfo info = new AttachmentInfo()
+                {
+                    Name = newfilename,
+                    Path = fileName,
+                    Size = file.ContentLength
+                };
+
+                SaveAttachmentInfo(info);
+
+                //return Json(new { message = "ok", url = domain + "/" + applicationid + "/" + date + "/" + newfilename, path = storageroot + "/" + applicationid + "/" + date + "/" + newfilename });
+                return Json(new
+                {
+                    message = "ok",
+                    url = Url.Action("Transmit", "upload", new { id = info.Id }, Request.Url.Scheme),
+                    path = fileName
+                });
+
             }
             catch (Exception ex)
             {
@@ -108,6 +137,9 @@ namespace Baseingfo.Test.Controllers
         [HttpPost]
         public ActionResult UploadFiles()
         {
+            AppSettingsReader reader = new AppSettingsReader();
+            string storageroot = reader.GetValue("storageroot", typeof(string)).ToString();
+             
             if (Request.Files == null || Request.Files.Count == 0)
             {
                 return Json(new { message = "请选择文件" });
@@ -130,8 +162,8 @@ namespace Baseingfo.Test.Controllers
             }
 
             string date = DateTime.Now.ToString("yyyyMMdd");
-            string applicationid = User.Identity.GetAccount().ApplicationId;
-            string path = Path.Combine(Server.MapPath(storageroot), applicationid, date);
+            string applicationid = User.Identity.GetAccount().RootApplicationId;
+            string path = Path.Combine(storageroot, applicationid, date);
             if (Directory.Exists(path) == false)
             {
                 Directory.CreateDirectory(path);
@@ -148,10 +180,21 @@ namespace Baseingfo.Test.Controllers
                 try
                 {
                     file.SaveAs(fileName);
+
+                    //文件信息存入数据库
+                    AttachmentInfo info = new AttachmentInfo()
+                    {
+                        Name = newfilename,
+                        Path = fileName,
+                        Size = file.ContentLength
+                    };
+
+                    SaveAttachmentInfo(info);
+
                     list.Add(new
                     {
                         name = file.FileName,
-                        url = domain + "/" + applicationid + "/" + date + "/" + newfilename,
+                        url = Url.Action("Transmit", "upload", new { id = info.Id }, Request.Url.Scheme),
                         size = GetFileSizeFriendly(file.ContentLength)
                     });
 
@@ -164,6 +207,20 @@ namespace Baseingfo.Test.Controllers
             }
 
             return Json(new { message = "ok", urls = list });
+        }
+
+        public ActionResult Transmit(int id)
+        {
+            var info = GetAttachmentInfo(id);
+            string mime=MimeTypes.MimeTypeMap.GetMimeType(new FileInfo(info.Path).Extension);
+            return File(info.Path, mime);
+        }
+
+        public ActionResult Temporary(string filename,string appid,string date)
+        {
+            string path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temporary", appid, date,filename);
+            string mime = MimeTypes.MimeTypeMap.GetMimeType(new FileInfo(path).Extension);
+            return File(path, mime);
         }
 
         private string GetFileSizeFriendly(int size)
@@ -179,6 +236,39 @@ namespace Baseingfo.Test.Controllers
             }
         }
 
-    }    
+        private void SaveAttachmentInfo(AttachmentInfo info)
+        {
+            string connectionstr = ConfigurationManager.ConnectionStrings["CentralDB"].ConnectionString;
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionstr))
+            {
+                connection.Open();
+                NpgsqlCommand command = new NpgsqlCommand();
+                command.Connection = connection;
+                command.CommandText = "insert into attachment (content) values (@content) returning id";
+                command.Parameters.Add("@content", NpgsqlTypes.NpgsqlDbType.Jsonb).Value = JsonConvert.SerializeObject(info).ToLower();
+                info.Id = Convert.ToInt32(command.ExecuteScalar());
+                connection.Close();
+            }
+        }
+
+        private AttachmentInfo GetAttachmentInfo(int id)
+        {
+            string connectionstr = ConfigurationManager.ConnectionStrings["CentralDB"].ConnectionString;
+            AttachmentInfo result = null;
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionstr))
+            {
+                connection.Open();
+                NpgsqlCommand command = new NpgsqlCommand();
+                command.Connection = connection;
+                command.CommandText = "select content from attachment where id="+id;
+                string content = command.ExecuteScalar().ToString();
+                result = JsonConvert.DeserializeObject<AttachmentInfo>(content);
+                connection.Close();
+            }
+
+            result.Id = id;
+            return result;
+        }
+    }
     
 }

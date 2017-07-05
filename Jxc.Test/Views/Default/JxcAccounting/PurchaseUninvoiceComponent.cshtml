@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "待开进项票";
+}
+<div data-component="purchaseuninvoicecomponent" style="height:100%;">
+    <div class="purchaseuninvoicecomponent">
+        <div>
+            <label>待开进项票</label>
+        </div>
+        <ul class="list-group">                         
+            <li class="list-group-item"><a href="/jxcaccounting/purchaseuninvoicereport">查看完整列表...</a></li>
+        </ul>
+    </div>
+</div>
+@section scripts{
+    
+    <script data-define="purchaseuninvoicecomponent">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.purchaseuninvoicecomponent) {
+            componentloader.purchaseuninvoicecomponent = function (id) {
+                var selector = '#' + id + ' .purchaseuninvoicecomponent';
+                if (!id) selector = '.purchaseuninvoicecomponent';
+                
+                $.post('/purchaseinvoicereportservice/purchaseuninvoicecomponentquery',
+                        {},
+                        function (data) {
+                            $.each(data.data, function (index,item) {
+                                $(selector + ' .list-group').prepend('<li class="list-group-item"><span>'
+                                    + item.vendorname + '</span><span style="margin-left:10px;">'
+                                    + item.uninvoicetotal + '</span></li>');
+                            });
+                        }, 'json');
+            };
+        }
+</script>
+    <script>
+        $(function () {
+            componentloader.purchaseuninvoicecomponent('');
+        });
+    </script>
+}

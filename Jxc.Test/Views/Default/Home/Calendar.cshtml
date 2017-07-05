@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "日历";
+}
+<div data-component="calendar" style="height:100%;">
+    <div class="calendar"></div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" data-define="fullcalendar">
+
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/moment.js/2.18.1/moment.min.js" data-define="moment"></script>
+    <script src="//cdn.bootcss.com/fullcalendar/3.4.0/fullcalendar.min.js" data-define="fullcalendar"></script>
+    <script src="//cdn.bootcss.com/fullcalendar/3.4.0/locale/zh-cn.js" data-define="fullcalendar"></script>
+
+    <script data-define="calendar">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.calendar) {
+            componentloader.calendar = function (id) {
+                var selector = '#' + id + ' .calendar';
+                if (!id) selector = '.calendar';
+                $(selector).fullCalendar({
+                    height:'parent'
+                });
+            };
+        }
+    </script>
+    <script>
+        $(function () {
+            componentloader.calendar('');
+        });
+    </script>
+}

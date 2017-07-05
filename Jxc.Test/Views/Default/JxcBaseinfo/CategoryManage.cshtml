@@ -160,7 +160,7 @@
                     $http.post('/categoryservice/addsave', { parentid: model.parentid, name: model.name,classname:$scope.category.classname })
                        .success(function (data) {
                            if(data.message=='ok'){
-                               window.location.href = window.location.href;
+                               window.location.reload();
                            }
                        });
                 });
@@ -189,7 +189,7 @@
                         modalInstance.result.then(function () {
                             $http.post('/categoryservice/editsave', { id:model.id,name:model.text })
                                .success(function (data) {
-                                   window.location.href = window.location.href;
+                                   window.location.reload();
                                });
                         });
                     }
@@ -223,7 +223,7 @@
                         $http.post('/categoryservice/delete', { id: id }).success(function (data) {
                             if (data.message == 'ok') {
                                 SweetAlert.swal({ title: '删除成功', type: 'success' }, function () {
-                                    window.location.href = window.location.href;
+                                    window.location.reload();
                                 });
                             }
                         });

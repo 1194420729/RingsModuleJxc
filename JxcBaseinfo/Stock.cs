@@ -81,8 +81,7 @@ namespace JxcBaseinfo
         {
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
             string path = dic["path"].ToString();
-            path = ContextServiceHelper.MapPath(path);
-
+            
             bool cover = Convert.ToBoolean(dic["cover"]);
 
             int rowno = 0;
@@ -201,7 +200,7 @@ namespace JxcBaseinfo
 
         public Object GetCode(string parameters)
         {
-            DBHelper db = new DBHelper();
+            DBHelper db = new DBHelper(true);
 
             string code = string.Empty;
             var model = db.FirstOrDefault("select * from \"" + tablename + "\" order by content->>'code' desc");
@@ -232,7 +231,7 @@ namespace JxcBaseinfo
         {
             TableModel model = JsonConvert.DeserializeObject<TableModel>(parameters);
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
                 int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where content->>'code'='" + model.content.Value<string>("code") + "'");
@@ -253,7 +252,7 @@ namespace JxcBaseinfo
         public Object EditSave(string parameters)
         {
             TableModel model = JsonConvert.DeserializeObject<TableModel>(parameters);
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
                 int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where id<>" + model.id + " and content->>'code'='" + model.content.Value<string>("code") + "'");

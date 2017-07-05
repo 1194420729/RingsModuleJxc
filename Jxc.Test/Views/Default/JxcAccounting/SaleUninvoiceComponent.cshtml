@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "待开销项票";
+}
+<div data-component="saleuninvoicecomponent" style="height:100%;">
+    <div class="saleuninvoicecomponent">
+        <div>
+            <label>待开销项票</label>
+        </div>
+        <ul class="list-group">                         
+            <li class="list-group-item"><a href="/jxcaccounting/saleuninvoicereport">查看完整列表...</a></li>
+        </ul>
+    </div>
+</div>
+@section scripts{
+    
+    <script data-define="saleuninvoicecomponent">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.saleuninvoicecomponent) {
+            componentloader.saleuninvoicecomponent = function (id) {
+                var selector = '#' + id + ' .saleuninvoicecomponent';
+                if (!id) selector = '.saleuninvoicecomponent';
+                
+                $.post('/saleinvoicereportservice/saleuninvoicecomponentquery',
+                        {},
+                        function (data) {
+                            $.each(data.data, function (index,item) {
+                                $(selector + ' .list-group').prepend('<li class="list-group-item"><span>'
+                                    + item.customername + '</span><span style="margin-left:10px;">'
+                                    + item.uninvoicetotal + '</span></li>');
+                            });
+                        }, 'json');
+            };
+        }
+</script>
+    <script>
+        $(function () {
+            componentloader.saleuninvoicecomponent('');
+        });
+    </script>
+}

@@ -129,7 +129,7 @@
                         $scope.savedisabled = false;
                         if (data.message == 'ok') {
                             SweetAlert.swal({ title: '月结成功!', type: 'success' }, function () {
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });
@@ -155,7 +155,7 @@
                     $http.post('/balanceservice/monthbalancedelete', { id: id }).success(function (data) {
                         if (data.message == 'ok') {
                             SweetAlert.swal({ title: '删除月结成功', type: 'success' }, function () {
-                                window.location.href = window.location.href;
+                                window.location.reload();
                             });
                         } else {
                             SweetAlert.swal({ title: data.message, type: 'error' });

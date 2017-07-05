@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <shorts>
   <short name="balanceservice" path="service/jxcsystem/jxcsystem/balance"></short>
-  <short name="userservice" path="service/jxcsystem/jxcsystem/user"></short> 
   <short name="optionservice" path="service/jxcsystem/jxcsystem/option"></short>
   <short name="logservice" path="service/jxcsystem/jxcsystem/log"></short>
   <short name="rebuildservice" path="service/jxcsystem/jxcsystem/rebuild"></short>

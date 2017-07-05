@@ -16,7 +16,7 @@
                 <div class="form-group form-inline">
                     <label>截止日期<span style="color:red;">*</span></label>
                     <div class="dropdown" style="display: inline;">
-                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                        <a class="dropdown-toggle enddate1" role="button" data-toggle="dropdown" data-target="#"
                            href="javascript:;">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
@@ -26,7 +26,7 @@
                             </div>
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate1',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div> 
                 </div>
@@ -226,7 +226,7 @@
                 });
 
                 modalInstance.result.then(function (filter) {
-                    var prodcutid = row.id;
+                    var prodcutid = row.productid;
                     var url = '/jxcstorage/storagestatusreportdetail?productid=' + prodcutid + '&stockid=' + $scope.filter.stockid
                            + '&startdate=' + filter.startdate + '&enddate=' + filter.enddate;
 

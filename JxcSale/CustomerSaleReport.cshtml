@@ -7,7 +7,7 @@
         <ol class="breadcrumb">
             <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
             <li><span>客户销售排行</span></li>
-        </ol> 
+        </ol>
         <div class="panel panel-info">
             <div class="panel-body">
                 <div class="form-group form-inline">
@@ -41,6 +41,7 @@
                             <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
                         </ul>
                     </div>
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
                 </div>
                 <div class="form-group form-inline">
                     <label>产品名称</label>
@@ -75,7 +76,7 @@
                             </td>
                             <td data-title="'客户名称'" header-class="'bg-warning'" data-sortable="'customername'">
                                 <span ng-bind="m.customername"></span>
-                            </td> 
+                            </td>
                             <td data-title="'未税均价'" header-class="'bg-warning'" data-sortable="'price'">
                                 <span ng-bind="m.price | number:digit"></span>
                             </td>
@@ -95,7 +96,7 @@
                         <tr class="warning">
                             <td colspan="3">
                                 合计：<span ng-bind="totalrecordes"></span>条记录
-                            </td> 
+                            </td>
                             <td></td>
                             <td ng-bind="totalsum | number:digit"></td>
                             <td></td>
@@ -144,15 +145,16 @@
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
     <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
     <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
 
     <script>
-        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter']);
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngDateScope']);
 
         app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
 
             $scope.filter = {};
             $scope.queryfilter = {};
-            
+
             $scope.digit = 2;
 
             $scope.category = {};
@@ -186,7 +188,7 @@
 
             $http.post('/salereportservice/initcustomersalereport', {})
                     .success(function (data) {
-                        
+
                         $scope.digit = data.digit;
 
                         $scope.category.treeData = data.categorys;
@@ -228,7 +230,7 @@
                 $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
 
             };
-             
+
             $scope.detailClick = function (row) {
                 var customerid = row.customerid;
                 var url = '/jxcsale/salebillreportdetail?type=bycustomer&customerid=' + customerid

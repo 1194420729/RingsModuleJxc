@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.UI;
 using System.Text.RegularExpressions;
 using CsQuery;
+using System.Xml;
 
 namespace Rings.Models
 {
@@ -71,7 +72,7 @@ namespace Rings.Models
 
                 CQ cq2 = cq.Select("[ng-limit='false']").Remove();
                 string newhtml = cq2.Render();
-
+                
                 writer.Write(newhtml);   
                 #endregion
             }
