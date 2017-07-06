@@ -331,7 +331,7 @@ namespace HomePage
             myquicklinks.Add(linkobj);
 
             instance["storage"] = JsonConvert.SerializeObject(myquicklinks);
-            employeeconfig.content["homepagecomponents"] = homepagecomponents;
+            //employeeconfig.content["homepagecomponents"] = homepagecomponents;
 
             db.Edit("employeeconfig", employeeconfig);
 
@@ -357,7 +357,7 @@ namespace HomePage
             myquicklinks.RemoveAt(index);
 
             instance["storage"] = JsonConvert.SerializeObject(myquicklinks);
-            employeeconfig.content["homepagecomponents"] = homepagecomponents;
+            //employeeconfig.content["homepagecomponents"] = homepagecomponents;
 
             db.Edit("employeeconfig", employeeconfig);
 
@@ -494,6 +494,87 @@ namespace HomePage
 
             return list;
 
+        }
+
+        public Object AddCalendarEventSave(string parameters)
+        {
+            ParameterHelper ph = new ParameterHelper(parameters);
+            string start = ph.GetParameterValue<string>("start");
+            string end = ph.GetParameterValue<string>("end");
+            string title = ph.GetParameterValue<string>("title");
+            string comment = ph.GetParameterValue<string>("comment");
+            string id = ph.GetParameterValue<string>("id");
+            string eventid = ph.GetParameterValue<string>("eventid");
+
+            DBHelper db = new DBHelper();
+
+            var employeeconfig = db.FirstOrDefault("select * from employeeconfig where (content->>'employeeid')::int=" + PluginContext.Current.Account.Id);
+
+            var homepagecomponents = new JArray();
+            homepagecomponents = employeeconfig.content.Value<JArray>("homepagecomponents");
+
+            var events = new JArray();
+            var instance = homepagecomponents.FirstOrDefault(c => c.Value<string>("guid") == id);
+            if (instance != null && instance["storage"] != null)
+            {
+                events = JsonConvert.DeserializeObject<JArray>(instance.Value<string>("storage"));
+            }
+
+            var newevents = new JArray();
+            if (string.IsNullOrEmpty(eventid))
+            {
+                JObject eventobj = new JObject();
+                eventobj.Add("id", Guid.NewGuid().ToString("N"));
+                eventobj.Add("title", title);
+                eventobj.Add("start", start);
+                eventobj.Add("end", end);
+                eventobj.Add("comment", comment);
+                events.Add(eventobj);
+                newevents.Add(eventobj);
+            }
+            else
+            {
+                var eventobj = events.First(c => c.Value<string>("id") == eventid);
+                eventobj["title"] = title;
+                eventobj["start"] = start;
+                eventobj["end"] = end;
+                eventobj["comment"] = comment;
+                newevents.Add(eventobj);
+            }
+
+            instance["storage"] = JsonConvert.SerializeObject(events);
+            //employeeconfig.content["homepagecomponents"] = homepagecomponents;
+
+            db.Edit("employeeconfig", employeeconfig);
+
+            db.SaveChanges();
+             
+
+            return new { message = "ok",events=newevents };
+        }
+
+        public Object GetCalendarEvents(string parameters)
+        {
+            ParameterHelper ph = new ParameterHelper(parameters);
+           
+            string id = ph.GetParameterValue<string>("id");
+
+            DBHelper db = new DBHelper();
+
+            var employeeconfig = db.FirstOrDefault("select * from employeeconfig where (content->>'employeeid')::int=" + PluginContext.Current.Account.Id);
+
+            var homepagecomponents = new JArray();
+            homepagecomponents = employeeconfig.content.Value<JArray>("homepagecomponents");
+
+            var events = new JArray();
+            var instance = homepagecomponents.FirstOrDefault(c => c.Value<string>("guid") == id);
+            if (instance != null && instance["storage"] != null)
+            {
+                events = JsonConvert.DeserializeObject<JArray>(instance.Value<string>("storage"));
+            }
+
+
+            return new { events=events };
         }
     }
 

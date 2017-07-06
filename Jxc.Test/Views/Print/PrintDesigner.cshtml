@@ -3,30 +3,42 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span></button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="edittitle">
                     打印模版设计器
                 </h4>
             </div>
             <div class="modal-body">
-                <textarea id="printeditor" name="content" style="width: 750px; height: 500px;">@if (ViewBag.Template != null) { @Html.Raw(ViewBag.Template.Content)}</textarea>
+                <textarea id="printeditor" name="content" style="width: 750px; height: 500px;">
+                @if (ViewBag.Template != null)
+                { 
+                    @Html.Raw(ViewBag.Template.Content)
+                }
+                else
+                {
+                    @Html.Raw(ViewBag.BlankTemplate)
+                }
+                </textarea>
             </div>
             <div class="modal-footer">
                 <img src="~/Content/images/loader.gif" alt="" style="display: none; margin-left: 10px;" />
                 <button type="button" class="btn btn-default" id="btncancel">
-                    关闭</button>
+                    关闭
+                </button>
                 <button type="button" class="btn btn-primary" id="btnsaveprinttemplate">
-                    保存</button>
+                    保存
+                </button>
             </div>
         </div>
     </div>
     <!-- /.modal-content -->
 </div>
 <!-- /.modal-dialog -->
-<input type="hidden" id="pagewidth" value="@ViewBag.Width"/>
-<input type="hidden" id="pageheight" value="@ViewBag.Height"/>
+<input type="hidden" id="pagewidth" value="@ViewBag.Width" />
+<input type="hidden" id="pageheight" value="@ViewBag.Height" />
 <input type="hidden" id="pagepadding" value="@ViewBag.Padding" />
-<input type="hidden" id="pagerepeatheader" value="@ViewBag.RepeatHeader" />
+<input type="hidden" id="pagerepeatheader" value="@(ViewBag.RepeatHeader?"true":"false")" />
 <input type="hidden" id="pagefixedlines" value="@ViewBag.FixedLines" />
 <input type="hidden" id="pagemaxlines" value="@ViewBag.MaxLines" />
 <style>
@@ -46,19 +58,20 @@
 
         KindEditor.plugin('pagesetup', function (K) {
             var self = this, name = 'pagesetup';
+             
             // 点击图标时执行
             self.clickToolbar(name, function () {
                 var dialog = KindEditor.dialog({
                     width: 200,
                     title: '页面设置',
                     body: '<div style="margin:10px;">'
-                            + '<div><label>页面宽度(mm):</label><input type="number" value="@ViewBag.Width" id="printpagewidth"/></div>'
-                            + '<div><label>页面高度(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Height" id="printpageheight"/></div>'
-                            + '<div><label>页边距(mm):</label><input type="number" style="margin-top:5px;" value="@ViewBag.Padding" id="printpagepadding"/></div>'
-                            + '<div><label>重复表头:</label><input type="checkbox" style="margin-top:5px;" id="printpagerepeatheader" @(ViewBag.RepeatHeader?"checked=\"checked\"":"")/></div>'
-                            + '<div><label>固定行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.FixedLines" id="printpagefixedlines"/></div>'
-                            + '<div><label>最大行数:</label><input type="number" style="margin-top:5px;" value="@ViewBag.MaxLines" id="printpagemaxlines"/></div>'
-                            +'</div>',
+                            + '<div><label>页面宽度(mm):</label><input type="number" value="' + $('#pagewidth').val() + '" id="printpagewidth"/></div>'
+                            + '<div><label>页面高度(mm):</label><input type="number" style="margin-top:5px;" value="' + $('#pageheight').val() + '" id="printpageheight"/></div>'
+                            + '<div><label>页边距(mm):</label><input type="number" style="margin-top:5px;" value="' + $('#pagepadding').val() + '" id="printpagepadding"/></div>'
+                            + '<div><label>重复表头:</label><input type="checkbox" style="margin-top:5px;" id="printpagerepeatheader" ' + ($('#pagerepeatheader').val() == 'true' ? 'checked="checked"' : '') + '/></div>'
+                            + '<div><label>固定行数:</label><input type="number" style="margin-top:5px;" value="' + $('#pagefixedlines').val() + '" id="printpagefixedlines"/></div>'
+                            + '<div><label>最大行数:</label><input type="number" style="margin-top:5px;" value="' + $('#pagemaxlines').val() + '" id="printpagemaxlines"/></div>'
+                            + '</div>',
                     closeBtn: {
                         name: '关闭',
                         click: function (e) {
@@ -77,7 +90,7 @@
                             if ($('#printpagepadding').val()) {
                                 $('#pagepadding').val($('#printpagepadding').val());
                             }
-                            $('#pagerepeatheader').val($('#printpagerepeatheader').prop('checked'));
+                            $('#pagerepeatheader').val($('#printpagerepeatheader').prop('checked')+'');
                             $('#pagefixedlines').val($('#printpagefixedlines').val());
                             $('#pagemaxlines').val($('#printpagemaxlines').val());
                             dialog.remove();
@@ -111,7 +124,7 @@
                             + '字段名称'
                             + '</label></div><div><select id="fieldname">'
                             + '<option value="">请选择</option>'
-                            +'</select></div></div>',
+                            + '</select></div></div>',
                     closeBtn: {
                         name: '关闭',
                         click: function (e) {

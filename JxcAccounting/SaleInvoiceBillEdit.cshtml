@@ -213,13 +213,7 @@
 
             $scope.model = { id: id, content: {} }; 
             $scope.tableParams = new NgTableParams({ count: 99999 });
-
-            $window.onbeforeunload = function () {
-                if ($scope.tableParams.total() > 0) {
-                    return ' ';
-                }
-            };
-
+             
             $http.post('/saleinvoicebillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -236,6 +230,13 @@
                             dataset: $scope.invoicebills
                         });
                          
+                        if(!$scope.model.content.auditorid){ 
+                            $window.onbeforeunload = function () { 
+                                if ($scope.tableParams.total() > 0) {
+                                    return ' ';
+                                }
+                            };
+                        }
                     });
                
             $scope.billcodeClick = function () {

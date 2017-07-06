@@ -168,28 +168,28 @@ namespace JxcPurchase
 
 
             string sql = cte
-                        +"select *  from cte "
+                        + "select *  from cte "
                         + sb.ToString()
                         + sborder.ToString();
 
             string sqlCount = cte
-                        +"select count(*) as cnt from cte "
+                        + "select count(*) as cnt from cte "
                         + sb.ToString();
 
             string sqlQtySum = cte
-                                +"select coalesce(sum(qty),0) as qty " +
+                                + "select coalesce(sum(qty),0) as qty " +
                                 "from  " +
                                 "( " +
                                 "select  ((jsonb_array_elements(content->'details')->>'qty')::decimal) as qty from cte " + sb.ToString() +
                                 ") as t";
             string sqlTotalSum = cte
-                                +"select coalesce(sum(total),0) as total " +
+                                + "select coalesce(sum(total),0) as total " +
                                 "from  " +
                                 "( " +
                                 "select  ((jsonb_array_elements(content->'details')->>'discounttotal')::decimal) as total from cte " + sb.ToString() +
                                 ") as t";
             string sqlDeliveryQtySum = cte
-                                +"select coalesce(sum(deliveryqty),0) as deliveryqty " +
+                                + "select coalesce(sum(deliveryqty),0) as deliveryqty " +
                                 "from  " +
                                 "( " +
                                 "select  ((jsonb_array_elements(content->'details')->>'deliveryqty')::decimal) as deliveryqty from cte " + sb.ToString() +
@@ -223,7 +223,7 @@ namespace JxcPurchase
                 showcost = showcost
             };
         }
-        
+
         public Object LoadBillQuery(string parameters)
         {
             QueryParameter para = ParameterHelper.GetQueryParameters(parameters);
@@ -399,7 +399,7 @@ namespace JxcPurchase
             ParameterHelper ph = new ParameterHelper(parameters);
             string path = ph.GetParameterValue<string>("path");
             decimal taxrate = ph.GetParameterValue<decimal>("taxrate");
-             
+
             int rowno = 0;
 
             try
@@ -545,7 +545,7 @@ namespace JxcPurchase
 
                 //单据日期不能早于月结存日期
                 var lastbalance = db.FirstOrDefault("select * from monthbalance order by id desc");
-                if (lastbalance != null 
+                if (lastbalance != null
                     && model.content.Value<DateTime>("billdate").CompareTo(lastbalance.content.Value<DateTime>("balancedate")) <= 0)
                 {
                     return new { message = StringHelper.GetString("单据日期不能早于月结存日期！") };
@@ -991,6 +991,9 @@ namespace JxcPurchase
             int billid = ph.GetParameterValue<int>("billid");
 
             DBHelper db = new DBHelper();
+
+            bool showcost = PluginContext.Current.Account.IsAllowed("showcost");
+
             var bill = db.First("bill", billid);
             var employee = db.First("employee", bill.content.Value<int>("employeeid"));
             var maker = db.First("employee", bill.content.Value<int>("makerid"));
@@ -1005,6 +1008,7 @@ namespace JxcPurchase
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人",
@@ -1028,6 +1032,7 @@ namespace JxcPurchase
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")},
@@ -1040,12 +1045,12 @@ namespace JxcPurchase
                 {"备注",bill.content.Value<string>("comment")},
                 {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
                 {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
-                {"未税金额",total.ToString("n2")},
-                {"未税金额大写",MoneyHelper.ConvertSum(total)},
-                {"含税金额",taxtotal.ToString("n2")},
-                {"含税金额大写",MoneyHelper.ConvertSum(taxtotal)},
-                {"折后金额",discounttotal.ToString("n2")},
-                {"折后金额大写",MoneyHelper.ConvertSum(discounttotal)},
+                {"未税金额",showcost?total.ToString("n2"):"****"},
+                {"未税金额大写",showcost?MoneyHelper.ConvertSum(total):"****"},
+                {"含税金额",showcost?taxtotal.ToString("n2"):"****"},
+                {"含税金额大写",showcost?MoneyHelper.ConvertSum(taxtotal):"****"},
+                {"折后金额",showcost?discounttotal.ToString("n2"):"****"},
+                {"折后金额大写",showcost?MoneyHelper.ConvertSum(discounttotal):"****"},
                 {"数量",qty.ToString()}
             };
 
@@ -1099,13 +1104,13 @@ namespace JxcPurchase
                 detail.Add("数量", item.Value<decimal>("qty").ToString());
                 detail.Add("库存数量", storageqty.ToString());
                 detail.Add("已到数量", item.Value<decimal>("deliveryqty").ToString());
-                detail.Add("单价", item.Value<decimal>("price").ToString("n2"));
-                detail.Add("金额", item.Value<decimal>("total").ToString("n2"));
-                detail.Add("含税单价", item.Value<decimal>("taxprice").ToString("n2"));
-                detail.Add("含税金额", item.Value<decimal>("taxtotal").ToString("n2"));
+                detail.Add("单价", showcost ? item.Value<decimal>("price").ToString("n2") : "****");
+                detail.Add("金额", showcost ? item.Value<decimal>("total").ToString("n2") : "****");
+                detail.Add("含税单价", showcost ? item.Value<decimal>("taxprice").ToString("n2") : "****");
+                detail.Add("含税金额", showcost ? item.Value<decimal>("taxtotal").ToString("n2") : "****");
                 detail.Add("税率", item.Value<decimal>("taxrate").ToString());
-                detail.Add("折后单价", item.Value<decimal>("discountprice").ToString("n2"));
-                detail.Add("折后金额", item.Value<decimal>("discounttotal").ToString("n2"));
+                detail.Add("折后单价", showcost ? item.Value<decimal>("discountprice").ToString("n2") : "****");
+                detail.Add("折后金额", showcost ? item.Value<decimal>("discounttotal").ToString("n2") : "****");
                 detail.Add("折扣率", item.Value<decimal>("discountrate").ToString());
                 detail.Add("备注", item.Value<string>("comment"));
                 pd.DetailValue.Add(detail);
@@ -1231,7 +1236,7 @@ namespace JxcPurchase
                             + "inner join product on mvw_purchaseorder.productid=product.id) ";
 
             string sql = cte
-                            +"select productid,productcode,productname,producttype,productstandard," +
+                            + "select productid,productcode,productname,producttype,productstandard," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
@@ -1246,11 +1251,11 @@ namespace JxcPurchase
 
             string sqlCount = cte
                             + "select count(*) from (select productid,productcode,productname,producttype,productstandard from cte "
-                            + sb.ToString() 
+                            + sb.ToString()
                             + " group by productid,productcode,productname,producttype,productstandard) as t";
 
             string sqlSum = cte
-                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
                             "from cte " +
@@ -1379,7 +1384,7 @@ namespace JxcPurchase
                             + "inner join product on mvw_purchaseorder.productid=product.id) ";
 
 
-            string sql = cte 
+            string sql = cte
                             + "select vendorid,vendorcode,vendorname," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
@@ -1400,7 +1405,7 @@ namespace JxcPurchase
 
 
             string sqlSum = cte
-                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
                             "from cte " +
@@ -1515,7 +1520,7 @@ namespace JxcPurchase
                             + "inner join product on mvw_purchaseorder.productid=product.id) ";
 
 
-            string sql = cte+
+            string sql = cte +
                         "select employeeid,employeecode,employeename," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
@@ -1525,7 +1530,7 @@ namespace JxcPurchase
                             "group by employeeid,employeecode,employeename " +
                             sborder.ToString();
 
-             
+
             string sqlCount = cte
                             + "select count(*) from (select employeeid from cte "
                             + sb.ToString()
@@ -1644,9 +1649,9 @@ namespace JxcPurchase
                             + "inner join stock on mvw_purchaseorder.stockid=stock.id "
                             + "inner join vendor on mvw_purchaseorder.vendorid=vendor.id "
                             + "inner join product on mvw_purchaseorder.productid=product.id) ";
-             
+
             string sql = cte
-                            +"select stockid,stockcode,stockname," +
+                            + "select stockid,stockcode,stockname," +
                             "sum(qty) as qty,sum(total) as total,sum(discounttotal) as discounttotal," +
                             "sum(discounttotal)-sum(total) as taxtotal," +
                             "sum(total) /sum(qty) as price,sum(discounttotal) /sum(qty) as discountprice " +
@@ -1665,7 +1670,7 @@ namespace JxcPurchase
                             + " group by stockid,stockcode,stockname) as t";
 
             string sqlSum = cte
-                            +"select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
+                            + "select coalesce(sum(qty),0) as qty,coalesce(sum(total),0) as total," +
                             "coalesce(sum(discounttotal),0) as discounttotal," +
                             "coalesce(sum(discounttotal)-sum(total),0) as taxtotal " +
                             "from cte " +
@@ -1708,7 +1713,7 @@ namespace JxcPurchase
             {
                 int vendorid = ph.GetParameterValue<int>("vendorid");
                 var vendor = db.First("vendor", vendorid);
-                tip =  vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
+                tip = vendor.content.Value<string>("code") + " " + vendor.content.Value<string>("name");
             }
             else if (reporttype == "byemployee")
             {
@@ -1830,7 +1835,7 @@ namespace JxcPurchase
 
             StringBuilder sborder = new StringBuilder();
             sborder.Append(" order by id,productcode ");
-             
+
             sborder.AppendFormat(" limit {0} offset {1} ", pagesize, pagesize * pageindex - pagesize);
 
             string cte = "with cte as (select mvw_purchaseorder.* from mvw_purchaseorder "
@@ -1844,7 +1849,7 @@ namespace JxcPurchase
                             sb.ToString() +
                             sborder.ToString();
 
-             
+
             string sqlCount = cte
                             + "select count(*) from cte "
                             + sb.ToString();

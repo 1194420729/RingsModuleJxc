@@ -299,7 +299,7 @@
             $scope.model = { id: id, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.global = {};
-
+             
             $http.post('/purchaseorderservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -318,6 +318,15 @@
                             counts: [],
                             dataset: $scope.model.content.details
                         });
+
+                         
+                        if(!$scope.model.content.auditorid){ 
+                            $window.onbeforeunload = function () { 
+                                if ($scope.tableParams.total() > 0) {
+                                    return ' ';
+                                }
+                            };
+                        }
                     });
 
             $scope.billcodeClick = function () {
@@ -413,6 +422,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload=null;
                     window.location.href = '/jxcpurchase/purchaseorderedit?id='+billid;
                 });
             };
@@ -434,6 +444,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' },function(){
+                                    $window.onbeforeunload=null;
                                     window.location.href = '/jxcpurchase/purchaseorderadd';
                                 });
 
@@ -454,6 +465,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpurchase/purchaseorderprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcpurchase/purchaseorderadd';
                             });
                         } else {
@@ -491,6 +503,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcpurchase/purchaseorderprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload=null;
                                 window.location.href = '/jxcpurchase/purchaseorderadd';
                             });
                         } else {

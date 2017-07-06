@@ -55,7 +55,7 @@ namespace Jxc.Utility
         {
             if (dic.ContainsKey(name) == false || dic[name]==null)
             {
-                throw new System.Collections.Generic.KeyNotFoundException();
+                throw new System.Collections.Generic.KeyNotFoundException("ParameterHelper参数不存在");
             }
             
             return (T)Convert.ChangeType(dic[name].ToString(),typeof(T));
