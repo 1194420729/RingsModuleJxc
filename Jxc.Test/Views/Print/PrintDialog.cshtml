@@ -55,7 +55,10 @@
     $(function () {
         var url = '';
 
-        $('#printmodal').modal({});
+        $('#printmodal').modal({
+            keyboard: false,
+            backdrop: 'static'
+        });
 
         $('#btnprintpreview').click(function () {
             if (!$('#printtemplate').val()) {

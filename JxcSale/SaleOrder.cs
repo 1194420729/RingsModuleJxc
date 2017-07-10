@@ -1005,9 +1005,11 @@ namespace JxcSale
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人",
+                "制单人",
                 "仓库名称",
                 "客户名称",
                 "客户联系人",
@@ -1028,9 +1030,11 @@ namespace JxcSale
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")},
+                {"制单人",maker.content.Value<string>("name")},
                 {"仓库名称",stock.content.Value<string>("name")},
                 {"客户名称",customer.content.Value<string>("name")},
                 {"客户联系人",customer.content.Value<string>("linkman")},

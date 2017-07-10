@@ -607,30 +607,122 @@ namespace JxcSale
 
             DBHelper db = new DBHelper();
             var bill = db.First("bill", billid);
+            var employee = db.First("employee", bill.content.Value<int>("employeeid"));
+            var maker = db.First("employee", bill.content.Value<int>("makerid"));
+            var customer = db.First("customer", bill.content.Value<int>("customerid"));
+            var stock = db.First("stock", bill.content.Value<int>("stockid"));
+
+            decimal total = bill.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("total"));
+            decimal taxtotal = bill.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("taxtotal"));
+            decimal discounttotal = bill.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("discounttotal"));
+            decimal qty = bill.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("qty"));
 
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
-                "单据编号"
+                "公司名称",
+                "单据编号",
+                "单据日期",
+                "经手人",
+                "制单人",
+                "仓库名称",
+                "客户名称",
+                "客户联系人",
+                "客户电话",
+                "客户地址", 
+                "备注",
+                "系统日期",
+                "系统时间",
+                "未税金额",
+                "未税金额大写",
+                "含税金额",
+                "含税金额大写",
+                "折后金额",
+                "折后金额大写",
+                "数量"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
-                {"单据编号",bill.content.Value<string>("billcode")}
-
+                {"公司名称",PluginContext.Current.Account.CompanyName},
+                {"单据编号",bill.content.Value<string>("billcode")},
+                {"单据日期",bill.content.Value<string>("billdate")},
+                {"经手人",employee.content.Value<string>("name")},
+                {"制单人",maker.content.Value<string>("name")},
+                {"仓库名称",stock.content.Value<string>("name")},
+                {"客户名称",customer.content.Value<string>("name")},
+                {"客户联系人",customer.content.Value<string>("linkman")},
+                {"客户电话",customer.content.Value<string>("linkmobile")},
+                {"客户地址",customer.content.Value<string>("address")}, 
+                {"备注",bill.content.Value<string>("comment")},
+                {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
+                {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
+                {"未税金额",total.ToString("n2")},
+                {"未税金额大写",MoneyHelper.ConvertSum(total)},
+                {"含税金额",taxtotal.ToString("n2")},
+                {"含税金额大写",MoneyHelper.ConvertSum(taxtotal)},
+                {"折后金额",discounttotal.ToString("n2")},
+                {"折后金额大写",MoneyHelper.ConvertSum(discounttotal)},
+                {"数量",qty.ToString()}
             };
 
             pd.DetailField = new List<string>()
             {
-                "产品编号"
+                "行号",
+                "产品编号",
+                "产品名称",
+                "规格",
+                "型号",
+                "产地",
+                "计量单位",
+                "条码",
+                "数量",
+                "库存数量", 
+                "单价",
+                "金额",
+                "含税单价",
+                "含税金额",
+                "税率",
+                "折后单价",
+                "折后金额",
+                "折扣率",
+                "备注"
             };
 
+            int stockid = stock.content.Value<int>("id");
             pd.DetailValue = new List<Dictionary<string, string>>();
+            int i = 0;
             foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
             {
                 var product = db.First("product", item.Value<int>("productid"));
+                decimal storageqty = decimal.Zero;
+                var storage = product.content.Value<JObject>("storage");
+                if (storage != null)
+                {
+                    var s = storage.Value<JObject>(stockid.ToString());
+                    if (s != null) storageqty = s.Value<decimal>("qty");
+                }
                 Dictionary<string, string> detail = new Dictionary<string, string>();
+                i++;
+                detail.Add("行号", i.ToString());
                 detail.Add("产品编号", product.content.Value<string>("code"));
+                detail.Add("产品名称", product.content.Value<string>("name"));
+                detail.Add("规格", product.content.Value<string>("standard"));
+                detail.Add("型号", product.content.Value<string>("type"));
+                detail.Add("产地", product.content.Value<string>("area"));
+                detail.Add("计量单位", product.content.Value<string>("unit"));
+                detail.Add("条码", product.content.Value<string>("barcode"));
+                detail.Add("数量", item.Value<decimal>("qty").ToString());
+                detail.Add("库存数量", storageqty.ToString());
+                detail.Add("单价", item.Value<decimal>("price").ToString("n2"));
+                detail.Add("金额", item.Value<decimal>("total").ToString("n2"));
+                detail.Add("含税单价", item.Value<decimal>("taxprice").ToString("n2"));
+                detail.Add("含税金额", item.Value<decimal>("taxtotal").ToString("n2"));
+                detail.Add("税率", item.Value<decimal>("taxrate").ToString());
+                detail.Add("折后单价", item.Value<decimal>("discountprice").ToString("n2"));
+                detail.Add("折后金额", item.Value<decimal>("discounttotal").ToString("n2"));
+                detail.Add("折扣率", item.Value<decimal>("discountrate").ToString());
+                detail.Add("备注", item.Value<string>("comment"));
                 pd.DetailValue.Add(detail);
 
             }

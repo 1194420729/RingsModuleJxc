@@ -142,10 +142,24 @@ namespace Baseingfo.Test.Controllers
 
                 if (id.HasValue)
                 {
+                    command.CommandText = "select count(*) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' and id<>"+id.Value;
+                    int cnt = Convert.ToInt32(command.ExecuteScalar());
+                    if (cnt > 0)
+                    {
+                        return Json(new { message = "模板名称重复！" }, "text/plain");
+                    }
+
                     command.CommandText = "update printtemplate set content=@content  where id=" + id.Value;
                 }
                 else
                 {
+                    command.CommandText = "select count(*) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' ";
+                    int cnt = Convert.ToInt32(command.ExecuteScalar());
+                    if (cnt > 0)
+                    {
+                        return Json(new { message = "模板名称重复！" }, "text/plain");
+                    }
+
                     command.CommandText = "insert into printtemplate (content) values (@content)";
                 }
 

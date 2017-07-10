@@ -531,9 +531,11 @@ namespace JxcAccounting
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
-                "经手人", 
+                "经手人",
+                "制单人", 
                 "供应商名称",
                 "供应商联系人",
                 "供应商电话",
@@ -541,15 +543,17 @@ namespace JxcAccounting
                 "备注",
                 "系统日期",
                 "系统时间",
-                "应收调整金额",
-                "应收调整金额大写"
+                "开票金额",
+                "开票金额大写"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
-                {"经手人",employee.content.Value<string>("name")}, 
+                {"经手人",employee.content.Value<string>("name")},
+                {"制单人",maker.content.Value<string>("name")}, 
                 {"供应商名称",vendor.content.Value<string>("name")},
                 {"供应商联系人",vendor.content.Value<string>("linkman")},
                 {"供应商电话",vendor.content.Value<string>("linkmobile")},
@@ -557,19 +561,55 @@ namespace JxcAccounting
                 {"备注",bill.content.Value<string>("comment")},
                 {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
                 {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
-                {"应收调整金额",total.ToString("n2")},
-                {"应收调整金额大写",MoneyHelper.ConvertSum(total)} 
+                {"开票金额",total.ToString("n2")},
+                {"开票金额大写",MoneyHelper.ConvertSum(total)}                 
             };
 
-            pd.DetailField = new List<string>();
+            pd.DetailField = new List<string>()
+            {
+                "行号",
+                "单据编号",
+                "单据名称",               
+                "开票金额",
+                "发票号码",
+                "发票类型",
+                "备注"
+            };
+
+
             pd.DetailValue = new List<Dictionary<string, string>>();
+            int i = 0;
+            foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
+            {
+                var bzbill = db.First("bill", item.Value<int>("billid"));
+                string billname = bzbill.content.Value<string>("billname");
+                if (billname == "purchasebill")
+                {
+                    billname = "采购入库单";
+                }
+                else if (billname == "purchasebackbill")
+                {
+                    billname = "采购退货单";
+                }
+
+                Dictionary<string, string> detail = new Dictionary<string, string>();
+                i++;
+                detail.Add("行号", i.ToString());
+                detail.Add("单据编号", bzbill.content.Value<string>("billcode"));
+                detail.Add("单据名称", billname);
+                detail.Add("开票金额", item.Value<decimal>("invoicetotal").ToString("n2"));
+                detail.Add("发票号码", item.Value<string>("invoicecode"));
+                detail.Add("发票类型", item.Value<string>("invoicetype"));
+                detail.Add("备注", item.Value<string>("comment"));
+                pd.DetailValue.Add(detail);
+
+            }
 
             PrintManager pm = new PrintManager(PluginContext.Current.Account.ApplicationId);
             int modelid = pm.RegisterPrintModel(pd);
 
             return new { modelid = modelid };
         }
-
 
     }
 }

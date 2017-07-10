@@ -210,13 +210,7 @@
 
             $scope.model = { id: id, content: {} };
             $scope.tableParams2 = new NgTableParams({ count: 10 });
-
-            $window.onbeforeunload = function () {
-                if ($scope.tableParams2.total() > 0) {
-                    return ' ';
-                }
-            };
-
+             
             $http.post('/payablebillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -235,6 +229,14 @@
                         }else if($scope.model.content.checkoutbills){
                             $scope.bybills=true;
                             $scope.bybillsChange();
+                        }
+
+                        if(!$scope.model.content.auditorid){ 
+                            $window.onbeforeunload = function () { 
+                                if ($scope.tableParams2.total() > 0) {
+                                    return ' ';
+                                }
+                            };
                         }
 
                     });

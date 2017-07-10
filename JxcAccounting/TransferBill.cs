@@ -403,30 +403,38 @@ namespace JxcAccounting
             var bill = db.First("bill", billid);
             var employee = db.First("employee", bill.content.Value<int>("employeeid"));
             var maker = db.First("employee", bill.content.Value<int>("makerid"));
+            var bank = db.First("bank", bill.content.Value<int>("bankid"));
+            var bank2 = db.First("bank", bill.content.Value<int>("bankid2"));
            
             decimal total = bill.content.Value<decimal>("total");
 
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人",                 
                 "备注",
                 "系统日期",
                 "系统时间",
+                "付款账户",
+                "收款账户",
                 "金额",
                 "金额大写"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")},                
                 {"备注",bill.content.Value<string>("comment")},
                 {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
                 {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
+                {"付款账户",bank.content.Value<string>("name")},
+                {"收款账户",bank2.content.Value<string>("name")},
                 {"金额",total.ToString("n2")},
                 {"金额大写",MoneyHelper.ConvertSum(total)} 
             };

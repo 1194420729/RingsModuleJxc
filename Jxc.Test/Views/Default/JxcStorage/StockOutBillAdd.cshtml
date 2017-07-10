@@ -229,6 +229,12 @@
             $scope.model = { id: 0, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             
+            $window.onbeforeunload = function () {
+                if ($scope.tableParams.total() > 0) {
+                    return ' ';
+                }
+            };
+
             var loademployeeandstock = function () {
 
                 if ($scope.billconfig.content.keepemployeeandstock && localStorage.stockoutbill) {
@@ -330,6 +336,7 @@
                 });
 
                 modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload = null;
                     window.location.href = '/jxcstorage/stockoutbilledit?id=' + billid;
                 });
             };
@@ -351,6 +358,7 @@
 
                             if (data.nodraftprint) {
                                 SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
+                                    $window.onbeforeunload = null;
                                     window.location.reload();
                                 });
                                 return;
@@ -370,6 +378,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockoutbillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload = null;
                                 window.location.reload();
 
                             });
@@ -408,6 +417,7 @@
                                 if (isConfirm) {
                                     $window.open('/jxcstorage/stockoutbillprint?billid=' + data.id);
                                 }
+                                $window.onbeforeunload = null;
                                 window.location.reload();
                             });
                         } else {

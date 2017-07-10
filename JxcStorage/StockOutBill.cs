@@ -578,30 +578,85 @@ namespace JxcStorage
 
             DBHelper db = new DBHelper();
             var bill = db.First("bill", billid);
+            var employee = db.First("employee", bill.content.Value<int>("employeeid"));
+            var maker = db.First("employee", bill.content.Value<int>("makerid"));
+            var stock = db.First("stock", bill.content.Value<int>("stockid"));
+            var inouttype = db.First("inouttype", bill.content.Value<int>("inouttypeid"));
+
+            decimal qty = bill.content.Value<JArray>("details").Values<JObject>().Sum(c => c.Value<decimal>("qty"));
 
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
-                "单据编号"
+                "公司名称",
+                "单据编号",
+                "单据日期",
+                "经手人",
+                "制单人",
+                "仓库名称",  
+                "出库类型",  
+                "备注",
+                "系统日期",
+                "系统时间",                 
+                "数量"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
-                {"单据编号",bill.content.Value<string>("billcode")}
-
+                {"公司名称",PluginContext.Current.Account.CompanyName},
+                {"单据编号",bill.content.Value<string>("billcode")},
+                {"单据日期",bill.content.Value<string>("billdate")},
+                {"经手人",employee.content.Value<string>("name")},
+                {"制单人",employee.content.Value<string>("name")},
+                {"仓库名称",stock.content.Value<string>("name")},
+                {"出库类型",inouttype.content.Value<string>("name")},
+                {"备注",bill.content.Value<string>("comment")},
+                {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
+                {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},               
+                {"数量",qty.ToString()}
             };
 
             pd.DetailField = new List<string>()
             {
-                "产品编号"
+                "行号",
+                "产品编号",
+                "产品名称",
+                "规格",
+                "型号",
+                "产地",
+                "计量单位",
+                "条码",
+                "数量",
+                "库存数量",                  
+                "备注"
             };
 
+            int stockid = stock.content.Value<int>("id");
             pd.DetailValue = new List<Dictionary<string, string>>();
+            int i = 0;
             foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
             {
                 var product = db.First("product", item.Value<int>("productid"));
+                decimal storageqty = decimal.Zero;
+                var storage = product.content.Value<JObject>("storage");
+                if (storage != null)
+                {
+                    var s = storage.Value<JObject>(stockid.ToString());
+                    if (s != null) storageqty = s.Value<decimal>("qty");
+                }
                 Dictionary<string, string> detail = new Dictionary<string, string>();
+                i++;
+                detail.Add("行号", i.ToString());
                 detail.Add("产品编号", product.content.Value<string>("code"));
+                detail.Add("产品名称", product.content.Value<string>("name"));
+                detail.Add("规格", product.content.Value<string>("standard"));
+                detail.Add("型号", product.content.Value<string>("type"));
+                detail.Add("产地", product.content.Value<string>("area"));
+                detail.Add("计量单位", product.content.Value<string>("unit"));
+                detail.Add("条码", product.content.Value<string>("barcode"));
+                detail.Add("数量", item.Value<decimal>("qty").ToString());
+                detail.Add("库存数量", storageqty.ToString());
+                detail.Add("备注", item.Value<string>("comment"));
                 pd.DetailValue.Add(detail);
 
             }
@@ -612,6 +667,5 @@ namespace JxcStorage
             return new { modelid = modelid };
         }
 
-         
     }
 }

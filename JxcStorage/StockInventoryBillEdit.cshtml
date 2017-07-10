@@ -267,7 +267,7 @@
             </div>
             <div class="panel-footer">
                 <div class="form-group form-inline pull-right">
-                    <a ng-href="/jxcstorage/stockinbillprint?billid={{model.id}}" ng-if="model.content.auditorid" target="_blank" class="btn btn-primary"><i class="fa fa-print fa-fw"></i>打印</a>
+                    <a ng-href="/jxcstorage/stockinventorybillprint?billid={{model.id}}" ng-if="model.content.auditorid" target="_blank" class="btn btn-primary"><i class="fa fa-print fa-fw"></i>打印</a>
                     <button type="button" class="btn btn-primary" ng-click="btnloadClick()"><i class="fa fa-folder-open-o fa-fw"></i>单据调阅</button>
                     <button type="button" class="btn btn-primary" ng-click="btnsaveClick()" ng-if="!model.content.auditorid" ng-disabled="savedisabled"><i class="fa fa-save fa-fw"></i>保存草稿</button>
                     <button type="button" class="btn btn-primary" ng-click="btnauditClick()" ng-if="!model.content.auditorid" ng-disabled="savedisabled" ng-limit="stockinventorybillaudit"><i class="fa fa-save fa-fw"></i>保存并审核</button>

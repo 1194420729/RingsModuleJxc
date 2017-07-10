@@ -363,6 +363,36 @@ namespace CommonConfig
 
         }
 
+        private ICollection<TableModel> CategoryList(string categoryclass)
+        {
+            DBHelper db = new DBHelper();
+            return db.Where("select * from category where content->>'classname'='" + categoryclass + "'");
+        }
+
+
+        private ICollection<TreeData> GetCategoryTreeData(string categoryclass)
+        {
+            var items = CategoryList(categoryclass);
+
+            var list = (from c in items
+                        select new TreeData
+                        {
+                            id = c.id.ToString(),
+                            parent = c.content["parentid"] == null ? "0" : c.content.Value<string>("parentid"),
+                            text = c.content.Value<string>("name"),
+                            icon = "fa fa-folder-o fa-fw"
+                        }).ToList();
+
+            list.Insert(0, new TreeData()
+            {
+                icon = "fa fa-folder-o fa-fw",
+                id = "0",
+                parent = "#",
+                text = StringHelper.GetString("全部分类")
+            });
+
+            return list;
+        }
 
         public Object Categorys(string parameters)
         {
@@ -371,9 +401,9 @@ namespace CommonConfig
             int id = Convert.ToInt32(dic["id"]);
 
 
-            var list = CategoryHelper.GetCategoryTreeData(classname);
+            var list = GetCategoryTreeData(classname);
 
-            DBHelper db = new DBHelper();
+            DBHelper db = new DBHelper(true);
             var employee = db.First("employee", id);
             if (employee.content["scope"] != null && employee.content.Value<JObject>("scope")[classname] != null)
             {
@@ -395,7 +425,7 @@ namespace CommonConfig
             string classname = dic["classname"].ToString();
             int id = Convert.ToInt32(dic["id"]);
 
-            DBHelper db = new DBHelper();
+            DBHelper db = new DBHelper(true);
             var stocks = db.Where("select * from stock where coalesce(content->>'stop','')=''  order by content->>'code'");
             List<TreeData> list = new List<TreeData>();
             list.Add(new TreeData()

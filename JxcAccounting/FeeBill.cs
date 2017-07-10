@@ -444,48 +444,53 @@ namespace JxcAccounting
             var bill = db.First("bill", billid);
             var employee = db.First("employee", bill.content.Value<int>("employeeid"));
             var maker = db.First("employee", bill.content.Value<int>("makerid"));
-            var customer = db.First("customer", bill.content.Value<int>("customerid"));
+            var vendor = db.FirstOrDefault("select * from vendor where id=" + bill.content.Value<int>("vendorid"));
+            var bank = db.FirstOrDefault("select * from bank where id=" + bill.content.Value<int>("bankid"));
 
             decimal total = bill.content.Value<decimal>("total");
 
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人", 
-                "客户名称",
-                "客户联系人",
-                "客户电话",
-                "客户地址", 
+                "供应商名称",
+                "供应商联系人",
+                "供应商电话",
+                "供应商地址", 
                 "备注",
                 "系统日期",
                 "系统时间",
-                "收款金额",
-                "收款金额大写"
+                "付款账户",
+                "金额",
+                "金额大写"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")}, 
-                {"客户名称",customer.content.Value<string>("name")},
-                {"客户联系人",customer.content.Value<string>("linkman")},
-                {"客户电话",customer.content.Value<string>("linkmobile")},
-                {"客户地址",customer.content.Value<string>("address")}, 
+                {"供应商名称",vendor==null?"":vendor.content.Value<string>("name")},
+                {"供应商联系人",vendor==null?"":vendor.content.Value<string>("linkman")},
+                {"供应商电话",vendor==null?"":vendor.content.Value<string>("linkmobile")},
+                {"供应商地址",vendor==null?"":vendor.content.Value<string>("address")}, 
                 {"备注",bill.content.Value<string>("comment")},
                 {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
                 {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
-                {"收款金额",total.ToString("n2")},
-                {"收款金额大写",MoneyHelper.ConvertSum(total)} 
+                {"付款账户",bank==null?"":bank.content.Value<string>("name")},
+                {"金额",total.ToString("n2")},
+                {"金额大写",MoneyHelper.ConvertSum(total)} 
             };
 
             pd.DetailField = new List<string>()
             {
                 "行号",
-                "账户编号",
-                "账户名称",                
+                "科目编号",
+                "科目名称",                
                 "金额",               
                 "备注"
             };
@@ -494,13 +499,13 @@ namespace JxcAccounting
             int i = 0;
             foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
             {
-                var bank = db.First("bank", item.Value<int>("bankid"));
+                var feetype = db.First("fee", item.Value<int>("feeid"));
 
                 Dictionary<string, string> detail = new Dictionary<string, string>();
                 i++;
                 detail.Add("行号", i.ToString());
-                detail.Add("账户编号", bank.content.Value<string>("code"));
-                detail.Add("账户名称", bank.content.Value<string>("name"));
+                detail.Add("科目编号", feetype.content.Value<string>("code"));
+                detail.Add("科目名称", feetype.content.Value<string>("name"));
                 detail.Add("金额", item.Value<decimal>("total").ToString("n2"));
                 detail.Add("备注", item.Value<string>("comment"));
                 pd.DetailValue.Add(detail);
@@ -512,7 +517,6 @@ namespace JxcAccounting
 
             return new { modelid = modelid };
         }
-
-
+         
     }
 }

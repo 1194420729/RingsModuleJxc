@@ -295,13 +295,7 @@
             $scope.model = { id: id, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.global = {};
-
-            $window.onbeforeunload = function () {
-                if ($scope.tableParams.total() > 0) {
-                    return ' ';
-                }
-            };
-
+             
             $http.post('/purchasebillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -322,6 +316,14 @@
                             counts: [],
                             dataset: $scope.model.content.details
                         });
+
+                        if(!$scope.model.content.auditorid){ 
+                            $window.onbeforeunload = function () { 
+                                if ($scope.tableParams.total() > 0) {
+                                    return ' ';
+                                }
+                            };
+                        }
                     });
 
 

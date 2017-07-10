@@ -628,6 +628,7 @@ namespace JxcPay
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人", 
@@ -644,6 +645,7 @@ namespace JxcPay
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")}, 

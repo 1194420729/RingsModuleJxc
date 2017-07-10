@@ -444,13 +444,15 @@ namespace JxcAccounting
             var bill = db.First("bill", billid);
             var employee = db.First("employee", bill.content.Value<int>("employeeid"));
             var maker = db.First("employee", bill.content.Value<int>("makerid"));
-            var customer = db.First("customer", bill.content.Value<int>("customerid"));
+            var customer = db.FirstOrDefault("select * from customer where id=" + bill.content.Value<int>("customerid"));
+            var bank = db.FirstOrDefault("select * from bank where id=" + bill.content.Value<int>("bankid"));
 
             decimal total = bill.content.Value<decimal>("total");
 
             PrintData pd = new PrintData();
             pd.HeaderField = new List<string>() 
             {
+                "公司名称",
                 "单据编号",
                 "单据日期",
                 "经手人", 
@@ -461,31 +463,34 @@ namespace JxcAccounting
                 "备注",
                 "系统日期",
                 "系统时间",
-                "收款金额",
-                "收款金额大写"
+                "收款账户",
+                "金额",
+                "金额大写"
             };
 
             pd.HeaderValue = new Dictionary<string, string>()
             {
+                {"公司名称",PluginContext.Current.Account.CompanyName},
                 {"单据编号",bill.content.Value<string>("billcode")},
                 {"单据日期",bill.content.Value<string>("billdate")},
                 {"经手人",employee.content.Value<string>("name")}, 
-                {"客户名称",customer.content.Value<string>("name")},
-                {"客户联系人",customer.content.Value<string>("linkman")},
-                {"客户电话",customer.content.Value<string>("linkmobile")},
-                {"客户地址",customer.content.Value<string>("address")}, 
+                {"客户名称",customer==null?"":customer.content.Value<string>("name")},
+                {"客户联系人",customer==null?"":customer.content.Value<string>("linkman")},
+                {"客户电话",customer==null?"":customer.content.Value<string>("linkmobile")},
+                {"客户地址",customer==null?"":customer.content.Value<string>("address")}, 
                 {"备注",bill.content.Value<string>("comment")},
                 {"系统日期",DateTime.Now.ToString("yyyy-MM-dd")},
                 {"系统时间",DateTime.Now.ToString("yyyy-MM-dd HH:mm")},
-                {"收款金额",total.ToString("n2")},
-                {"收款金额大写",MoneyHelper.ConvertSum(total)} 
+                {"收款账户",bank==null?"":bank.content.Value<string>("name")},
+                {"金额",total.ToString("n2")},
+                {"金额大写",MoneyHelper.ConvertSum(total)} 
             };
 
             pd.DetailField = new List<string>()
             {
                 "行号",
-                "账户编号",
-                "账户名称",                
+                "科目编号",
+                "科目名称",                
                 "金额",               
                 "备注"
             };
@@ -494,13 +499,13 @@ namespace JxcAccounting
             int i = 0;
             foreach (var item in bill.content.Value<JArray>("details").Values<JObject>())
             {
-                var bank = db.First("bank", item.Value<int>("bankid"));
+                var earning = db.First("earning", item.Value<int>("earningid"));
 
                 Dictionary<string, string> detail = new Dictionary<string, string>();
                 i++;
                 detail.Add("行号", i.ToString());
-                detail.Add("账户编号", bank.content.Value<string>("code"));
-                detail.Add("账户名称", bank.content.Value<string>("name"));
+                detail.Add("科目编号", earning.content.Value<string>("code"));
+                detail.Add("科目名称", earning.content.Value<string>("name"));
                 detail.Add("金额", item.Value<decimal>("total").ToString("n2"));
                 detail.Add("备注", item.Value<string>("comment"));
                 pd.DetailValue.Add(detail);
