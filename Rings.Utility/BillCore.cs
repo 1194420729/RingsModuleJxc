@@ -1356,14 +1356,20 @@ namespace Jxc.Utility
             {
                 if (item.Value<decimal>("ykqty") == decimal.Zero) continue;
 
+                decimal costtotal = item.Value<decimal>("costtotal");
+                if (item.Value<decimal>("ykqty") < decimal.Zero)
+                {
+                    costtotal = -costtotal;
+                }
+
                 #region 更新库存
                 var product = db.First("product", item.Value<int>("productid"));
 
                 if (product.content["storage"] == null)
                 {
                     JObject vs = new JObject();
-                    vs.Add("0", new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", item.Value<decimal>("costtotal") }, { "price", item.Value<decimal>("costprice") } });
-                    vs.Add(stockid.ToString(), new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", item.Value<decimal>("costtotal") }, { "price", item.Value<decimal>("costprice") } });
+                    vs.Add("0", new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", costtotal }, { "price", item.Value<decimal>("costprice") } });
+                    vs.Add(stockid.ToString(), new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", costtotal }, { "price", item.Value<decimal>("costprice") } });
 
                     product.content["storage"] = vs;
                 }
@@ -1371,7 +1377,7 @@ namespace Jxc.Utility
                 {
                     JObject vs = product.content.Value<JObject>("storage");
                     decimal qty0 = vs.Value<JObject>("0").Value<decimal>("qty") + item.Value<decimal>("ykqty");
-                    decimal total0 = vs.Value<JObject>("0").Value<decimal>("total") + item.Value<decimal>("costtotal");
+                    decimal total0 = vs.Value<JObject>("0").Value<decimal>("total") + costtotal;
                     vs["0"] = new JObject()
                         {
                             {"qty",qty0},
@@ -1380,7 +1386,7 @@ namespace Jxc.Utility
                         };
 
                     decimal qty = vs[stockid.ToString()] == null ? item.Value<decimal>("ykqty") : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("qty") + item.Value<decimal>("ykqty"));
-                    decimal total = vs[stockid.ToString()] == null ? (item.Value<decimal>("costtotal")) : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("total") + item.Value<decimal>("costtotal"));
+                    decimal total = vs[stockid.ToString()] == null ? (costtotal) : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("total") + costtotal);
                     vs[stockid.ToString()] = new JObject()
                         {
                             {"qty",qty},
@@ -1398,11 +1404,11 @@ namespace Jxc.Utility
                 storagedetail.content.Add("productid", product.id);
                 storagedetail.content.Add("qty", item.Value<decimal>("ykqty"));
                 storagedetail.content.Add("price", item.Value<decimal>("costprice"));
-                storagedetail.content.Add("total", item.Value<decimal>("ykqty") > decimal.Zero ? item.Value<decimal>("costtotal") : (-item.Value<decimal>("costtotal")));
+                storagedetail.content.Add("total", costtotal);
                 if (item.Value<decimal>("ykqty") > decimal.Zero)
                 {
                     storagedetail.content.Add("leftqty", item.Value<decimal>("ykqty"));
-                    storagedetail.content.Add("lefttotal", item.Value<decimal>("costtotal"));
+                    storagedetail.content.Add("lefttotal", costtotal);
                 }
                 storagedetail.content.Add("createtime", DateTime.Now);
                 storagedetail.content.Add("billid", bill.id);
@@ -1425,14 +1431,20 @@ namespace Jxc.Utility
             {
                 if (item.Value<decimal>("ykqty") == decimal.Zero) continue;
 
+                decimal costtotal = item.Value<decimal>("costtotal");
+                if (item.Value<decimal>("ykqty") < decimal.Zero)
+                {
+                    costtotal = -costtotal;
+                }
+
                 #region 更新虚拟库存
                 var product = db.First("product", item.Value<int>("productid"));
 
                 if (product.content["virtualstorage"] == null)
                 {
                     JObject vs = new JObject();
-                    vs.Add("0", new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", item.Value<decimal>("costtotal") }, { "price", item.Value<decimal>("costprice") } });
-                    vs.Add(stockid.ToString(), new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", item.Value<decimal>("costtotal") }, { "price", item.Value<decimal>("costprice") } });
+                    vs.Add("0", new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", costtotal }, { "price", item.Value<decimal>("costprice") } });
+                    vs.Add(stockid.ToString(), new JObject() { { "qty", item.Value<decimal>("ykqty") }, { "total", costtotal }, { "price", item.Value<decimal>("costprice") } });
 
                     product.content["virtualstorage"] = vs;
                 }
@@ -1440,7 +1452,7 @@ namespace Jxc.Utility
                 {
                     JObject vs = product.content.Value<JObject>("virtualstorage");
                     decimal qty0 = vs.Value<JObject>("0").Value<decimal>("qty") + item.Value<decimal>("ykqty");
-                    decimal total0 = vs.Value<JObject>("0").Value<decimal>("total") + item.Value<decimal>("costtotal");
+                    decimal total0 = vs.Value<JObject>("0").Value<decimal>("total") + costtotal;
                     vs["0"] = new JObject()
                         {
                             {"qty",qty0},
@@ -1449,7 +1461,7 @@ namespace Jxc.Utility
                         };
 
                     decimal qty = vs[stockid.ToString()] == null ? item.Value<decimal>("ykqty") : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("qty") + item.Value<decimal>("ykqty"));
-                    decimal total = vs[stockid.ToString()] == null ? (item.Value<decimal>("costtotal")) : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("total") + item.Value<decimal>("costtotal"));
+                    decimal total = vs[stockid.ToString()] == null ? (costtotal) : (vs.Value<JObject>(stockid.ToString()).Value<decimal>("total") + costtotal);
                     vs[stockid.ToString()] = new JObject()
                         {
                             {"qty",qty},
@@ -1467,7 +1479,7 @@ namespace Jxc.Utility
                 virtualstoragedetail.content.Add("productid", product.id);
                 virtualstoragedetail.content.Add("qty", item.Value<decimal>("ykqty"));
                 virtualstoragedetail.content.Add("price", item.Value<decimal>("costprice"));
-                virtualstoragedetail.content.Add("total", item.Value<decimal>("ykqty") > decimal.Zero ? item.Value<decimal>("costtotal") : (-item.Value<decimal>("costtotal")));
+                virtualstoragedetail.content.Add("total", costtotal);
                 virtualstoragedetail.content.Add("createtime", DateTime.Now);
                 virtualstoragedetail.content.Add("billid", bill.id);
                 virtualstoragedetail.content.Add("billname", billname);

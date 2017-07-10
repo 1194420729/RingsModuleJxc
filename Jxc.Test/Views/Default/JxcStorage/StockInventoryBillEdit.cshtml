@@ -324,27 +324,27 @@
             $scope.model = { id: id, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.showwaiter = false;
-              
+
             $http.post('/stockinventorybillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
-                        $scope.model.content = data.content; 
+                        $scope.model.content = data.content;
                         $scope.employee=data.employeename;
                         $scope.stock=data.stockname;
                         $scope.billconfig = data.billconfig;
-                        $scope.digit = data.digit; 
-                        $scope.categoryname = data.categoryname;
-                        
+                        $scope.digit = data.digit;
+                        $scope.categoryname =data.content.categoryid==0? "全部分类": data.categoryname;
+
                         $scope.noeditbillcode = data.noeditbillcode;
                         $scope.noeditbilldate = data.noeditbilldate;
-                        
+
                         $scope.tableParams.settings({
                             counts: [],
                             dataset: $scope.model.content.details
                         });
 
-                        if(!$scope.model.content.auditorid){ 
-                            $window.onbeforeunload = function () { 
+                        if(!$scope.model.content.auditorid){
+                            $window.onbeforeunload = function () {
                                 if ($scope.tableParams.total() > 0) {
                                     return ' ';
                                 }
@@ -380,10 +380,10 @@
                            });
             };
 
-            $scope.inventorydateChange = function () {                
+            $scope.inventorydateChange = function () {
                 refreshProductStorage();
             };
-            
+
             $scope.billcodeClick = function () {
                 var model = {};
                 var modalInstance = $uibModal.open({
@@ -516,7 +516,7 @@
                     SweetAlert.swal({ title: '请填写仓库', type: 'error' });
                     return false;
                 }
-                if (!$scope.model.content.categoryid) {
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
                     SweetAlert.swal({ title: '请填写盘点产品类别', type: 'error' });
                     return false;
                 }

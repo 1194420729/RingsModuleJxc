@@ -21,7 +21,7 @@ namespace JxcSystem
             bool cleardraft = ph.GetParameterValue<bool>("cleardraft");
             bool clearstop = ph.GetParameterValue<bool>("clearstop");
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //删除开账日期
                 db.ExcuteNoneQuery("update option set content=content-'initoverdate'");

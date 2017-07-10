@@ -525,7 +525,7 @@
                     SweetAlert.swal({ title: '请填写仓库', type: 'error' });
                     return false;
                 }
-                if (!$scope.model.content.categoryid) {
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
                     SweetAlert.swal({ title: '请填写盘点产品类别', type: 'error' });
                     return false;
                 }

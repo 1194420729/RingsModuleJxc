@@ -49,7 +49,7 @@ namespace JxcSystem
             ParameterHelper ph = new ParameterHelper(parameters);
             DateTime balancedate = ph.GetParameterValue<DateTime>("balancedate");
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查是否已经开账
                 var options = db.First("select * from option");
@@ -96,7 +96,7 @@ namespace JxcSystem
                 balancedate = ph.GetParameterValue<DateTime>("balancedate");
             }
 
-            using (DBHelper db = new DBHelper())
+            using (DBHelper db = new DBHelper(true))
             {
                 //检查是否已经开账
                 var options = db.First("select * from option");
