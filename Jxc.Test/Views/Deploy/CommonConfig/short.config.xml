@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="departmentservice" path="service/commonconfig/commonconfig/department"></short>
+  <short name="employeeservice" path="service/commonconfig/commonconfig/employee"></short>
+  <short name="userservice" path="service/commonconfig/commonconfig/user"></short>   
+</shorts>

@@ -87,7 +87,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from customer "
+            string sqlCount = "select count(0) as cnt from customer "
                         + sb.ToString();
 
 
@@ -147,7 +147,7 @@ namespace JxcPay
                         + " group by customerid,customername,customercode "
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (select customerid,customername,customercode from mvw_receivabledetail "
+            string sqlCount = "select count(0) as cnt from (select customerid,customername,customercode from mvw_receivabledetail "
                         + sb.ToString()
                         + " group by customerid,customername,customercode) as t";
 
@@ -207,7 +207,7 @@ namespace JxcPay
                         + " group by employeeid,employeename,employeecode "
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (select employeeid,employeename,employeecode from mvw_receivabledetail "
+            string sqlCount = "select count(0) as cnt from (select employeeid,employeename,employeecode from mvw_receivabledetail "
                         + sb.ToString()
                         + " group by employeeid,employeename,employeecode) as t";
 
@@ -272,7 +272,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from mvw_receivabledetail where 1=1 "
+            string sqlCount = "select count(0) as cnt from mvw_receivabledetail where 1=1 "
                         + sb.ToString();
 
 
@@ -342,7 +342,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from mvw_receivabledetail where 1=1 "
+            string sqlCount = "select count(0) as cnt from mvw_receivabledetail where 1=1 "
                         + sb.ToString();
 
 
@@ -417,7 +417,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from vendor "
+            string sqlCount = "select count(0) as cnt from vendor "
                         + sb.ToString();
 
 
@@ -477,7 +477,7 @@ namespace JxcPay
                         + " group by vendorid,vendorname,vendorcode "
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (select vendorid,vendorname,vendorcode from mvw_payabledetail "
+            string sqlCount = "select count(0) as cnt from (select vendorid,vendorname,vendorcode from mvw_payabledetail "
                         + sb.ToString()
                         + " group by vendorid,vendorname,vendorcode) as t";
 
@@ -541,7 +541,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from payabledetail where 1=1 "
+            string sqlCount = "select count(0) as cnt from payabledetail where 1=1 "
                         + sb.ToString();
 
 
@@ -629,7 +629,7 @@ namespace JxcPay
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = "select count(0) as cnt from bill "
                         + sb.ToString();
 
 

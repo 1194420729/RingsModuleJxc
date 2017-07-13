@@ -142,7 +142,7 @@ namespace Baseingfo.Test.Controllers
 
                 if (id.HasValue)
                 {
-                    command.CommandText = "select count(*) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' and id<>"+id.Value;
+                    command.CommandText = "select count(0) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' and id<>"+id.Value;
                     int cnt = Convert.ToInt32(command.ExecuteScalar());
                     if (cnt > 0)
                     {
@@ -153,7 +153,7 @@ namespace Baseingfo.Test.Controllers
                 }
                 else
                 {
-                    command.CommandText = "select count(*) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' ";
+                    command.CommandText = "select count(0) as cnt from printtemplate where content->>'name'='" + item.Name + "' and content->>'category'='" + item.Category + "' ";
                     int cnt = Convert.ToInt32(command.ExecuteScalar());
                     if (cnt > 0)
                     {

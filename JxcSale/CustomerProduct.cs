@@ -96,7 +96,7 @@ namespace JxcSale
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt"
+            string sqlCount = "select count(0) as cnt"
                         + " from customerproduct "
                         + " inner join customer on (customerproduct.content->>'customerid')::int=customer.id "
                         + " inner join product on (customerproduct.content->>'productid')::int=product.id "

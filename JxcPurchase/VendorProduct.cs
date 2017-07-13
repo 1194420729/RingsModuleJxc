@@ -96,7 +96,7 @@ namespace JxcPurchase
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt"
+            string sqlCount = "select count(0) as cnt"
                         + " from vendorproduct "
                         + " inner join vendor on (vendorproduct.content->>'vendorid')::int=vendor.id "
                         + " inner join product on (vendorproduct.content->>'productid')::int=product.id "

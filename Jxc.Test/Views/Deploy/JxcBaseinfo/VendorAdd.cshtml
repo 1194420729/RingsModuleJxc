@@ -1,0 +1,265 @@
+﻿@{
+    ViewBag.Title = "新增供应商资料";
+}
+<div data-pagelimit="vendoradd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="categorychoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    选择分类
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" tree="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcbaseinfo/vendorlist">供应商资料</a></li>
+            <li><span>新增供应商资料</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                新增供应商资料
+            </div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group form-inline col-md-12">
+                                <label>供应商编号<span style="color:red;">*</span></label>
+                                <input type="text" class="form-control" autocomplete="off" name="code" ng-model="model.content.code" required />
+                                <span class="text-danger" ng-show="myForm.code.$invalid">必填项</span>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>供应商名称<span style="color:red;">*</span></label>
+                                <input type="text" class="form-control" autocomplete="off" name="name" ng-model="model.content.name" required />
+                                <span class="text-danger" ng-show="myForm.name.$invalid">必填项</span>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>供应商分类</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" readonly="readonly" style="background-color:#fff" ng-model="categoryname">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="categoryClick()"><i class="fa fa-search fa-fw"></i></button>
+                                        <button class="btn btn-default" type="button" ng-click="categoryremoveClick()"><i class="fa fa-remove"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>联系人</label>
+                                <input type="text" class="form-control" autocomplete="off" name="linkman" ng-model="model.content.linkman" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>联系电话</label>
+                                <input type="text" class="form-control" autocomplete="off" name="linkmobile" ng-model="model.content.linkmobile" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>电子邮箱</label>
+                                <input type="text" class="form-control" autocomplete="off" name="email" ng-model="model.content.email" />
+                            </div>
+                            <div class="form-group form-inline col-md-4 col-lg-3">
+                                <label>公司传真</label>
+                                <input type="text" class="form-control" autocomplete="off" name="fax" ng-model="model.content.fax" />
+                            </div>
+
+                            <div class="form-group form-inline col-md-8 col-lg-6">
+                                <label>公司地址</label>
+                                <input type="text" class="form-control" style="width:400px;" autocomplete="off" name="address" ng-model="model.content.address" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>备注</label>
+                                <textarea class="form-control" autocomplete="off" name="comment" ng-model="model.content.comment" style="width:500px;height:100px;"></textarea>
+                            </div>
+                            <div class="form-group form-inline col-md-12">
+                                <label>附件</label>
+                                <input type="file" class="form-control" id="file" multiple="multiple" />
+                                <button class="btn btn-info" type="button" ng-click="uploadAttachments()"><i class="fa fa-upload fa-fw"></i>上传</button>
+                                <img src="~/Content/images/loader.gif" ng-show="uploadwaiter" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <ul class="list-group">
+                                    <li class="list-group-item" ng-repeat="m in model.content.attachments">
+                                        <a ng-href="{{m.url}}" download="{{m.name}}" ng-bind="m.name"></a>
+                                        <span style="margin-left:20px;" ng-bind="m.size"></span>
+                                        <a href="javascript:;" title="删除" class="text-danger" ng-click="removeAttachment(m.url)"><i class="fa fa-remove fa-fw"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <button type="button" class="btn btn-primary"
+                                        ng-disabled="myForm.code.$invalid || myForm.name.$invalid || savedisabled"
+                                        ng-click="btnsaveClick()">
+                                    <i class="fa fa-save fa-fw"></i>保存
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        label{min-width:80px;}
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $uibModal, SweetAlert) {
+
+            $scope.model = { id: 0, content: { attachments: [] } };
+
+            $http.post('/vendorservice/getcode', {})
+                    .success(function (data) {
+                        $scope.model.content.code = data.code;
+                    });
+
+            $scope.categoryremoveClick = function () {
+                delete $scope.model.content.categoryid;
+                $scope.categoryname = '';
+            };
+
+            $scope.categoryClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'categorychoice.html',
+                    controller: 'categorychoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    if (model.categoryid > 0) {
+                        $scope.model.content.categoryid = model.categoryid;
+                        $scope.categoryname = model.categoryname;
+                    } else {
+                        delete $scope.model.content.categoryid;
+                        $scope.categoryname = '';
+                    }
+                });
+            };
+
+            $scope.uploadAttachments = function () {
+                var file = document.getElementById('file');
+                if (file.files.length == 0) return;
+
+                $scope.uploadwaiter = true;
+
+                var myform = new FormData();
+                for (var i = 0; i < file.files.length; i++) {
+                    myform.append("files[]", file.files[i]);
+                }
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        $scope.uploadwaiter = false;
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            angular.forEach(data.urls, function (item) {
+                                $scope.model.content.attachments.push(item);
+                            });
+                            SweetAlert.swal({ title: '上传成功！', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfiles", true);
+                req.send(myform);
+            };
+
+            $scope.removeAttachment = function (url) {
+                for (var i = 0; i < $scope.model.content.attachments.length; i++) {
+                    if ($scope.model.content.attachments[i].url === url) {
+                        $scope.model.content.attachments.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/vendorservice/addsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!可以继续添加', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+        });
+
+        app.controller('categorychoiceModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": [
+                            "dnd", "search",
+                            "state", "types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/vendorservice/categorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.selectNode = function (node, selected, event) {
+                model.categoryid = parseInt(selected.node.id);
+                model.categoryname = selected.node.text;
+            };
+
+            $scope.ok = function () {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

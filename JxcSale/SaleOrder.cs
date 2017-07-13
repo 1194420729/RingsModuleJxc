@@ -171,7 +171,7 @@ namespace JxcSale
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = cte+"select count(*) as cnt from cte "
+            string sqlCount = cte+"select count(0) as cnt from cte "
                         + sb.ToString();
 
             string sqlQtySum = cte
@@ -297,7 +297,7 @@ namespace JxcSale
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = "select count(0) as cnt from bill "
                         + sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -552,7 +552,7 @@ namespace JxcSale
 
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -607,7 +607,7 @@ namespace JxcSale
                 }
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -666,7 +666,7 @@ namespace JxcSale
 
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -726,7 +726,7 @@ namespace JxcSale
                 }
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -1238,7 +1238,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from (select productid from cte "
+                            + "select count(0) from (select productid from cte "
                             + sb.ToString()
                             + " group by productid) as t";
 
@@ -1377,7 +1377,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from (select customerid from cte "
+                            + "select count(0) from (select customerid from cte "
                             + sb.ToString()
                             + " group by customerid) as t";
 
@@ -1503,7 +1503,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from (select employeeid from cte "
+                            + "select count(0) from (select employeeid from cte "
                             + sb.ToString()
                             + " group by employeeid) as t";
 
@@ -1628,7 +1628,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from (select stockid from cte "
+                            + "select count(0) from (select stockid from cte "
                             + sb.ToString()
                             + " group by stockid) as t";
 
@@ -1817,10 +1817,10 @@ namespace JxcSale
 
             //string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_saleorder "
             //                    + sb.ToString()
-            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
+            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(0) from cte";
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
             string sqlSum = cte

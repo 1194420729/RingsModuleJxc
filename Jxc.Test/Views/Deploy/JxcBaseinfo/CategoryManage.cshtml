@@ -1,0 +1,272 @@
+﻿@{
+    ViewBag.Title = "编辑分类";
+}
+<div>
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <script type="text/ng-template" id="categoryedit.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    编辑分类
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" class="form-control" ng-model="categoryname" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <script type="text/ng-template" id="categoryadd.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    新增子类
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>父类：<span ng-bind="parentname"></span></label> 
+                </div>
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" class="form-control" ng-model="categoryname" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>分类管理</span></li>
+        </ol>
+        <div class="form-group form-inline">
+            <label>
+                搜索 :
+            </label>
+            <input type="text" class="form-control" ng-model="category.filter" />
+            <button class="btn btn-primary" ng-click="btncategoryqueryClick()">
+                <i class="fa fa-search fa-fw"></i>查询
+            </button>
+            <button type="button" class="btn btn-success" ng-click="btncategoryaddClick()">
+                <i class="fa fa-asterisk fa-fw">
+                </i>新增子类
+            </button>
+            <button class="btn btn-warning" ng-click="btncategoryeditClick()">
+                <i class="fa fa-pencil fa-fw"></i>编辑
+            </button>
+            <button class="btn btn-danger" ng-click="btncategorydeleteClick()">
+                <i class="fa fa-remove fa-fw"></i>删除
+            </button>
+            <button class="btn btn-primary" ng-click="btncategorymoveClick()">
+                <i class="fa fa-cut fa-fw"></i>类别搬移
+            </button>
+            <button class="btn btn-primary" ng-click="btndatamoveClick()">
+                <i class="fa fa-copy fa-fw"></i>数据搬移
+            </button>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div>
+                    <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                         tree-events="select_node:selectNode">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+            max-width: 200px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert, $uibModal) {
+            var classname = '@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("classname"))';
+
+            $scope.category = { classname: classname };
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": [
+                            "dnd", "search",
+                            "state", "types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/categoryservice/categorys', { classname: $scope.category.classname })
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.btncategoryaddClick = function () {
+                var nodes = angular.element('#treeInstance').jstree(true).get_selected(true);
+                if (nodes.length == 0) { 
+                    SweetAlert.swal({ title: '请先选择父类！', type: 'error' });
+                    return;
+                }
+
+                var model = {parentname:nodes[0].text,parentid:parseInt(nodes[0].id)};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'categoryadd.html',
+                    controller: 'categoryaddModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/categoryservice/addsave', { parentid: model.parentid, name: model.name,classname:$scope.category.classname })
+                       .success(function (data) {
+                           if(data.message=='ok'){
+                               window.location.reload();
+                           }
+                       });
+                });
+            };
+
+            $scope.btncategoryqueryClick = function () {
+                if ($scope.category.filter) {
+                    angular.element('#treeInstance').jstree(true).search($scope.category.filter);
+                }
+            };
+
+            $scope.btncategoryeditClick = function () {
+                var nodes = angular.element('#treeInstance').jstree(true).get_selected(true);
+                if (nodes.length > 0) {
+                    if (parseInt(nodes[0].id) > 0) {
+                        var model = nodes[0];
+                        var modalInstance = $uibModal.open({
+                            animation: true,
+                            templateUrl: 'categoryedit.html',
+                            controller: 'categoryeditModalCtrl',
+                            resolve: {
+                                model: function () { return model; }
+                            }
+                        });
+
+                        modalInstance.result.then(function () {
+                            $http.post('/categoryservice/editsave', { id:model.id,name:model.text })
+                               .success(function (data) {
+                                   window.location.reload();
+                               });
+                        });
+                    }
+                }
+
+            };
+
+            $scope.btncategorydeleteClick = function () {
+                var ids = angular.element('#treeInstance').jstree(true).get_selected(false);
+                if (ids.length == 0) {
+                    return;
+                }
+                var id = ids[0];
+                if (id <= 0) {
+                    return;
+                }
+
+                SweetAlert.swal({
+                    title: '确定要删除吗？',
+                    text: '数据删除后无法恢复',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '删除',
+                    closeOnConfirm: false
+                },
+                    function (isConfirm) {
+                        if (!isConfirm) return;
+
+                        $http.post('/categoryservice/delete', { id: id }).success(function (data) {
+                            if (data.message == 'ok') {
+                                SweetAlert.swal({ title: '删除成功', type: 'success' }, function () {
+                                    window.location.reload();
+                                });
+                            }
+                        });
+
+                    });
+            };
+
+            $scope.btncategorymoveClick = function () {
+                window.location.href = '/jxcbaseinfo/categorymove?classname='+$scope.category.classname;
+            };
+
+            $scope.btndatamoveClick = function () {
+                window.location.href = '/jxcbaseinfo/categorymovedata?classname=' + $scope.category.classname;
+            };
+        });
+
+        app.controller('categoryeditModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.categoryname = model.text;
+            
+            $scope.ok = function () {
+                model.text = $scope.categoryname;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('categoryaddModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.parentname = model.parentname;
+
+            $scope.ok = function () {
+                model.name = $scope.categoryname;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<components>
+  <component name="receivablecomponent" title="应收账款" path="/jxcpay/receivablecomponent" limit="receivablequery" width="200" height="200">
+  </component>
+  <component name="payablecomponent" title="应付账款" path="/jxcpay/payablecomponent" limit="payablequery" width="200" height="200">
+  </component>
+</components>

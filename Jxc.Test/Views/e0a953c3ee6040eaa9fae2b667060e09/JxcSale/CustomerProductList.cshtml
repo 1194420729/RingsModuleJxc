@@ -1,0 +1,207 @@
+﻿@{
+    ViewBag.Title = "产品价格表";
+}
+<div data-pagelimit="customerproductlist">
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>产品价格表</span></li>
+        </ol>
+        <div class="container-fluid">
+            <div class="col-md-6">
+                <div class="form-group form-inline">
+                    <label>
+                        客户
+                    </label>
+                    <input type="text" autocomplete="off" ng-model="customer" placeholder="编号或名称模糊查询" uib-typeahead="customer.content.name for customer in updateCustomers($viewValue)"
+                           typeahead-on-select="customerSelected($item, $model, $label,$event)" typeahead-loading="loadingCustomerLocations"
+                           typeahead-no-results="noCustomerResults" typeahead-select-on-blur="true" class="form-control">
+                    <i ng-show="loadingCustomerLocations" class="glyphicon glyphicon-refresh"></i>
+                    <span class="text-danger" ng-show="noCustomerResults">没有匹配项</span>
+                </div>
+                <div class="form-group form-inline">
+                    <label>
+                        产品
+                    </label>
+                    <input type="text" autocomplete="off" ng-model="product" placeholder="编号或名称模糊查询" uib-typeahead="product.content.name for product in updateProducts($viewValue)"
+                           typeahead-on-select="productSelected($item, $model, $label,$event)" typeahead-loading="loadingProductLocations"
+                           typeahead-no-results="noProductResults" typeahead-select-on-blur="true" class="form-control">
+                    <i ng-show="loadingProductLocations" class="glyphicon glyphicon-refresh"></i>
+                    <span class="text-danger" ng-show="noProductResults">没有匹配项</span>
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()">
+                        <i class="fa fa-search fa-fw"></i>
+                        查询
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">                
+                <div class="form-group form-inline pull-right">
+
+                    <a href="javascript:;" class="btn btn-info" ng-limit="customerproductexport" ng-click="csv.generate($event, '产品价格表.csv')">
+                        <i class="fa fa-file-excel-o fa-fw"></i>
+                        导出Excel
+                    </a>
+                    <a class="btn btn-info" ng-limit="customerproductimport" href="/jxcsale/customerproductimport">
+                        <i class="fa fa-inbox fa-fw"></i>
+                        数据导入
+                    </a>
+                    <a class="btn btn-primary" ng-limit="customerproductadd" href="/jxcsale/customerproductadd">
+                        <i class="fa fa-plus fa-fw"></i>
+                        新增
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div style="width:100%;overflow-x:auto;">
+            <table ng-table="tableParams" export-csv="csv" class="table table-bordered table-condensed table-striped">
+                <tr ng-repeat="m in $data">
+
+                    <td data-title="'No.'" header-class="'bg-warning'" style="width:100px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'客户编号'" header-class="'bg-warning'"
+                        data-sortable="'customer.code'">
+                        <span ng-bind="m.content.customer.code"></span>
+                    </td>
+                    <td data-title="'客户名称'" header-class="'bg-warning'"
+                        data-sortable="'customer.name'">
+                        <span ng-bind="m.content.customer.name"></span>
+                    </td>
+                    <td data-title="'产品编号'" header-class="'bg-warning'"
+                        data-sortable="'product.code'">
+                        <span ng-bind="m.content.product.code"></span>
+                    </td>
+                    <td data-title="'产品名称'" header-class="'bg-warning'"
+                        data-sortable="'product.name'">
+                        <span ng-bind="m.content.product.name"></span>
+                    </td>
+                    <td data-title="'产品规格'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.product.standard"></span>
+                    </td>
+                    <td data-title="'产品型号'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.product.type"></span>
+                    </td>
+                    <td data-title="'销售价'" header-class="'bg-warning'"
+                        data-sortable="'price'">
+                        <span ng-bind="m.content.price | currency:'￥'"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td>
+                        合计
+                    </td>
+                    <td>
+                        <span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {};
+
+            var getData = function ($defer, params) {
+                var filter = {};
+                if ($scope.customer && !$scope.noCustomerResults) {
+                    filter.customerid = $scope.filter.customerid;
+                }
+                if ($scope.product && !$scope.noProductResults) {
+                    filter.productid = $scope.filter.productid;
+                }
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/customerproductservice/list',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            $scope.btnqueryClick = function () {
+                $scope.tableParams.page(1);
+                $scope.tableParams.reload();
+            };
+
+            $scope.updateCustomers = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/customerchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.customerSelected = function ($item, $model, $label, $event) {
+                $scope.filter.customerid = $item.id;
+            };
+
+            $scope.updateProducts = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/productchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.productSelected = function ($item, $model, $label, $event) {
+                $scope.filter.productid = $item.id;
+            };
+
+        });
+
+
+    </script>
+}

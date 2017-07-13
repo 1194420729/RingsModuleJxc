@@ -1,0 +1,170 @@
+﻿@{
+    ViewBag.Title = "月结存";
+}
+<div data-pagelimit="monthbalance">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>月结存</span></li>
+        </ol>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">月结存</div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="form-group">
+                        <label>月结存不会删除业务数据，仅仅是在指定日期打一个标记，并禁止再录入该日期之前的单据。</label>
+                    </div>
+                    <div class="form-group form-inline">
+                        <label>结存日期</label>
+                        <div class="dropdown" style="display: inline;">
+                            <a class="dropdown-toggle balancedate" role="button" data-toggle="dropdown" data-target="#"
+                               href="javascript:;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="balancedate" ng-model="balancedate" required />
+                                    <span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker ng-model="balancedate" data-datetimepicker-config="{ dropdownSelector: '.balancedate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                            </ul>
+                        </div>
+                        <span class="text-danger" ng-show="myForm.balancedate.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary"
+                                ng-disabled="myForm.balancedate.$invalid || savedisabled"
+                                ng-click="btnsaveClick()">
+                            <i class="fa fa-save fa-fw"></i>确定结存
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <table ng-table="tableParams" class="table table-bordered table-condensed table-striped"
+                   show-filter="false">
+                <tr ng-repeat="m in $data">
+                    <td header-class="'bg-warning'" style="min-width:90px;width:90px;">
+                        <a href="javascript:;" ng-click="btndeleteClick(m.id)" title="删除月结">
+                            <i class="fa fa-trash fa-fw"></i>
+                        </a>
+                    </td>
+                    <td data-title="'No.'" header-class="'bg-warning'" style="width:100px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'结存日期'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.balancedate"></span>
+                    </td>
+                    <td data-title="'操作员'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.accountname"></span>
+                    </td>
+
+                </tr>
+                <tr class="warning">
+                    <td>
+                        合计
+                    </td>
+                    <td colspan="2">
+                        <span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert, $uibModal, NgTableParams) {
+            $scope.tableParams = new NgTableParams({ count: 99999 });
+
+            $http.post('/balanceservice/monthbalancelist', {})
+                    .success(function (data) {
+                         
+                        $scope.history = data.history;
+
+                        $scope.tableParams.settings({
+                            counts: [],
+                            dataset: $scope.history
+                        });
+                    });
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/balanceservice/monthbalancesave', { balancedate: $scope.balancedate })
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '月结成功!', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+
+            $scope.btndeleteClick = function (id) {
+                SweetAlert.swal({
+                    title: '确定要删除吗？',
+                    text: '删除月结仅仅是删除一个标记，没有其他影响',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '删除',
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    $http.post('/balanceservice/monthbalancedelete', { id: id }).success(function (data) {
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '删除月结成功', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+                });
+            };
+        });
+
+    </script>
+}

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="initstoragelist" title="期初库存" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initstorageexport" title="导出期初库存" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initstorageimport" title="导入期初库存" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initstorageedit" title="修改期初库存" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initreceivablelist" title="期初应收" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initreceivableexport" title="导出期初应收" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initreceivableimport" title="导入期初应收" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initreceivableedit" title="修改期初应收" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initpayablelist" title="期初应付" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initpayableexport" title="导出期初应付" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initpayableimport" title="导入期初应付" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initpayableedit" title="修改期初应付" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initbanklist" title="期初现金银行" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initbankexport" title="导出期初现金银行" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initbankimport" title="导入期初现金银行" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initbankedit" title="修改期初现金银行" groupname="期初建账" modulename="进销存"></limit>
+  <limit name="initover" title="开账" groupname="期初建账" modulename="进销存"></limit>
+</limits>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="customerproductlist" title="产品价格表" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="customerproductexport" title="导出产品价格" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="customerproductimport" title="导入产品价格" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="customerproductadd" title="新增产品价格" groupname="销售管理" modulename="进销存"></limit>
+
+  <limit name="saleorderadd" title="录入销售订单" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderaudit" title="销售订单审核" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderquery" title="销售订单查询" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderdelete" title="删除销售订单" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderabort" title="中止销售订单" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderreport" title="销售订单统计" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="salebilladd" title="录入销售出库单" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="salebillaudit" title="销售出库单审核" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="salebackbilladd" title="录入销售退货单" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="salebackbillaudit" title="销售退货单审核" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="dailysalereport" title="销售日报" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="monthsalereport" title="销售月报" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="timespansalereport" title="任意时间段销售报表" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="productsalereport" title="产品销售排行" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="employeesalereport" title="经手人销售排行" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="customersalereport" title="客户销售排行" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="stocksalereport" title="仓库销售排行" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="saleorderflow" title="销售订单流水" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="salebillflow" title="销售出库流水" groupname="销售管理" modulename="进销存"></limit>
+  <limit name="myselfsalereport" title="个人业绩统计" groupname="销售管理" modulename="进销存"></limit>
+</limits>

@@ -125,7 +125,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from (select productid from cte "
+                            + "select count(0) from (select productid from cte "
                             + sb.ToString()
                             + " group by productid) as t";
 
@@ -260,7 +260,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                           + "select count(*) from (select productid from cte "
+                           + "select count(0) from (select productid from cte "
                            + sb.ToString()
                            + " group by productid) as t";
 
@@ -416,7 +416,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                           + "select count(*) from (select productid from cte "
+                           + "select count(0) from (select productid from cte "
                            + sb.ToString()
                            + " group by productid) as t";
 
@@ -571,7 +571,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                           + "select count(*) from (select productid from cte "
+                           + "select count(0) from (select productid from cte "
                            + sb.ToString()
                            + " group by productid) as t";
 
@@ -710,7 +710,7 @@ namespace JxcSale
 
             string sqlCount = "with cte as (select employeeid,employeecode,employeename from mvw_salebill "
                                 + sb.ToString()
-                                + " group by employeeid,employeecode,employeename) select count(*) from cte";
+                                + " group by employeeid,employeecode,employeename) select count(0) from cte";
 
             string sqlSum = "select coalesce(sum(case when billname='salebill' then qty else -qty end),0) as qty," +
                             "coalesce(sum(case when billname='salebill' then total else -total end),0) as total," +
@@ -851,7 +851,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                           + "select count(*) from (select customerid from cte "
+                           + "select count(0) from (select customerid from cte "
                            + sb.ToString()
                            + " group by customerid) as t";
 
@@ -980,7 +980,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                           + "select count(*) from (select stockid from cte "
+                           + "select count(0) from (select stockid from cte "
                            + sb.ToString()
                            + " group by stockid) as t";
 
@@ -1142,7 +1142,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
             string sqlSum = cte
@@ -1271,10 +1271,10 @@ namespace JxcSale
 
             //string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_saleorder "
             //                    + sb.ToString()
-            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
+            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(0) from cte";
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
             string sqlSum = cte
@@ -1387,7 +1387,7 @@ namespace JxcSale
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
             string sqlSum = cte
@@ -1516,7 +1516,7 @@ namespace JxcSale
 
             string sqlCount = "with cte as (select employeeid,employeecode,employeename from mvw_salebill "
                                 + sb.ToString()
-                                + " group by employeeid,employeecode,employeename) select count(*) from cte";
+                                + " group by employeeid,employeecode,employeename) select count(0) from cte";
 
             string sqlSum = "select coalesce(sum(case when billname='salebill' then qty else -qty end),0) as qty," +
                             "coalesce(sum(case when billname='salebill' then total else -total end),0) as total," +

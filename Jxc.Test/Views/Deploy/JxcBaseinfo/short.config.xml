@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+   <short name="vendorservice" path="service/jxcbaseinfo/jxcbaseinfo/vendor"></short>
+  <short name="categoryservice" path="service/jxcbaseinfo/jxcbaseinfo/category"></short>
+  <short name="stockservice" path="service/jxcbaseinfo/jxcbaseinfo/stock"></short>
+  <short name="customerservice" path="service/jxcbaseinfo/jxcbaseinfo/customer"></short>
+  <short name="productservice" path="service/jxcbaseinfo/jxcbaseinfo/product"></short>
+  <short name="bankservice" path="service/jxcbaseinfo/jxcbaseinfo/bank"></short>
+  <short name="feeservice" path="service/jxcbaseinfo/jxcbaseinfo/fee"></short>
+  <short name="earningservice" path="service/jxcbaseinfo/jxcbaseinfo/earning"></short>
+  <short name="inouttypeservice" path="service/jxcbaseinfo/jxcbaseinfo/inouttype"></short>
+</shorts>

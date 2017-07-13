@@ -116,7 +116,7 @@ namespace JxcAccounting
 
             string sqlCount = "with cte as (select earningid from mvw_earningbill "
                                 + sb.ToString()
-                                + " group by earningid) select count(*) from cte";
+                                + " group by earningid) select count(0) from cte";
 
             string sqlSum = "select coalesce(sum(total),0) as total " +
                             "from mvw_earningbill " +
@@ -431,7 +431,7 @@ namespace JxcAccounting
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) from mvw_earningbill "
+            string sqlCount = "select count(0) from mvw_earningbill "
                             + sb.ToString();
 
 
@@ -523,7 +523,7 @@ namespace JxcAccounting
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) from mvw_earningbill "
+            string sqlCount = "select count(0) from mvw_earningbill "
                             + sb.ToString();
 
 

@@ -387,7 +387,7 @@ namespace Jxc.Utility
                 foreach (var employee in employees)
                 {
                     string rolename = "myuid" + db.CurrentDataContext.CorporationId + "_" + employee.id;
-                    int cnt = db.Count("select count(*) as cnt from pg_user where usename='" + rolename + "'");
+                    int cnt = db.Count("select count(0) as cnt from pg_user where usename='" + rolename + "'");
                     if (cnt == 0)
                     {
                         db.ExcuteNoneQuery(string.Format("create role {0} login password '{1}'", rolename, "mypassword" + employee.id));

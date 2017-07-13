@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "首页";
+}
+<div>
+    <div class="page-header text-center">
+        <h2>欢迎您进入系统！<small>今天是@(DateTime.Now.ToString("yyyy-MM-dd") + " " + DateTime.Now.ToString("dddd"))</small></h2>
+        <a href="/home/homepageconfig" class="pull-right" title="配置个性化首页"><i class="fa fa-gear"></i></a>
+        <div style="clear:both;"></div>
+    </div>
+    <div class="text-center" style="display:none;" id="notconfigalert">您还没有配置专属于您的个性化首页，请<a href="/home/homepageconfig">点击这里</a>，用一分钟的时间进行配置。</div>
+    <div id="root"></div>
+</div>
+@section styles{
+
+}
+@section scripts{
+
+    <script>
+        var componentloader = {};
+
+        $(function () {
+            var mycomponents;
+            var loadjs = function (js, index) {
+
+                if (js.length == index) {
+                    $.each(mycomponents, function (i, item) {
+                        loadcomponent(item);
+                    });
+                    return;
+                }
+
+                var script = js[index];
+                var srcreg = /src=['"]?([^'"]*)['"]?/i;
+                var src = script.match(srcreg);
+                if (src == null) {
+
+                    $('body').append(script);
+                    loadjs(js, index + 1);
+                } else {
+                    var link = src[1];
+                    if (link.indexOf('/') == 0) {
+                        link = 'http:' + link;
+                    }
+                    $.getScript(link).done(function () {
+                        loadjs(js, index + 1);
+                    });
+                }
+            };
+
+            var loadcomponent = function (component) {
+                var guid = component.guid;
+
+                $('#root').append('<div class="componentinstance thumbnail" id="' + guid
+                    + '" style="' + component.style + '"></div>');
+                $('#' + guid).data(component);
+                if (component.name == 'blankcomponent') return;
+                $('#' + guid).load(component.path, function () {
+                    var init = componentloader[component.name];
+                    if (typeof (init) == 'function') init(guid);
+
+                });
+            };
+
+            $.post('/homepageservice/init', function (data) {
+                if (data.mycomponents.length == 0) {
+                    $('#notconfigalert').show();
+                } else {
+                    mycomponents = data.mycomponents;
+                    var js = [];
+                    $.each(data.dependency, function (index, item) {
+                        $('head').append(item.css);
+                        for (var i = 0; i < item.js.length; i++) {
+                            js.push(item.js[i]);
+                        }
+                    });
+
+                    loadjs(js, 0);
+
+                }
+            }, 'json');
+        });
+    </script>
+}

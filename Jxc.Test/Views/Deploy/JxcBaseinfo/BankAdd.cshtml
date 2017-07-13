@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "新增资金账户";
+}
+<div data-pagelimit="bankadd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcbaseinfo/banklist">资金账户资料</a></li>
+            <li><span>新增资金账户资料</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                新增资金账户资料
+            </div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="form-group form-inline">
+                        <label>资金账户编号<span style="color:red;">*</span></label>
+                        <input type="text" class="form-control" autocomplete="off" name="code" ng-model="model.content.code" required />
+                        <span class="text-danger" ng-show="myForm.code.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group form-inline">
+                        <label>资金账户名称<span style="color:red;">*</span></label>
+                        <input type="text" class="form-control" autocomplete="off" name="name" ng-model="model.content.name" required />
+                        <span class="text-danger" ng-show="myForm.name.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea class="form-control" autocomplete="off" name="comment" ng-model="model.content.comment" style="width:500px;height:100px;"></textarea> 
+                    </div>
+                    <button type="button" class="btn btn-primary"
+                            ng-disabled="myForm.code.$invalid || myForm.name.$invalid || savedisabled"
+                            ng-click="btnsaveClick()">
+                        <i class="fa fa-save fa-fw"></i>保存
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert) {
+
+            $scope.model = { id: 0, content: {} };
+
+            $http.post('/bankservice/getcode', {})
+                    .success(function (data) {
+                        $scope.model.content.code = data.code;
+                    });
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/bankservice/addsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!可以继续添加', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+        });
+
+    </script>
+}

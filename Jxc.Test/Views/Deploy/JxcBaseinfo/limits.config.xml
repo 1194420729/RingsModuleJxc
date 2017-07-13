@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="productlist" title="产品列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productadd" title="新增产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productedit" title="编辑产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productdelete" title="删除产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productstop" title="停用产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productunstop" title="启用产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productimport" title="导入产品" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="productexport" title="导出产品" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="customerlist" title="客户列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customeradd" title="新增客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customeredit" title="编辑客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customerdelete" title="删除客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customerstop" title="停用客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customerunstop" title="启用客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customerimport" title="导入客户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="customerexport" title="导出客户" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="vendorlist" title="供应商列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendoradd" title="新增供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendoredit" title="编辑供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendordelete" title="删除供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendorstop" title="停用供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendorunstop" title="启用供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendorimport" title="导入供应商" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="vendorexport" title="导出供应商" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="stocklist" title="仓库列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockadd" title="新增仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockedit" title="编辑仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockdelete" title="删除仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockstop" title="停用仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockunstop" title="启用仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockimport" title="导入仓库" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="stockexport" title="导出仓库" groupname="基础资料" modulename="进销存"></limit>
+   
+  <limit name="banklist" title="资金账户列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankadd" title="新增资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankedit" title="编辑资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankdelete" title="删除资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankstop" title="停用资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankunstop" title="启用资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankimport" title="导入资金账户" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="bankexport" title="导出资金账户" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="feelist" title="费用科目列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feeadd" title="新增费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feeedit" title="编辑费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feedelete" title="删除费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feestop" title="停用费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feeunstop" title="启用费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feeimport" title="导入费用科目" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="feeexport" title="导出费用科目" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="earninglist" title="收入类型列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningadd" title="新增收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningedit" title="编辑收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningdelete" title="删除收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningstop" title="停用收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningunstop" title="启用收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningimport" title="导入收入类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="earningexport" title="导出收入类型" groupname="基础资料" modulename="进销存"></limit>
+  
+  <limit name="inouttypelist" title="出入库类型列表" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypeadd" title="新增出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypeedit" title="编辑出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypedelete" title="删除出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypestop" title="停用出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypeunstop" title="启用出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypeimport" title="导入出入库类型" groupname="基础资料" modulename="进销存"></limit>
+  <limit name="inouttypeexport" title="导出出入库类型" groupname="基础资料" modulename="进销存"></limit>
+</limits>

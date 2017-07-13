@@ -109,7 +109,7 @@ namespace JxcAccounting
                                 "group by customerid,customercode,customername " +
                                 sborder.ToString();
 
-            string sqlCount = cte+"select count(*) as cnt from (select customerid from cte "+
+            string sqlCount = cte+"select count(0) as cnt from (select customerid from cte "+
                                 sb.ToString()+
                                 " group by customerid) as t";
 
@@ -187,7 +187,7 @@ namespace JxcAccounting
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) from mvw_saleinvoicebill "
+            string sqlCount = "select count(0) from mvw_saleinvoicebill "
                             + sb.ToString();
 
 
@@ -266,7 +266,7 @@ namespace JxcAccounting
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) from mvw_saleinvoicebill "
+            string sqlCount = "select count(0) from mvw_saleinvoicebill "
                             + sb.ToString();
 
 
@@ -343,7 +343,7 @@ namespace JxcAccounting
                                 "group by customer.id,customer.content->>'code',customer.content->>'name' " +
                                 sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (select customer.id from bill inner join customer on (bill.content->>'customerid')::int=customer.id " +
+            string sqlCount = "select count(0) as cnt from (select customer.id from bill inner join customer on (bill.content->>'customerid')::int=customer.id " +
                                 sb.ToString() +
                                 " group by customer.id) as t";
 
@@ -435,7 +435,7 @@ namespace JxcAccounting
                                 sb.ToString() +
                                 sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill " +
+            string sqlCount = "select count(0) as cnt from bill " +
                                 sb.ToString() ;
 
             string sqlSum = "select coalesce(sum(case bill.content->>'billname' when 'salebill' then (bill.content->>'total')::decimal else -((bill.content->>'total')::decimal) end),0) as total,"+

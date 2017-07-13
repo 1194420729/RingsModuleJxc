@@ -122,7 +122,7 @@ namespace CommonConfig
 
                 //创建角色
                 string rolename = "myuid" + db.CurrentDataContext.CorporationId + "_" + id;
-                int cnt = db.Count("select count(*) as cnt from pg_user where usename='" + rolename + "'");
+                int cnt = db.Count("select count(0) as cnt from pg_user where usename='" + rolename + "'");
                 if (cnt == 0)
                 {
                     db.ExcuteNoneQuery(string.Format("create role {0} login password '{1}'", rolename, "mypassword" + id));

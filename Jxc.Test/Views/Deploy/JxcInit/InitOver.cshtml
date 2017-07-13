@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "系统开账";
+}
+<div data-pagelimit="initover">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>开账</span></li>
+        </ol>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">系统开账</div>
+            <div class="panel-body">
+                <form name="myForm">
+                    <div class="form-group" ng-show="notinitover">
+                        <label>系统开账后，期初数据将不能再修改，可以开始录入业务单据。请注意开账日期的选择：业务单据的单据日期不能在开账日期之前。</label>
+                    </div>
+                    <div class="form-group" ng-hide="notinitover">
+                        <label>系统已经开账，开账日期：<span ng-bind="initoverdate | date:'yyyy-MM-dd'"></span>。如果需要反开账，“主菜单》系统设置》系统重建”。</label>
+                    </div>
+                    <div class="form-group form-inline" ng-show="notinitover">
+                        <label>开账日期</label>
+                        <div class="dropdown" style="display: inline;">
+                            <a class="dropdown-toggle initoverdate" role="button" data-toggle="dropdown" data-target="#"
+                               href="javascript:;">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="initoverdate" ng-model="initoverdate" required/>
+                                    <span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker ng-model="initoverdate" data-datetimepicker-config="{ dropdownSelector: '.initoverdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                            </ul>
+                        </div>
+                        <span class="text-danger" ng-show="myForm.initoverdate.$invalid">必填项</span>
+                    </div>
+                    <div class="form-group" ng-show="notinitover">
+                        <button type="button" class="btn btn-primary"
+                                ng-disabled="myForm.initoverdate.$invalid || savedisabled"
+                                ng-click="btnsaveClick()">
+                            <i class="fa fa-save fa-fw"></i>确定开账
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, SweetAlert, $uibModal) {
+            $http.post('/initoverservice/getstatus', {})
+                    .success(function (data) {
+                        if (data.initoverdate) {
+                            $scope.initoverdate = data.initoverdate;
+                        }
+                        $scope.notinitover = data.notinitover;
+                    });
+
+            $scope.btnsaveClick = function () {
+                $scope.savedisabled = true;
+                $http.post('/initoverservice/initoversave', { initoverdate: $scope.initoverdate })
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '开账成功!', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+
+            };
+
+        });
+
+    </script>
+}

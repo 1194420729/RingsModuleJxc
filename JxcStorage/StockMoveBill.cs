@@ -138,7 +138,7 @@ namespace JxcStorage
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = "select count(0) as cnt from bill "
                         + sb.ToString();
 
             int recordcount = db.Count(sqlCount);
@@ -374,7 +374,7 @@ namespace JxcStorage
 
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -428,7 +428,7 @@ namespace JxcStorage
                 }
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -486,7 +486,7 @@ namespace JxcStorage
 
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -545,7 +545,7 @@ namespace JxcStorage
                 }
 
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
+                int cnt = db.Count("select count(0) as cnt from bill where id<>" + model.id + " and content->>'billname'='" + billname + "' and content->>'billcode'='" + model.content.Value<string>("billcode") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };

@@ -31,7 +31,7 @@ namespace JxcSystem
 
             using (DBHelper db = new DBHelper())
             {
-                int cnt=db.Count("select count(*) as cnt from monthbalance where id>"+id);
+                int cnt=db.Count("select count(0) as cnt from monthbalance where id>"+id);
                 if (cnt>0)
                 {
                     return new { message = StringHelper.GetString("请先删除最后一次的月结！") };

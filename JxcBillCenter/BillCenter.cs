@@ -127,7 +127,7 @@ namespace JxcBillCenter
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = "select count(0) as cnt from bill "
                         + sb.ToString();
 
 
@@ -254,7 +254,7 @@ namespace JxcBillCenter
                     }
 
                     //检查编号重复
-                    int cnt = db.Count("select count(*) as cnt from bill where id<>" + bill.id
+                    int cnt = db.Count("select count(0) as cnt from bill where id<>" + bill.id
                         + " and content->>'billname'='" + bill.content.Value<string>("billname")
                         + "' and content->>'billcode'='" + bill.content.Value<string>("billcode") + "'");
                     if (cnt > 0)
@@ -410,7 +410,7 @@ namespace JxcBillCenter
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bill "
+            string sqlCount = "select count(0) as cnt from bill "
                         + sb.ToString();
 
 

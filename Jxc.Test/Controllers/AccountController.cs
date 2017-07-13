@@ -2,26 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc; 
+using System.Web.Mvc;
 using System.Data;
-using System.Web.Security; 
+using System.Web.Security;
 using System.Drawing;
 using System.IO;
 using Npgsql;
 using System.Configuration;
 using System.Globalization;
-using System.Threading; 
+using System.Threading;
 using System.Resources;
 using Rings.Models;
 
 namespace Baseingfo.Test.Controllers
 {
-    
+
     public class AccountController : Controller
     {
         public ActionResult Login(string lan)
         {
-            ViewBag.Lan = lan;
+            ViewBag.Lan = string.IsNullOrEmpty(lan) ? "zh-CN" : lan;
 
             if (string.IsNullOrEmpty(lan) == false && lan.ToLower() != "zh-cn")
             {
@@ -181,12 +181,12 @@ namespace Baseingfo.Test.Controllers
         public ActionResult UnitTestLogin()
         {
 #if DEBUG
-            string applicationid="D36F64D9-4646-4531-990B-B7A3FA5FAEF2";
-            string company="测试公司";
-            string username="001";
-            string lan="zh-CN";
+            string applicationid = "D36F64D9-4646-4531-990B-B7A3FA5FAEF2";
+            string company = "测试公司";
+            string username = "001";
+            string lan = "zh-CN";
             FormsAuthentication.SetAuthCookie(applicationid + "`" + company + "`" + username + "`" + lan, false);
-            return Content("ok","text/plain",System.Text.Encoding.UTF8);
+            return Content("ok", "text/plain", System.Text.Encoding.UTF8);
 #else
 
             return Content("error", "text/plain", System.Text.Encoding.UTF8);
@@ -286,6 +286,6 @@ namespace Baseingfo.Test.Controllers
             }
         }
 
-    } 
-    
+    }
+
 }

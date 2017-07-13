@@ -67,7 +67,7 @@ namespace JxcAccounting
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from bank "
+            string sqlCount = "select count(0) as cnt from bank "
                         + sb.ToString();
 
 
@@ -127,7 +127,7 @@ namespace JxcAccounting
                         + " group by bankid,bankname,bankcode "
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (select bankid from mvw_bankdetail "
+            string sqlCount = "select count(0) as cnt from (select bankid from mvw_bankdetail "
                         + sb.ToString()
                         + " group by bankid) as t";
 
@@ -191,7 +191,7 @@ namespace JxcAccounting
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from mvw_bankdetail where 1=1 "
+            string sqlCount = "select count(0) as cnt from mvw_bankdetail where 1=1 "
                         + sb.ToString();
 
 
@@ -277,7 +277,7 @@ namespace JxcAccounting
                         + sb.ToString()
                         + sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from mvw_bankdetail where 1=1 "
+            string sqlCount = "select count(0) as cnt from mvw_bankdetail where 1=1 "
                         + sb.ToString();
 
 

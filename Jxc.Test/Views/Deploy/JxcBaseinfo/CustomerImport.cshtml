@@ -1,0 +1,106 @@
+﻿@{
+    ViewBag.Title = "客户数据导入";
+}
+<div data-pagelimit="customerimport">
+    <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li><a href="/jxcbaseinfo/customerlist">客户资料</a></li>
+        <li><span>客户数据导入</span></li>
+    </ol>
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            客户数据导入
+        </div>
+        <div class="panel-body">
+            <form method="post" id="form1" action="/upload/uploadfile" enctype="multipart/form-data">
+                <ol style="line-height:30px;">
+                    <li>下载数据导入模板：<a href="http://139.196.218.9/cdn/客户数据导入.xls" download="客户数据导入">Excel模板</a></li>
+                    <li>在Excel模板中填充要导入的数据</li>
+                    <li>
+                        导入选项：
+                        <div class="form-group form-inline">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="cover">清空原有数据</label>
+                                <span style="color:red;margin-left:10px;">
+                                    请慎重选择，清空后无法恢复
+                                </span>
+                            </div>
+                        </div>
+
+                    </li>
+                    <li>
+                        <div class="form-group form-inline">
+                            <input type="file" class="form-control" id="file" name="file" />
+                            <input id="btnupload" type="submit" class="btn btn-primary" value="上传并导入" />
+                            <img src="~/content/images/loader.gif" alt="" id="ajaxloader" style="display:none;margin-left:10px;" />
+                        </div>
+                    </li>
+                </ol>
+            </form>
+            <div class="alert alert-danger" role="alert" id="errors" style="display: none;">
+            </div>
+        </div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/alertify.js/0.3.11/alertify.core.min.css" rel="Stylesheet" />
+    <link href="//cdn.bootcss.com/alertify.js/0.3.11/alertify.bootstrap.min.css" rel="Stylesheet" />
+    
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/alertify.js/0.3.11/alertify.min.js" type="text/javascript"></script>
+    <script src="//cdn.bootcss.com/jquery.form/3.51/jquery.form.min.js"></script>
+    <script>
+        $(function () { 
+            var dealfile = function (path) {
+                $.ajax({
+                    url: '/customerservice/importdata',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        path: path,
+                        cover: $('#cover').prop('checked')
+                    },
+                    success: function (data) {
+                        $('#ajaxloader').hide();
+                        $('#btnupload').prop('disabled', false);
+                        if (data.message == 'ok') {
+                            alertify.alert('导入成功！', function () {
+                                window.location.href = '/jxcbaseinfo/customerlist';
+                            });
+                        } else {
+                            $('#errors').html(data.message);
+                            $('#errors').show();
+                        }
+                    }
+                });
+
+            };
+
+            $('#form1').ajaxForm({
+                beforeSubmit: function () {
+                    if (!confirm('确定要导入吗？')) {
+                        return false;
+                    }
+                    $('#ajaxloader').show();
+                    $('#btnupload').prop('disabled', true);
+                    return true;
+                },
+                dataType: 'json',
+                success: function (data) {
+
+                    if (data.message == "ok") {
+                        dealfile(data.path);
+                    } else {
+                        $('#ajaxloader').hide();
+                        $('#btnupload').prop('disabled', false);
+
+                        $('#errors').html(data.message);
+                        $('#errors').show();
+                    }
+                }
+            });
+
+        });
+    </script>
+}

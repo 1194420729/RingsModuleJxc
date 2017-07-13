@@ -103,7 +103,7 @@ namespace JxcStorage
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from product " +
+            string sqlCount = "select count(0) as cnt from product " +
                             sb.ToString();
 
             string sqlSum = "select coalesce(sum((content->'storage'->'" + stockid + "'->>'qty')::decimal),0) as qty,coalesce(sum((content->'storage'->'" + stockid + "'->>'total')::decimal),0) as total " +
@@ -220,7 +220,7 @@ namespace JxcStorage
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt " +
+            string sqlCount = "select count(0) as cnt " +
                             "from storagedetail " +
                             sb.ToString();
             string sqlQtySum = "select coalesce(sum((content->>'qty')::decimal),0) as qty from storagedetail " + sb.ToString();
@@ -483,7 +483,7 @@ namespace JxcStorage
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from product " +
+            string sqlCount = "select count(0) as cnt from product " +
                             sb.ToString();
 
             string sqlSum = "select coalesce(sum((content->'virtualstorage'->'" + stockid
@@ -644,7 +644,7 @@ namespace JxcStorage
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt " +
+            string sqlCount = "select count(0) as cnt " +
                             "from virtualstoragedetail " +
                             sb.ToString();
             string sqlQtySum = "select coalesce(sum((content->>'qty')::decimal),0) as qty from virtualstoragedetail " + sb.ToString();
@@ -796,7 +796,7 @@ namespace JxcStorage
                             sb.ToString() +
                             sborder.ToString();
 
-            string sqlCount = cte+"select count(*) as cnt " +
+            string sqlCount = cte+"select count(0) as cnt " +
                             "from cte " +
                             sb.ToString();
             string sqlQtySum = cte+"select coalesce(sum((content->>'qty')::decimal),0) as qty from cte " + sb.ToString();
@@ -939,7 +939,7 @@ namespace JxcStorage
                         "	product.content->>'unit',product.content->>'barcode',product.content->>'area' " +
                         sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from (" +
+            string sqlCount = "select count(0) as cnt from (" +
                             cte +
                         "select cte.productid " +
                         "from cte inner join product on cte.productid=product.id " +
@@ -1079,7 +1079,7 @@ namespace JxcStorage
                         sb.ToString() +
                         sborder.ToString();
 
-            string sqlCount = "select count(*) as cnt from product " + sb.ToString();
+            string sqlCount = "select count(0) as cnt from product " + sb.ToString();
             int recordcount = db.Count(sqlCount);
 
             var list = db.Where(sql);

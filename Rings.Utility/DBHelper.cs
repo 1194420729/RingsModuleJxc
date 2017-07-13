@@ -47,7 +47,7 @@ namespace Jxc.Utility
                 command.Connection = this.connection;
                 command.Transaction = this.transaction;
 
-                command.CommandText = "select count(*) as cnt from \"" + tablename + "\" where 1=1 "
+                command.CommandText = "select count(0) as cnt from \"" + tablename + "\" where 1=1 "
                         + condition;
                 recordcount = Convert.ToInt32(command.ExecuteScalar());
 
@@ -65,7 +65,7 @@ namespace Jxc.Utility
                     NpgsqlCommand command = new NpgsqlCommand();
                     command.Connection = connection;
 
-                    command.CommandText = "select count(*) as cnt from \"" + tablename + "\" where 1=1 "
+                    command.CommandText = "select count(0) as cnt from \"" + tablename + "\" where 1=1 "
                         + condition;
                     recordcount = Convert.ToInt32(command.ExecuteScalar());
 

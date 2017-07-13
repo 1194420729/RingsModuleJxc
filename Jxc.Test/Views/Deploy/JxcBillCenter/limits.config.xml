@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="draftlist" title="业务草稿" groupname="单据中心" modulename="进销存"></limit>
+  <limit name="draftdelete" title="删除草稿" groupname="单据中心" modulename="进销存"></limit>
+  <limit name="batchaudit" title="批量过账" groupname="单据中心" modulename="进销存"></limit>
+  <limit name="bizhistory" title="经营历程" groupname="单据中心" modulename="进销存"></limit>
+  <limit name="redword" title="红字反冲" groupname="单据中心" modulename="进销存"></limit> 
+</limits>

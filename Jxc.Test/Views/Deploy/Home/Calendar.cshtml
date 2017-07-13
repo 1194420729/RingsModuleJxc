@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "日历";
+}
+<div data-component="calendar" style="height:100%;">
+    <div class="calendar" style="height:100%;">
+        <div class="mycalendar"></div>
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" data-define="fullcalendar"> 
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/moment.js/2.18.1/moment.min.js" data-define="moment"></script>
+    <script src="//cdn.bootcss.com/fullcalendar/3.4.0/fullcalendar.min.js" data-define="fullcalendar"></script>
+    <script src="//cdn.bootcss.com/fullcalendar/3.4.0/locale/zh-cn.js" data-define="fullcalendar"></script> 
+
+    <script data-define="calendar">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.calendar) {
+            componentloader.calendar = function (id) {
+                var selector = '#' + id + ' .calendar';
+                if (!id) selector = '.calendar';
+               
+                $(selector + ' .mycalendar').fullCalendar({
+                    height: 'parent',
+                    customButtons: {
+                        myCustomButton: {
+                            text: '日程',
+                            click: function () {
+                                $('.modal.calendarmodal' + id).modal();
+                            }
+                        }
+                    },
+                    header: {
+                        left: 'title',
+                        center: '',
+                        right: 'today prev,next myCustomButton'
+                    },
+                    events: [],
+                    eventClick: function (calEvent, jsEvent, view) {
+                          
+                        $('.modal.calendarmodal' + id).find('input.eventtitle').val(calEvent.title);
+                        $('.modal.calendarmodal' + id).find('input.eventstart').val(moment(calEvent.start).format());
+                        $('.modal.calendarmodal' + id).find('input.eventend').val(calEvent.end?moment(calEvent.end).format():'');
+                        $('.modal.calendarmodal' + id).find('.eventcomment').val(calEvent.comment);
+                        $('.modal.calendarmodal' + id).find('input.eventid').val(calEvent.id);
+                        $('.modal.calendarmodal' + id).find('.btndelete').show();
+
+                        $('.modal.calendarmodal' + id).modal();
+                    },
+                    dayClick: function (date, jsEvent, view) {
+                        
+                        $('.modal.calendarmodal' + id).find('input.eventstart').val(date.format()+'T00:00');
+                        $('.modal.calendarmodal' + id).modal();
+                    }
+                });
+
+                $.post('/homepageservice/getcalendarevents', {id:id}, function (data) {
+                    $(selector + ' .mycalendar').fullCalendar('addEventSource', data.events);
+                }, 'json');
+                
+                
+                var modal = '<div class="modal fade calendarmodal' + id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">' +
+                                        '<div class="modal-dialog" role="document">' +
+                                            '<div class="modal-content">' +
+                                                '<div class="modal-header">' +
+                                                    '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                                                    '<h4 class="modal-title" id="myModalLabel">日程安排</h4>' +
+                                                '</div>' +
+                                                '<div class="modal-body">' +
+                                                    '<input type="hidden" class="form-control eventid" />' +
+                                                    '<div class="form-group form-inline">' +
+                                                        '<label>标题</label>' +
+                                                        '<input type="text" class="form-control eventtitle" />' +
+                                                    '</div>' +
+                                                    '<div class="form-group form-inline">' +
+                                                        '<label>开始时间</label>' +
+                                                        '<input type="datetime-local" class="form-control eventstart" />' +
+                                                    '</div>' +
+                                                     '<div class="form-group form-inline">' +
+                                                        '<label>结束时间</label>' +
+                                                        '<input type="datetime-local" class="form-control eventend" />' +
+                                                        '<span class="help-block" style="display:inline;">可选</span>' +
+                                                    '</div>' +
+                                                    '<div class="form-group form-inline">' +
+                                                        '<label>备注</label>' +
+                                                        '<textarea class="form-control eventcomment" style="width:300px;height:100px;"></textarea>' +
+                                                    '</div>' +
+                                                '</div>' +
+                                                '<div class="modal-footer">' +
+                                                    '<button type="button" class="btn btn-primary btnok">确定</button>' +
+                                                    '<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>' +
+                                                    '<button type="button" class="btn btn-danger btndelete" style="display:none;">删除</button>' +
+                                                '</div>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>';
+
+                if ($('.modal.calendarmodal' + id).length == 0) {
+                    $('body').append(modal);
+
+                    $('.modal.calendarmodal' + id).on('hidden.bs.modal', function (e) {
+                        $('.modal.calendarmodal' + id).find('input.eventtitle').val('');
+                        $('.modal.calendarmodal' + id).find('input.eventstart').val('');
+                        $('.modal.calendarmodal' + id).find('input.eventend').val('');
+                        $('.modal.calendarmodal' + id).find('.eventcomment').val('');
+                        $('.modal.calendarmodal' + id).find('input.eventid').val('');
+                        $('.modal.calendarmodal' + id).find('.btndelete').hide();
+                    });
+
+                    $('.modal.calendarmodal' + id).find('.btnok').click(function () {
+                        var title = $('.modal.calendarmodal' + id).find('input.eventtitle').val();
+                        var start = $('.modal.calendarmodal' + id).find('input.eventstart').val();
+                        var end = $('.modal.calendarmodal' + id).find('input.eventend').val();
+                        var comment = $('.modal.calendarmodal' + id).find('.eventcomment').val();
+                        var eventid = $('.modal.calendarmodal' + id).find('input.eventid').val();
+                        if (!title) {
+                            alert('请填写标题');
+                            return;
+                        }
+                        if (!start) {
+                            alert('请填写开始时间');
+                            return;
+                        }
+                        $.post('/homepageservice/addcalendareventsave', {id:id,eventid:eventid,title:title,start:start,end:end,comment:comment}, function (data) {
+                            if (eventid) {
+                                $(selector + ' .mycalendar').fullCalendar('updateEvents', data.events);
+                            } else {
+                                $(selector + ' .mycalendar').fullCalendar('addEventSource', data.events);
+                            }
+                            $('.modal.calendarmodal' + id).modal('hide');
+                        }, 'json');
+                    });
+
+                    $('.modal.calendarmodal' + id).find('.btndelete').click(function () {
+                        
+                        var eventid = $('.modal.calendarmodal' + id).find('input.eventid').val();
+                        
+                        $.post('/homepageservice/deletecalendareventsave', { id: id, eventid: eventid }, function (data) {
+                            $(selector + ' .mycalendar').fullCalendar('removeEvents', [eventid]);
+                            $('.modal.calendarmodal' + id).modal('hide');
+                        }, 'json');
+                    });
+                }
+
+            }; 
+        }
+    </script>
+    <script>
+        $(function () {
+            componentloader.calendar('');
+        });
+    </script>
+}

@@ -1,0 +1,1644 @@
+﻿@{
+    ViewBag.Title = "编辑盘点单";
+}
+<div data-pagelimit="stockinventorybilladd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+        @{Html.RenderPartial("/jxcstorage/checkboxheader");}
+        @{Html.RenderPartial("/jxcstorage/employeechoice");}
+        @{Html.RenderPartial("/jxcstorage/stockchoice");}
+        @{Html.RenderPartial("/jxcstorage/productchoice");}
+        @{Html.RenderPartial("/jxcstorage/productbatchchoice");}
+        @{Html.RenderPartial("/jxcstorage/billcodeconfig");}
+        @{Html.RenderPartial("/jxcstorage/stockinventorybilldetail");}
+        @{Html.RenderPartial("/jxcstorage/stockinventorybillexcelimport");}
+        @{Html.RenderPartial("/jxcstorage/billload");}
+        @{Html.RenderPartial("/jxcstorage/costpriceinput");}
+        <script type="text/ng-template" id="billconfig.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    单据配置
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group form-inline">
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.showstandard" />显示产品规格</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.showtype" />显示产品型号</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.showunit" />显示计量单位</label>
+                    </div>
+                </div>
+                <div class="form-group form-inline">
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.showarea" />显示产地</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.showbarcode" />显示条码</label>
+                    </div>
+                </div>
+                <div class="form-group form-inline">
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="model.content.keepemployeeandstock" />记忆经手人和仓库</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <script type="text/ng-template" id="categorychoice.html">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    选择分类
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" tree="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">
+                    确定
+                </button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">
+                    取消
+                </button>
+            </div>
+
+        </script>
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>盘点单</span></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                盘点单
+                <span style="margin-left:200px;">制单人：{{makername}}</span>
+                <span style="margin-left:20px;" ng-bind="model.content.auditorid?'【已审核】':'【草稿】'"></span>
+                <a class="pull-right" href="javascript:;" ng-click="billconfigClick()"><i class="fa fa-gear fa-fw"></i></a>
+            </div>
+            <div class="panel-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>单据编号<span style="color:red">*</span></label>
+                            <input type="text" class="form-control" ng-readonly="noeditbillcode" name="billcode" ng-model="model.content.billcode" required />
+                            <a href="javascript:;" ng-click="billcodeClick()" title="设置编号格式"><i class="fa fa-info-circle"></i></a>
+                        </div>
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>单据日期<span style="color:red">*</span></label>
+                            <input type="text" class="form-control" ng-if="noeditbilldate" readonly="readonly" ng-model="model.content.billdate" />
+                            <div class="dropdown" style="display: inline;" ng-if="!noeditbilldate">
+                                <a class="dropdown-toggle billdate" role="button" data-toggle="dropdown" data-target="#"
+                                   href="javascript:;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="billdate" ng-model="model.content.billdate" required />
+                                        <span class="input-group-addon">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </span>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <datetimepicker ng-model="model.content.billdate" data-datetimepicker-config="{ dropdownSelector: '.billdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>盘点日期<span style="color:red">*</span></label>
+                            <div class="dropdown" style="display: inline;">
+                                <a class="dropdown-toggle inventorydate" role="button" data-toggle="dropdown" data-target="#"
+                                   href="javascript:;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="inventorydate" ng-change="inventorydateChange()"
+                                               ng-model-options="{ updateOn:'blur'}" ng-model="model.content.inventorydate" required />
+                                        <span class="input-group-addon">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </span>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                    <datetimepicker ng-model="model.content.inventorydate" ng-change="inventorydateChange()" data-datetimepicker-config="{ dropdownSelector: '.inventorydate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>经手人<span style="color:red">*</span></label>
+                            <div class="input-group">
+                                <input type="text" autocomplete="off" ng-next="true" ng-model="employee" placeholder="编号或名称模糊查询" uib-typeahead="employee.content.name for employee in updateEmployees($viewValue)"
+                                       typeahead-on-select="employeeSelected($item, $model, $label,$event)" typeahead-loading="loadingEmployeeLocations"
+                                       typeahead-no-results="noEmployeeResults" typeahead-select-on-blur="true" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="employeeClick()">...</button>
+                                </span>
+                            </div>
+                            <i ng-show="loadingEmployeeLocations" class="glyphicon glyphicon-refresh"></i>
+                            <span class="text-danger" ng-show="noEmployeeResults">没有匹配项</span>
+                        </div>
+                        <div class="form-group form-inline col-md-4 col-lg-4">
+                            <label>仓库名称<span style="color:red">*</span></label>
+                            <div class="input-group">
+                                <input type="text" autocomplete="off" ng-next="true" ng-model="stock" placeholder="编号或名称模糊查询" uib-typeahead="stock.content.name for stock in updateStocks($viewValue)"
+                                       typeahead-on-select="stockSelected($item, $model, $label,$event)" typeahead-loading="loadingStockLocations"
+                                       typeahead-no-results="noStockResults" typeahead-select-on-blur="true" class="form-control">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="stockClick()">...</button>
+                                </span>
+                            </div>
+                            <i ng-show="loadingStockLocations" class="glyphicon glyphicon-refresh"></i>
+                            <span class="text-danger" ng-show="noStockResults">没有匹配项</span>
+                        </div>
+                        <div class="form-group form-inline col-md-12">
+                            <label>产品分类<span style="color:red">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" readonly="readonly" style="background-color:#fff" ng-model="categoryname">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button" ng-click="categoryClick()"><i class="fa fa-search fa-fw"></i></button>
+                                    <button class="btn btn-default" type="button" ng-click="categoryremoveClick()"><i class="fa fa-remove"></i></button>
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-primary" ng-if="!model.content.auditorid" ng-click="btnlistClick()" ng-disabled="showwaiter"><i class="fa fa-list-ol fa-fw"></i>列出清单</button>
+                            <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                        </div>
+                        <div class="form-group form-inline col-md-12 col-lg-12">
+                            <label>备注</label>
+                            <input type="text" class="form-control" style="width:80%" name="comment" ng-model="model.content.comment" />
+                            <a href="javascript:;" ng-click="showAttachment=true" title="上传附件"><i class="fa fa-paperclip fa-fw"></i></a>
+                        </div>
+                        <div class="form-group form-inline col-md-12" ng-show="showAttachment">
+                            <label>附件</label>
+                            <input type="file" class="form-control" id="file" multiple="multiple" />
+                            <button class="btn btn-info" type="button" ng-click="uploadAttachments()"><i class="fa fa-upload fa-fw"></i>上传</button>
+                            <img src="~/Content/images/loader.gif" ng-show="uploadwaiter" />
+                        </div>
+                        <div class="form-group col-md-12">
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="m in model.content.attachments">
+                                    <a ng-href="{{m.url}}" download="{{m.name}}" ng-bind="m.name"></a>
+                                    <span style="margin-left:20px;" ng-bind="m.size"></span>
+                                    <a href="javascript:;" title="删除" class="text-danger" ng-click="removeAttachment(m.url)"><i class="fa fa-remove fa-fw"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group form-inline pull-right" ng-if="!model.content.auditorid">
+
+                    <button type="button" class="btn btn-success" ng-click="detailClick()"><i class="fa fa-plus fa-fw"></i>新增明细</button>
+                    <button type="button" class="btn btn-success" ng-click="detailbatchClick()"><i class="fa fa-plus-circle fa-fw"></i>批量新增</button>
+                    <button type="button" class="btn btn-success" ng-click="detailexcelClick()"><i class="fa fa-file-excel-o fa-fw"></i>Excel导入</button>
+                </div>
+            </div>
+            <div style="width:100%;overflow-x:auto;">
+                <table ng-table="tableParams" class="table table-bordered table-condensed table-striped" show-filter="false">
+                    <tr ng-repeat="m in $data">
+                        <td header-class="'bg-warning'" style="width:60px;">
+                            <a ng-click="deleteDetail(m.uuid)" class="text-danger" href="javascript:;" title="删除">
+                                <i class="fa fa-trash fa-fw">
+                                </i>
+                            </a>
+                        </td>
+                        <td data-title="'No.'" header-class="'bg-warning'" style="width:60px;">
+                            <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                        </td>
+                        <td data-title="'产品编号'" header-class="'bg-warning'"
+                            data-sortable="'product.code'">
+                            <span ng-bind="m.product.code"></span>
+                            <a href="javascript:;" title="选择产品" class="pull-right" ng-click="productChange(m)"><i class="fa fa-ellipsis-h fa-fw"></i></a>
+                        </td>
+                        <td data-title="'产品名称'" header-class="'bg-warning'">
+                            <span ng-bind="m.product.name"></span>
+                        </td>
+                        <td data-title="'规格'" header-class="'bg-warning'" ng-if="billconfig.content.showstandard">
+                            <span ng-bind="m.product.standard"></span>
+                        </td>
+                        <td data-title="'型号'" header-class="'bg-warning'" ng-if="billconfig.content.showtype">
+                            <span ng-bind="m.product.type"></span>
+                        </td>
+                        <td data-title="'单位'" header-class="'bg-warning'" ng-if="billconfig.content.showunit">
+                            <span ng-bind="m.product.unit"></span>
+                        </td>
+                        <td data-title="'产地'" header-class="'bg-warning'" ng-if="billconfig.content.showarea">
+                            <span ng-bind="m.product.area"></span>
+                        </td>
+                        <td data-title="'条码'" header-class="'bg-warning'" ng-if="billconfig.content.showbarcode">
+                            <span ng-bind="m.product.barcode"></span>
+                        </td>
+                        <td data-title="'实盘数量'" header-class="'bg-warning'" style="max-width:100px;">
+                            <input type="number" class="tableinput" ng-model="m.qty" ng-model-options="{ updateOn:'blur'}" ng-change="qtyChange(m)" />
+                        </td>
+                        <td data-title="'账面库存'" header-class="'bg-warning'" style="max-width:100px;">
+                            <span ng-bind="m.storageqty"></span>
+                        </td>
+                        <td data-title="'盈亏数量'" header-class="'bg-warning'" ng-class="{'bg-danger':m.ykqty<0,'bg-info':m.ykqty>0}" style="max-width:100px;">
+                            <span ng-bind="m.ykqty"></span>
+                        </td>
+                        <td data-title="'备注'" header-class="'bg-warning'">
+                            <input type="text" class="tableinput" ng-model="m.comment" ng-model-options="{ updateOn:'blur'}" />
+                        </td>
+                    </tr>
+                    <tr class="warning">
+                        <td colspan="2">
+                            合计
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td ng-if="billconfig.content.showstandard"></td>
+                        <td ng-if="billconfig.content.showtype"></td>
+                        <td ng-if="billconfig.content.showunit"></td>
+                        <td ng-if="billconfig.content.showarea"></td>
+                        <td ng-if="billconfig.content.showbarcode"></td>
+                        <td ng-bind="qtysum"></td>
+                        <td ng-bind="storageqtysum"></td>
+                        <td ng-bind="ykqtysum"></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <div class="form-group form-inline pull-right">
+                    <a ng-href="/jxcstorage/stockinventorybillprint?billid={{model.id}}" ng-if="model.content.auditorid" target="_blank" class="btn btn-primary"><i class="fa fa-print fa-fw"></i>打印</a>
+                    <button type="button" class="btn btn-primary" ng-click="btnloadClick()"><i class="fa fa-folder-open-o fa-fw"></i>单据调阅</button>
+                    <button type="button" class="btn btn-primary" ng-click="btnsaveClick()" ng-if="!model.content.auditorid" ng-disabled="savedisabled"><i class="fa fa-save fa-fw"></i>保存草稿</button>
+                    <button type="button" class="btn btn-primary" ng-click="btnauditClick()" ng-if="!model.content.auditorid" ng-disabled="savedisabled" ng-limit="stockinventorybillaudit"><i class="fa fa-save fa-fw"></i>保存并审核</button>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//139.196.218.9/cdn/myservice.js"></script>
+    <script src="//139.196.218.9/cdn/ngnext.js"></script>
+    <script src="//cdn.bootcss.com/node-uuid/1.4.7/uuid.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree', 'ngNext', 'ui.bootstrap.datetimepicker', 'myservice', 'myfilter']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, mytools, $uibModal) {
+
+            var id=@((ViewBag.QueryString as System.Collections.Specialized.NameValueCollection).Get("id")) ;
+
+            $scope.model = { id: id, content: {} };
+            $scope.tableParams = new NgTableParams({ count: 99999 });
+            $scope.showwaiter = false;
+
+            $http.post('/stockinventorybillservice/loadbill', {id:id})
+                    .success(function (data) {
+                        $scope.makername = data.makername;
+                        $scope.model.content = data.content;
+                        $scope.employee=data.employeename;
+                        $scope.stock=data.stockname;
+                        $scope.billconfig = data.billconfig;
+                        $scope.digit = data.digit;
+                        $scope.categoryname =data.content.categoryid==0? "全部分类": data.categoryname;
+
+                        $scope.noeditbillcode = data.noeditbillcode;
+                        $scope.noeditbilldate = data.noeditbilldate;
+
+                        $scope.tableParams.settings({
+                            counts: [],
+                            dataset: $scope.model.content.details
+                        });
+
+                        if(!$scope.model.content.auditorid){
+                            $window.onbeforeunload = function () {
+                                if ($scope.tableParams.total() > 0) {
+                                    return ' ';
+                                }
+                            };
+                        }
+                    });
+
+            var refreshProductStorage = function () {
+                if ($scope.model.content.details.length === 0
+                    || !$scope.model.content.stockid
+                    || !$scope.model.content.inventorydate) return;
+
+                var ids = '';
+                angular.forEach($scope.model.content.details, function (detail) {
+                    ids += detail.productid + ',';
+                });
+                $http.post('/stockinventorybillservice/gethistorystoragebyproductids',
+                           { productids: ids, enddate: $scope.model.content.inventorydate, stockid: $scope.model.content.stockid })
+                           .success(function (data) {
+                               for (var i = 0; i < $scope.model.content.details.length; i++) {
+                                   var detail = $scope.model.content.details[i];
+                                   detail.product.storage = data.data[detail.productid];
+
+                                   if (detail.product.storage && detail.product.storage[$scope.model.content.stockid + '']) {
+                                       detail.storageqty = detail.product.storage[$scope.model.content.stockid + ''].qty;
+                                   } else {
+                                       detail.storageqty = 0;
+                                   }
+
+                                   detail.ykqty = detail.qty - detail.storageqty;
+                               }
+
+                           });
+            };
+
+            $scope.inventorydateChange = function () {
+                refreshProductStorage();
+            };
+
+            $scope.billcodeClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billcodeconfig.html',
+                    controller: 'billcodeconfigModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $http.post('/stockinventorybillservice/BillCodeConfigSave', { template: model.template })
+                        .success(function (data) {
+                            if (data.message == 'ok') {
+                                $scope.model.content.billcode = data.newcode;
+                            } else {
+                                SweetAlert.swal({ title: data.message, type: 'error' });
+                            }
+                        });
+                });
+            };
+
+            $scope.categoryremoveClick = function () {
+                delete $scope.model.content.categoryid;
+                $scope.categoryname = '';
+            };
+
+            $scope.categoryClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'categorychoice.html',
+                    controller: 'categorychoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.model.content.categoryid = model.categoryid;
+                    $scope.categoryname = model.categoryname;
+                });
+            };
+
+            $scope.btnlistClick = function () {
+                if (!$scope.model.content.stockid) {
+                    SweetAlert.swal({ title: '请先选择仓库！', type: 'error' });
+                    return;
+                }
+
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
+                    SweetAlert.swal({ title: '请先选择盘点产品类别！', type: 'error' });
+                    return;
+                }
+
+                var f = function () {
+                    $scope.showwaiter = true;
+
+                    $http.post('/stockinventorybillservice/getproductsbycategoryid',
+                        { categoryid: $scope.model.content.categoryid, stockid: $scope.model.content.stockid, inventorydate: $scope.model.content.inventorydate })
+                            .success(function (data) {
+                                $scope.showwaiter = false;
+
+                                angular.forEach(data.data, function (product) {
+                                    var detail = { productid: product.id, product: product.content };
+
+                                    detail.qty = 0;
+                                    if (product.content.storage && product.content.storage[$scope.model.content.stockid + '']) {
+                                        detail.qty = product.content.storage[$scope.model.content.stockid + ''].qty;
+                                    }
+                                    detail.storageqty = detail.qty;
+                                    detail.ykqty = 0;
+                                    detail.uuid = uuid.v1();
+                                    $scope.model.content.details.push(detail);
+                                });
+
+                                $scope.tableParams.reload();
+                            });
+                };
+
+                if ($scope.model.content.details.length > 0) {
+                    SweetAlert.swal({
+                        title: '将清空现有明细。确定要执行吗？',
+                        text: '',
+                        type: "success",
+                        showCancelButton: true,
+                        cancelButtonText: '取消',
+                        confirmButtonColor: "#0099CC",
+                        confirmButtonText: '确定',
+                        closeOnConfirm: true
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            $scope.model.content.details.splice(0, $scope.model.content.details.length);
+                            f();
+                        }
+                    });
+                } else {
+                    f();
+                }
+
+            };
+
+            $scope.qtyChange = function (detail) {
+                if (detail.qty !== undefined && detail.qty !== null) {
+                    detail.ykqty = detail.qty - detail.storageqty;
+                }
+            };
+
+            var savecheck = function () {
+                if (!$scope.model.content.billcode) {
+                    SweetAlert.swal({ title: '请填写单据编号', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.billdate) {
+                    SweetAlert.swal({ title: '请填写单据日期', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.inventorydate) {
+                    SweetAlert.swal({ title: '请填写盘点日期', type: 'error' });
+                    return false;
+                }
+                if (!$scope.model.content.employeeid) {
+                    SweetAlert.swal({ title: '请填写经手人', type: 'error' });
+                    return false;
+                }
+
+                if (!$scope.model.content.stockid) {
+                    SweetAlert.swal({ title: '请填写仓库', type: 'error' });
+                    return false;
+                }
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
+                    SweetAlert.swal({ title: '请填写盘点产品类别', type: 'error' });
+                    return false;
+                }
+                if ($scope.model.content.details.length === 0) {
+                    SweetAlert.swal({ title: '请填写产品明细', type: 'error' });
+                    return false;
+                }
+                for (var i = 0; i < $scope.model.content.details.length; i++) {
+                    var detail = $scope.model.content.details[i];
+                    var row = i + 1;
+                    if (detail.qty===undefined || detail.qty===null || detail.qty<0) {
+                        SweetAlert.swal({ title: '产品第' + row + '行没有数量', type: 'error' });
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+
+            $scope.btnloadClick = function () {
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billload.html',
+                    controller: 'billloadModalCtrl',
+                    size: 'lg'
+                });
+
+                modalInstance.result.then(function (billid) {
+                    $window.onbeforeunload=null;
+                    window.location.href = '/jxcstorage/stockinventorybilledit?id=' + billid;
+                });
+            };
+
+            $scope.btnsaveClick = function () {
+                if (savecheck() === false) return;
+
+                $scope.savedisabled = true;
+                $http.post('/stockinventorybillservice/editsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            if ($scope.billconfig.content.keepemployeeandstock) {
+                                var stockinventorybill = {};
+                                stockinventorybill.employeeid = $scope.model.content.employeeid;
+                                stockinventorybill.stockid = $scope.model.content.stockid;
+                                localStorage.stockinventorybill = angular.toJson(stockinventorybill);
+                            }
+
+                            if (data.nodraftprint) {
+                                SweetAlert.swal({ title: '保存成功', type: 'success' }, function () {
+                                    $window.onbeforeunload=null;
+                                    window.location.href = '/jxcstorage/stockinventorybilladd';
+                                });
+                                return;
+                            }
+
+                            SweetAlert.swal({
+                                title: '保存成功。要打印吗？',
+                                text: '如果此处不打印，事后也可以重新调出单据打印',
+                                type: "success",
+                                showCancelButton: true,
+                                cancelButtonText: '取消',
+                                confirmButtonColor: "#0099CC",
+                                confirmButtonText: '打印',
+                                closeOnConfirm: true
+                            },
+                            function (isConfirm) {
+                                if (isConfirm) {
+                                    $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
+                                }
+                                $window.onbeforeunload=null;
+                                window.location.href = '/jxcstorage/stockinventorybilladd';
+
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+            };
+
+            $scope.btnauditClick = function () {
+                if (savecheck() === false) return;
+
+                $scope.savedisabled = true;
+                $http.post('/stockinventorybillservice/editauditsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            if ($scope.billconfig.content.keepemployeeandstock) {
+                                var stockinventorybill = {};
+                                stockinventorybill.employeeid = $scope.model.content.employeeid;
+                                stockinventorybill.stockid = $scope.model.content.stockid;
+                                localStorage.stockinventorybill = angular.toJson(stockinventorybill);
+                            }
+
+                            SweetAlert.swal({
+                                title: '保存并审核成功。要打印吗？',
+                                text: '如果此处不打印，事后也可以重新调出单据打印',
+                                type: "success",
+                                showCancelButton: true,
+                                cancelButtonText: '取消',
+                                confirmButtonColor: "#0099CC",
+                                confirmButtonText: '打印',
+                                closeOnConfirm: false
+                            },
+                            function (isConfirm) {
+                                if (isConfirm) {
+                                    $window.open('/jxcstorage/stockinventorybillprint?billid=' + data.id);
+                                }
+                                $window.onbeforeunload=null;
+                                window.location.href = '/jxcstorage/stockinventorybilladd';
+                            });
+                        } else if (data.message === 'needcost') {
+                            SweetAlert.swal({ title: '部分产品库存为零，无法取得当前成本，请手工指定成本价', type: 'error' }, function () {
+                                var model = { productids: data.productids };
+                                var modalInstance = $uibModal.open({
+                                    animation: true,
+                                    templateUrl: 'costpriceinput.html',
+                                    controller: 'costpriceinputModalCtrl',
+                                    resolve: {
+                                        model: function () { return model; }
+                                    }
+                                });
+
+                                modalInstance.result.then(function () {
+                                    $scope.model.content.costpriceinput = model.costpriceinput;
+                                    $scope.btnauditClick();
+                                });
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+            };
+
+            $scope.detailClick = function () {
+                if (!$scope.model.content.inventorydate) {
+                    SweetAlert.swal({ title: '请先填写盘点日期！', type: 'error' });
+                    return;
+                }
+                if (!$scope.model.content.stockid) {
+                    SweetAlert.swal({ title: '请先选择仓库！', type: 'error' });
+                    return;
+                }
+
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
+                    SweetAlert.swal({ title: '请先选择盘点产品类别！', type: 'error' });
+                    return;
+                }
+
+                var model = { stockid: $scope.model.content.stockid, inventorydate: $scope.model.content.inventorydate, digit: $scope.digit, categoryid: $scope.model.content.categoryid };
+                var modalInstance = $uibModal.open({
+                    animation: false,
+                    templateUrl: 'billdetail.html',
+                    controller: 'billdetailModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    for (var i = 0; i < $scope.model.content.details.length; i++) {
+                        if ($scope.model.content.details[i].productid === model.content.productid) {
+                            SweetAlert.swal({ title: '产品已存在！', type: 'error' });
+                            return;
+                        }
+                    }
+                    $scope.model.content.details.push(model.content);
+
+                    $scope.tableParams.reload();
+                    $scope.detailClick();
+                });
+            };
+
+            $scope.detailbatchClick = function () {
+                if (!$scope.model.content.inventorydate) {
+                    SweetAlert.swal({ title: '请先填写盘点日期！', type: 'error' });
+                    return;
+                }
+
+                if (!$scope.model.content.stockid) {
+                    SweetAlert.swal({ title: '请先选择仓库！', type: 'error' });
+                    return;
+                }
+
+                if ($scope.model.content.categoryid === undefined || $scope.model.content.categoryid === null) {
+                    SweetAlert.swal({ title: '请先选择盘点产品类别！', type: 'error' });
+                    return;
+                }
+
+                var model = { stockid: $scope.model.content.stockid, inventorydate: $scope.model.content.inventorydate, categoryid: $scope.model.content.categoryid };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'productbatchchoice.html',
+                    controller: 'productbatchchoiceModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    for (var productid in model.content.products) {
+                        for (var i = 0; i < $scope.model.content.details.length; i++) {
+                            if ($scope.model.content.details[i].productid === parseInt(productid)) {
+                                //alert(productid);
+                                delete model.content.products[productid];
+                                break;
+                            }
+                        }
+                    }
+
+                    var f = function () {
+                        for (var productid in model.content.products) {
+                            if (model.content.products.hasOwnProperty(productid)) {
+                                var detail = { productid: parseInt(productid), product: model.content.products[productid] };
+
+                                detail.qty = 0;
+                                if (detail.product.storage && detail.product.storage[$scope.model.content.stockid + '']) {
+                                    detail.qty = detail.product.storage[$scope.model.content.stockid + ''].qty;
+                                }
+                                detail.storageqty = detail.qty;
+                                detail.ykqty = 0;
+
+                                detail.uuid = uuid.v1();
+                                $scope.model.content.details.push(detail);
+
+                            }
+                        }
+
+                        $scope.tableParams.reload();
+                    };
+
+                    if ($scope.model.content.inventorydate !== moment().format("YYYY-MM-DD")) {
+                        var ids = '';
+                        for (var productid in model.content.products) {
+                            ids += productid + ',';
+                        }
+                        $http.post('/stockinventorybillservice/gethistorystoragebyproductids',
+                           { productids: ids, enddate: model.inventorydate, stockid: model.stockid })
+                           .success(function (data) {
+                               for (var productid in model.content.products) {
+                                   model.content.products[productid].storage = data.data[productid];
+                               }
+
+                               f();
+                           });
+                    } else {
+                        f();
+                    }
+
+                });
+            };
+
+            $scope.detailexcelClick = function () {
+                if (!$scope.model.content.inventorydate) {
+                    SweetAlert.swal({ title: '请先填写盘点日期！', type: 'error' });
+                    return;
+                }
+                if (!$scope.model.content.stockid) {
+                    SweetAlert.swal({ title: '请先选择仓库！', type: 'error' });
+                    return;
+                }
+
+                var model = { stockid: $scope.model.content.stockid, inventorydate: $scope.model.content.inventorydate, categoryid: $scope.model.content.categoryid };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'excelimport.html',
+                    controller: 'excelimportModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    angular.forEach(model.content.details, function (item) {
+                        item.uuid = uuid.v1();
+                        $scope.model.content.details.push(item);
+                    });
+
+                    $scope.tableParams.reload();
+                });
+            };
+
+            $scope.productChange = function (detail) {
+                var model = { qty: detail.qty, stockid: $scope.model.content.stockid, inventorydate: $scope.model.content.inventorydate, categoryid: $scope.model.content.categoryid };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'productchoice.html',
+                    controller: 'productchoiceModalCtrl',
+                    size: 'lg',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    for (var i = 0; i < $scope.model.content.details.length; i++) {
+                        if ($scope.model.content.details[i].productid === model.content.productid) {
+                            SweetAlert.swal({ title: '产品已存在！', type: 'error' });
+                            return;
+                        }
+                    }
+
+                    detail.product = model.content.product;
+                    detail.productid = model.content.productid;
+                    detail.storageqty = model.content.storageqty;
+                    detail.ykqty = model.content.ykqty;
+                });
+            };
+
+            $scope.deleteDetail = function (uuid) {
+                SweetAlert.swal({
+                    title: '确定要删除吗？',
+                    text: '数据删除后无法恢复',
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: '删除',
+                    closeOnConfirm: true
+                },
+                function (isConfirm) {
+                    if (!isConfirm) return;
+
+                    for (var i = 0; i < $scope.model.content.details.length; i++) {
+                        if ($scope.model.content.details[i].uuid === uuid) {
+                            $scope.model.content.details.splice(i, 1);
+                            $scope.tableParams.reload();
+                            return;
+                        }
+                    }
+                });
+            };
+
+            $scope.$watch('model.content.details', function () {
+                var qtysum = 0;
+                var storageqtysum = 0;
+                var ykqtysum = 0;
+
+                angular.forEach($scope.model.content.details, function (item) {
+                    if (item.qty) qtysum += item.qty;
+                    if (item.storageqty) storageqtysum += item.storageqty;
+                    if (item.ykqty !== undefined && item.ykqty !== null) ykqtysum += item.ykqty;
+                });
+
+                $scope.qtysum = qtysum;
+                $scope.storageqtysum = storageqtysum;
+                $scope.ykqtysum = ykqtysum;
+            }, true);
+
+            $scope.billconfigClick = function () {
+                var model = { billconfig: $scope.billconfig };
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'billconfig.html',
+                    controller: 'billconfigModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.billconfig = model.billconfig;
+                    $http.post('/stockinventorybillservice/billconfigsave', model)
+                        .success(function (data) {
+                            $scope.billconfig.id = data.id;
+                            SweetAlert.swal({ title: '保存成功！', type: 'success' });
+                            //$scope.tableParams.reload();
+                        });
+                });
+            };
+
+            var stockChange = function () {
+                refreshProductStorage();
+            };
+
+            $scope.updateStocks = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/stockchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.stockSelected = function ($item, $model, $label, $event) {
+                $scope.model.content.stockid = $item.id;
+                stockChange();
+            };
+
+            $scope.stockClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'stockchoice.html',
+                    controller: 'stockchoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.stock = model.stock.content.name;
+                    $scope.model.content.stockid = model.stock.id;
+                    stockChange();
+                });
+            };
+
+            $scope.updateEmployees = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/employeechoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.employeeSelected = function ($item, $model, $label, $event) {
+                $scope.model.content.employeeid = $item.id;
+            };
+
+            $scope.employeeClick = function () {
+                var model = {};
+                var modalInstance = $uibModal.open({
+                    animation: true,
+                    templateUrl: 'employeechoice.html',
+                    controller: 'employeechoiceModalCtrl',
+                    resolve: {
+                        model: function () { return model; }
+                    }
+                });
+
+                modalInstance.result.then(function () {
+                    $scope.employee = model.employee.content.name;
+                    $scope.model.content.employeeid = model.employee.id;
+                });
+            };
+
+            $scope.uploadAttachments = function () {
+                var file = document.getElementById('file');
+                if (file.files.length == 0) return;
+
+                $scope.uploadwaiter = true;
+
+                var myform = new FormData();
+                for (var i = 0; i < file.files.length; i++) {
+                    myform.append("files[]", file.files[i]);
+                }
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        $scope.uploadwaiter = false;
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            angular.forEach(data.urls, function (item) {
+                                $scope.model.content.attachments.push(item);
+                            });
+                            SweetAlert.swal({ title: '上传成功！', type: 'success' });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfiles", true);
+                req.send(myform);
+            };
+
+            $scope.removeAttachment = function (url) {
+                for (var i = 0; i < $scope.model.content.attachments.length; i++) {
+                    if ($scope.model.content.attachments[i].url === url) {
+                        $scope.model.content.attachments.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+
+        });
+
+        app.controller('categorychoiceModalCtrl', function ($scope, $uibModalInstance, $http, $sce, $q, model) {
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": [
+                            "dnd", "search",
+                            "state", "types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/commonservice/productcategorys', {})
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            $scope.selectNode = function (node, selected, event) {
+                model.categoryid = parseInt(selected.node.id);
+                model.categoryname = selected.node.text;
+            };
+
+            $scope.ok = function () {
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('billcodeconfigModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            $scope.items = [];
+
+            $http.post('/commonservice/GetBillCodeTemplate', { billname: 'stockinventorybill' })
+                    .success(function (data) {
+                        var template = data.template;
+                        var ss = template.split(',');
+                        angular.forEach(ss, function (item) {
+                            if (item) {
+                                $scope.items.push({ value: item });
+                            }
+                        });
+                        var length = $scope.items.length;
+                        for (var i = 0; i < 10 - length; i++) {
+                            $scope.items.push({ value: '' });
+                        }
+                    });
+
+            $scope.ok = function () {
+                var ss = [];
+                angular.forEach($scope.items, function (item) {
+                    if (item.value) {
+                        ss.push(item.value);
+                    }
+                });
+                model.template = ss.join(',');
+
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('billdetailModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            model.content = {};
+            $scope.legalcategroyids = [];
+
+            $scope.model = JSON.parse(angular.toJson(model));
+
+            $scope.stockid = model.stockid ? (model.stockid + '') : '0';
+
+            $scope.showproductchoice = false;
+            $scope.productClick = function () {
+                $scope.showproductchoice = !$scope.showproductchoice;
+            };
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $http.post('/stockinventorybillservice/legalproductcategorys', { categoryid: model.categoryid })
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            if (parseInt(model.categoryid) > 0) {
+                $http.post('/stockinventorybillservice/getlegalcategoryids', { categoryid: model.categoryid })
+                        .success(function (data) {
+                            $scope.legalcategroyids = data.data;
+                        });
+            }
+
+            $scope.categoryid = model.categoryid;
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/commonservice/productlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.updateProducts = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/productchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.productSelected = function ($item, $model, $label, $event) {
+                $scope.showproductchoice = false;
+                $scope.product = $item.content.name;
+                $scope.productcategoryid = $item.content.categoryid;
+                $scope.model.content.product = $item.content;
+                $scope.model.content.productid = $item.id;
+            };
+
+            $scope.productChoice = function (product) {
+                $scope.showproductchoice = false;
+                $scope.product = product.content.name;
+                $scope.productcategoryid = product.content.categoryid;
+                $scope.model.content.product = product.content;
+                $scope.model.content.productid = product.id;
+            };
+
+            $scope.ok = function () {
+                if (!$scope.model.content.productid) {
+                    SweetAlert.swal({ title: '请选择产品', type: 'error' });
+                    return;
+                }
+
+                if (!$scope.model.content.qty) {
+                    SweetAlert.swal({ title: '请填写数量', type: 'error' });
+                    return;
+                }
+
+                if (parseInt(model.categoryid) > 0) {
+                    if ($scope.productcategoryid === undefined || $scope.productcategoryid === null) {
+                        SweetAlert.swal({ title: '只能选择盘点类别范围内的产品！', type: 'error' });
+                        return;
+                    }
+                    var legal = false;
+                    for (var i = 0; i < $scope.legalcategroyids.length; i++) {
+                        if ($scope.legalcategroyids[i] == $scope.productcategoryid) {
+                            legal = true;
+                            break;
+                        }
+                    }
+                    if (legal === false) {
+                        SweetAlert.swal({ title: '只能选择盘点类别范围内的产品！', type: 'error' });
+                        return;
+                    }
+                }
+
+                if (model.inventorydate !== moment().format('YYYY-MM-DD')) {
+                    $http.post('/stockinventorybillservice/gethistorystoragebyproductid',
+                        { productid: $scope.model.content.productid, enddate: model.inventorydate, stockid: model.stockid })
+                        .success(function (data) {
+                            $scope.model.content.product.storage = data.data;
+
+                            model.content = $scope.model.content;
+                            model.content.storageqty = 0;
+                            if (model.content.product.storage && model.content.product.storage[model.stockid + '']) {
+                                model.content.storageqty = model.content.product.storage[model.stockid + ''].qty;
+                            }
+                            model.content.ykqty = model.content.qty - model.content.storageqty;
+
+                            model.content.uuid = uuid.v1();
+                            $uibModalInstance.close();
+                        });
+                } else {
+                    model.content = $scope.model.content;
+                    model.content.storageqty = 0;
+                    if (model.content.product.storage && model.content.product.storage[model.stockid + '']) {
+                        model.content.storageqty = model.content.product.storage[model.stockid + ''].qty;
+                    }
+                    model.content.ykqty = model.content.qty - model.content.storageqty;
+
+                    model.content.uuid = uuid.v1();
+                    $uibModalInstance.close();
+                }
+
+
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('productchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            model.content = {};
+            $scope.model = JSON.parse(angular.toJson(model));
+
+            $scope.stockid = model.stockid ? (model.stockid + '') : '0';
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $scope.categoryid = model.categoryid;
+
+            $http.post('/stockinventorybillservice/legalproductcategorys', { categoryid: model.categoryid })
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            if (parseInt(model.categoryid) > 0) {
+                $http.post('/stockinventorybillservice/getlegalcategoryids', { categoryid: model.categoryid })
+                        .success(function (data) {
+                            $scope.legalcategroyids = data.data;
+                        });
+            }
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/commonservice/productlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.productClick = function (product) {
+                var productcategoryid = product.content.categoryid;
+                if (parseInt(model.categoryid) > 0) {
+                    if (productcategoryid === undefined || productcategoryid === null) {
+                        SweetAlert.swal({ title: '只能选择盘点类别范围内的产品！', type: 'error' });
+                        return;
+                    }
+                    var legal = false;
+                    for (var i = 0; i < $scope.legalcategroyids.length; i++) {
+                        if ($scope.legalcategroyids[i] == productcategoryid) {
+                            legal = true;
+                            break;
+                        }
+                    }
+                    if (legal === false) {
+                        SweetAlert.swal({ title: '只能选择盘点类别范围内的产品！', type: 'error' });
+                        return;
+                    }
+                }
+
+
+                if (model.inventorydate !== moment().format('YYYY-MM-DD')) {
+                    $http.post('/stockinventorybillservice/gethistorystoragebyproductid',
+                        { productid: product.id, enddate: model.inventorydate, stockid: model.stockid })
+                        .success(function (data) {
+                            product.content.storage = data.data;
+
+                            model.content.product = product.content;
+                            model.content.productid = product.id;
+                            model.content.storageqty = 0;
+                            if (model.content.product.storage && model.content.product.storage[model.stockid + '']) {
+                                model.content.storageqty = model.content.product.storage[model.stockid + ''].qty;
+                            }
+                            model.content.ykqty = model.qty - model.content.storageqty;
+
+                            $uibModalInstance.close();
+                        });
+                } else {
+                    model.content.product = product.content;
+                    model.content.productid = product.id;
+                    model.content.storageqty = 0;
+                    if (model.content.product.storage && model.content.product.storage[model.stockid + '']) {
+                        model.content.storageqty = model.content.product.storage[model.stockid + ''].qty;
+                    }
+                    model.content.ykqty = model.qty - model.content.storageqty;
+
+                    $uibModalInstance.close();
+                }
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('productbatchchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            model.content = {};
+            $scope.model = JSON.parse(angular.toJson(model));
+
+            $scope.checkboxes = { 'checked': false, items: {}, products: {} };
+            $scope.$watch('checkboxes.checked', function (value) {
+                angular.forEach($scope.datalist, function (item) {
+                    $scope.checkboxes.items[item.id] = value;
+                    if (value) {
+                        $scope.checkboxes.products[item.id] = item.content;
+                    } else {
+                        delete $scope.checkboxes.products[item.id];
+                    }
+                });
+            });
+
+            $scope.rowClick = function (product) {
+                $scope.checkboxes.items[product.id] = $scope.checkboxes.items[product.id] ? false : true;
+                $scope.checkChange(product);
+            };
+
+            $scope.checkChange = function (product) {
+                if ($scope.checkboxes.items[product.id]) {
+                    $scope.checkboxes.products[product.id] = product.content;
+                } else {
+                    delete $scope.checkboxes.products[product.id];
+                }
+            };
+
+            $scope.stockid = model.stockid ? (model.stockid + '') : '0';
+
+            $scope.category = {};
+
+            $scope.category.treeConfig = {
+                "core": {
+                    "animation": 0,
+                    "themes": { "stripes": true },
+                    "multiple": false
+                },
+                "plugins": ["types", "wholerow"
+                ],
+                version: 1
+            };
+
+            $scope.categoryid = model.categoryid;
+
+            $http.post('/stockinventorybillservice/legalproductcategorys', { categoryid: model.categoryid })
+                    .success(function (data) {
+                        $scope.category.treeData = data;
+                        $scope.category.treeConfig.version++;
+                    });
+
+            var getData = function ($defer, params) {
+                var filter = JSON.parse(angular.toJson(params.filter()));
+                filter.categoryid = $scope.categoryid;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/commonservice/productlist',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.checkboxes.checked = false;
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            var selectednode;
+            $scope.selectNode = function (node, selected, event) {
+                if (selectednode) {
+                    angular.element('#treeInstance').jstree(true).set_icon(selectednode, 'fa fa-folder-o fa-fw');
+                }
+                selectednode = selected.node;
+                angular.element('#treeInstance').jstree(true).set_icon(selected.node, 'fa fa-folder-open-o fa-fw');
+                $scope.categoryid = selected.node.id;
+                $scope.tableParams.reload();
+            };
+
+            $scope.ok = function () {
+                model.content.products = $scope.checkboxes.products;
+
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('excelimportModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, mytools, NgTableParams, model) {
+
+            model.content = {};
+
+            var dealfile = function (path) {
+                $http.post('/stockinventorybillservice/importdata', { path: path,stockid:model.stockid,categoryid:model.categoryid,inventorydate:model.inventorydate })
+                    .success(function (data) {
+                        $scope.uploadwaiter = false;
+                        if (data.message == 'ok') {
+                            model.content.details = data.data;
+                            $uibModalInstance.close();
+                        } else {
+                            angular.element('#excelerrors').html(data.message);
+                            angular.element('#excelerrors').show();
+                        }
+                    });
+
+            };
+
+            $scope.uploadClick = function () {
+                var file = document.getElementById('excelfile');
+                if (file.files.length == 0) return;
+
+                $scope.uploadwaiter = true;
+                angular.element('#excelerrors').hide();
+
+                var myform = new FormData();
+                myform.append("file", file.files[0]);
+
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4 && req.status == 200) {
+                        var data = JSON.parse(req.responseText);
+                        if (data.message == 'ok') {
+                            dealfile(data.path);
+                        } else {
+                            $scope.uploadwaiter = false;
+                            angular.element('#excelerrors').html(data.message);
+                            angular.element('#excelerrors').show();
+                        }
+                    }
+                }
+
+                req.open("post", "/upload/uploadfile", true);
+                req.send(myform);
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('billconfigModalCtrl', function ($scope, $uibModalInstance, $http, $q, model) {
+
+            $scope.model = JSON.parse(angular.toJson(model.billconfig));
+            $scope.ok = function () {
+                model.billconfig = $scope.model;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('employeechoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, model) {
+
+            $http.post('/commonservice/employeelist', {})
+                    .success(function (data) {
+                        $scope.employees = data.data;
+                    });
+
+            $scope.employeeSelected = function (employee) {
+                model.employee = employee;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('stockchoiceModalCtrl', function ($scope, $uibModalInstance, $http, $q, model) {
+
+            $http.post('/commonservice/stocklist', {})
+                    .success(function (data) {
+                        $scope.stocks = data.data;
+                    });
+
+            $scope.stockSelected = function (stock) {
+                model.stock = stock;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('billloadModalCtrl', function ($scope, $uibModalInstance, $http, $q, NgTableParams) {
+
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/stockinventorybillservice/loadbillquery',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25], total: 0, getData: getData });
+
+            $scope.btnqueryClick = function () {
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams.reload();
+            };
+
+            $scope.billSelected = function (bill) {
+                $uibModalInstance.close(bill.id);
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+        app.controller('costpriceinputModalCtrl', function ($scope, $uibModalInstance, $http, $q, SweetAlert, NgTableParams, model) {
+
+            $scope.tableParams = new NgTableParams({ count: 99999 });
+            var ids = model.productids.split(',');
+            var productids = [];
+            $scope.costpriceobj = {};
+
+            angular.forEach(ids, function (item) {
+                if (item) {
+                    productids.push(item);
+                }
+            });
+
+            var getData = function () {
+
+                $http.post('/commonservice/getproductsbyid',
+                    { productids: model.productids })
+                    .success(function (data) {
+                        $scope.products = data.data;
+                        $scope.tableParams.settings({
+                            counts: [],
+                            dataset: $scope.products
+                        });
+                    });
+            };
+
+            getData();
+
+            $scope.ok = function () {
+                var s = '';
+                for (var i = 0; i < productids.length; i++) {
+                    var id = productids[i];
+                    if ($scope.costpriceobj[id] === undefined || $scope.costpriceobj[id] === null) {
+                        SweetAlert.swal({ title: '请填写成本单价', type: 'error' });
+                        return;
+                    } else {
+                        s += id + ':' + $scope.costpriceobj[id] + ',';
+                    }
+                }
+
+                model.costpriceinput = s;
+                $uibModalInstance.close();
+            };
+
+            $scope.cancel = function () {
+                $uibModalInstance.dismiss();
+            };
+        });
+
+    </script>
+}

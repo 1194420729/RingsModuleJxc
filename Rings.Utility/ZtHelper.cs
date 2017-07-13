@@ -90,7 +90,7 @@ namespace Jxc.Utility
                 NpgsqlCommand command = new NpgsqlCommand();
                 command.Connection = connection;
 
-                command.CommandText = "select count(*) as cnt from corporation where name=@name";
+                command.CommandText = "select count(0) as cnt from corporation where name=@name";
                 command.Parameters.Add("name", NpgsqlTypes.NpgsqlDbType.Text).Value = name;
                 cnt = Convert.ToInt32(command.ExecuteScalar());
                 connection.Close();

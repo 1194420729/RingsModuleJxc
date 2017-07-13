@@ -287,7 +287,7 @@ namespace JxcBaseinfo
             using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where content->>'code'='" + model.content.Value<string>("code") + "'");
+                int cnt = db.Count("select count(0) as cnt from \"" + tablename + "\" where content->>'code'='" + model.content.Value<string>("code") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };
@@ -322,7 +322,7 @@ namespace JxcBaseinfo
             using (DBHelper db = new DBHelper(true))
             {
                 //检查编号重复
-                int cnt = db.Count("select count(*) as cnt from \"" + tablename + "\" where id<>" + model.id + " and content->>'code'='" + model.content.Value<string>("code") + "'");
+                int cnt = db.Count("select count(0) as cnt from \"" + tablename + "\" where id<>" + model.id + " and content->>'code'='" + model.content.Value<string>("code") + "'");
                 if (cnt > 0)
                 {
                     return new { message = StringHelper.GetString("编号有重复") };

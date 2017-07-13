@@ -150,10 +150,10 @@ namespace JxcPurchase
 
             //string sqlCount = "with cte as (select productid from mvw_purchasebill "
             //                    + sb.ToString()
-            //                    + " group by productid) select count(*) from cte";
+            //                    + " group by productid) select count(0) from cte";
 
             string sqlCount = cte
-                            + "select count(*) from (select productid from cte "
+                            + "select count(0) from (select productid from cte "
                             + sb.ToString()
                             + " group by productid) as t";
 
@@ -309,10 +309,10 @@ namespace JxcPurchase
 
             //string sqlCount = "with cte as (select vendorid,vendorcode,vendorname from mvw_purchasebill "
             //                    + sb.ToString()
-            //                    + " group by vendorid,vendorcode,vendorname) select count(*) from cte";
+            //                    + " group by vendorid,vendorcode,vendorname) select count(0) from cte";
 
             string sqlCount = cte
-                            + "select count(*) from (select vendorid,vendorcode,vendorname from cte "
+                            + "select count(0) from (select vendorid,vendorcode,vendorname from cte "
                             + sb.ToString()
                             + " group by vendorid,vendorcode,vendorname) as t";
 
@@ -485,7 +485,7 @@ namespace JxcPurchase
                             sborder.ToString();
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
 
@@ -754,10 +754,10 @@ namespace JxcPurchase
 
             //string sqlCount = "with cte as (select productid,productcode,productname,producttype,productstandard from mvw_purchaseorder "
             //                    + sb.ToString()
-            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(*) from cte";
+            //                    + " group by productid,productcode,productname,producttype,productstandard) select count(0) from cte";
 
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
             string sqlSum = cte
@@ -873,7 +873,7 @@ namespace JxcPurchase
                             sborder.ToString();
              
             string sqlCount = cte
-                            + "select count(*) from cte "
+                            + "select count(0) from cte "
                             + sb.ToString();
 
 

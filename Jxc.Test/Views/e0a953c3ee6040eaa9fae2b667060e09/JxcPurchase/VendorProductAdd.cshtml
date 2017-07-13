@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "新增产品价格";
+}
+<div data-pagelimit="vendorproductadd">
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><a href="/jxcpurchase/vendorproductlist">产品价格表</a></li>
+        </ol>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                新增产品价格
+            </div>
+            <div class="panel-body">
+                <div class="alert alert-success">如果已存在相同的供应商和产品，将用新的价格覆盖旧的价格</div>
+                <div class="form-group form-inline">
+                    <label>
+                        供应商
+                    </label>
+                    <input type="text" autocomplete="off" ng-model="vendor" placeholder="编号或名称模糊查询" uib-typeahead="vendor.content.name for vendor in updateVendors($viewValue)"
+                           typeahead-on-select="vendorSelected($item, $model, $label,$event)" typeahead-loading="loadingVendorLocations"
+                           typeahead-no-results="noVendorResults" typeahead-select-on-blur="true" class="form-control">
+                    <i ng-show="loadingVendorLocations" class="glyphicon glyphicon-refresh"></i>
+                    <span class="text-danger" ng-show="noVendorResults">没有匹配项</span>
+                </div>
+                <div class="form-group form-inline">
+                    <label>
+                        产品
+                    </label>
+                    <input type="text" autocomplete="off" ng-model="product" placeholder="编号或名称模糊查询" uib-typeahead="product.content.name for product in updateProducts($viewValue)"
+                           typeahead-on-select="productSelected($item, $model, $label,$event)" typeahead-loading="loadingProductLocations"
+                           typeahead-no-results="noProductResults" typeahead-select-on-blur="true" class="form-control">
+                    <i ng-show="loadingProductLocations" class="glyphicon glyphicon-refresh"></i>
+                    <span class="text-danger" ng-show="noProductResults">没有匹配项</span>
+                    
+                </div>
+                <div class="form-group form-inline">
+                    <label>价格</label>
+                    <input type="number" class="form-control" ng-model="model.price" />
+                </div> 
+                <div class="form-group form-inline">
+                    <button type="button" class="btn btn-primary"
+                            ng-disabled="savedisabled"
+                            ng-click="btnsaveClick()">
+                        <i class="fa fa-save fa-fw"></i>保存
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <style>
+        .table td {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, SweetAlert, $uibModal) {
+
+            $scope.model = {};
+
+            $scope.updateVendors = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/vendorchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.vendorSelected = function ($item, $model, $label, $event) {
+                $scope.model.vendorid = $item.id;
+            };
+
+            $scope.updateProducts = function (filter) {
+                if (filter === undefined || filter === null) {
+                    filter = '';
+                }
+                var defer = $q.defer();
+                $http.post('/commonservice/productchoice',
+                            { filter: filter })
+                            .success(function (data) {
+                                defer.resolve(data.data);
+                            });
+                return defer.promise;
+            };
+
+            $scope.productSelected = function ($item, $model, $label, $event) {
+                $scope.model.productid = $item.id;
+            };
+
+            $scope.btnsaveClick = function () {
+                if (!$scope.vendor || $scope.noVendorResults) {
+                    SweetAlert.swal({ title: '请选择供应商', type: 'error' });
+                    return;
+                }
+                if (!$scope.product || $scope.noProductResults) {
+                    SweetAlert.swal({ title: '请选择产品', type: 'error' });
+                    return;
+                }
+                if (!$scope.model.price) {
+                    SweetAlert.swal({ title: '请填写价格', type: 'error' });
+                    return;
+                }
+
+                $scope.savedisabled = true;
+                $http.post('/vendorproductservice/addsave', $scope.model)
+                    .success(function (data) {
+                        $scope.savedisabled = false;
+                        if (data.message == 'ok') {
+                            SweetAlert.swal({ title: '保存成功!可以继续新增', type: 'success' }, function () {
+                                window.location.reload();
+                            });
+                        } else {
+                            SweetAlert.swal({ title: data.message, type: 'error' });
+                        }
+                    });
+            }
+
+        });
+
+
+    </script>
+}
