@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="gatheringbilladd" title="收款单录入" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="gatheringbillaudit" title="收款单审核" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="paybilladd" title="付款单录入" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="paybillaudit" title="付款单审核" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="receivablebilladd" title="应收调整单录入" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="receivablebillaudit" title="应收调整单审核" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="payablebilladd" title="应付调整单录入" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="payablebillaudit" title="应付调整单审核" groupname="往来管理" modulename="进销存"></limit>
+  
+  <limit name="receivablequery" title="应收查询" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="payablequery" title="应付查询" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="returnedmoneyreport" title="回款分析" groupname="往来管理" modulename="进销存"></limit>
+  <limit name="agingreport" title="账龄分析" groupname="往来管理" modulename="进销存"></limit>
+  
+</limits>

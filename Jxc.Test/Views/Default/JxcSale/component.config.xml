@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<components>
+  <component name="myselfsalereportcomponent" title="个人业绩统计" path="/jxcsale/myselfsalereportcomponent" limit="myselfsalereport" width="400" height="400">
+  </component>
+  <component name="timesalereportcomponent" title="销售走势图" path="/jxcsale/timesalereportcomponent" limit="timespansalereport" width="400" height="400">
+  </component>
+  <component name="employeesalereportcomponent" title="业绩排行" path="/jxcsale/employeesalereportcomponent" limit="employeesalereport" width="400" height="400">
+  </component>
+  <component name="productsalereportcomponent" title="畅销单品" path="/jxcsale/productsalereportcomponent" limit="productsalereport" width="400" height="400">
+  </component>
+</components>

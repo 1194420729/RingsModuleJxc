@@ -1,0 +1,217 @@
+﻿@{
+    ViewBag.Title = "销售订单统计按仓库";
+}
+<div data-pagelimit="saleorderreport">
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>销售订单统计</span></li>
+        </ol>
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="/jxcsale/saleorderproductreport">按产品统计</a></li>
+            <li role="presentation"><a href="/jxcsale/saleordercustomerreport">按客户统计</a></li>
+            <li role="presentation"><a href="/jxcsale/saleorderemployeereport">按经手人统计</a></li>
+            <li role="presentation" class="active"><a href="javascript:;">按仓库统计</a></li>
+        </ul>
+        <div class="panel panel-info">
+
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>起止日期<span style="color:red;">*</span></label>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle startdate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="startdate" ng-model="filter.startdate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.startdate" data-datetimepicker-config="{ dropdownSelector: '.startdate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <span>-</span>
+                    <div class="dropdown" style="display: inline;">
+                        <a class="dropdown-toggle enddate" role="button" data-toggle="dropdown" data-target="#"
+                           href="javascript:;">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="enddate" ng-model="filter.enddate" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <datetimepicker ng-model="filter.enddate" data-datetimepicker-config="{ dropdownSelector: '.enddate',minView:'day',modelType:'YYYY-MM-DD'  }" />
+                        </ul>
+                    </div>
+                    <div style="display: inline;margin-left:10px;" ng-date-scope="true" startmodel="filter.startdate" endmodel="filter.enddate"></div>
+                </div>
+                <div class="form-group form-inline">
+                    <label>客户名称</label>
+                    <input type="text" class="form-control" ng-model="filter.customername" placeholder="按编号或名称模糊查询" />
+                    <label>经手人</label>
+                    <input type="text" class="form-control" ng-model="filter.employeename" placeholder="按编号或名称模糊查询" />
+                    <label>产品名称</label>
+                    <input type="text" class="form-control" ng-model="filter.productname" placeholder="按编号或名称模糊查询" />
+                    <button type="button" class="btn btn-primary" ng-click="btnreportClick()"><i class="fa fa-play fa-fw"></i>开始统计</button>
+                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '销售订单统计.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                </div>
+            </div>
+            <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" ng-dblclick="detailClick(m)" title="双击查看明细">
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'仓库编号'" header-class="'bg-warning'" data-sortable="'stockcode'">
+                        <span ng-bind=" m.stockcode"></span>
+                    </td>
+                    <td data-title="'仓库名称'" header-class="'bg-warning'" data-sortable="'stockname'">
+                        <span ng-bind="m.stockname"></span>
+                    </td>
+                    <td data-title="'数量'" header-class="'bg-warning'" data-sortable="'qty'">
+                        <span ng-bind="m.qty"></span>
+                    </td>
+                    <td data-title="'未税均价'" header-class="'bg-warning'" data-sortable="'price'">
+                        <span ng-bind="m.price | number:digit"></span>
+                    </td>
+                    <td data-title="'未税金额'" header-class="'bg-warning'" data-sortable="'total'">
+                        <span ng-bind="m.total | number:digit"></span>
+                    </td>
+                    <td data-title="'含税均价'" header-class="'bg-warning'" data-sortable="'discountprice'">
+                        <span ng-bind="m.discountprice | number:digit"></span>
+                    </td>
+                    <td data-title="'含税金额'" header-class="'bg-warning'" data-sortable="'discounttotal'">
+                        <span ng-bind="m.discounttotal | number:digit"></span>
+                    </td>
+                    <td data-title="'税额'" header-class="'bg-warning'" data-sortable="'taxtotal'">
+                        <span ng-bind="m.taxtotal | number:digit"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td colspan="3">
+                        合计：<span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td ng-bind="qtysum"></td>
+                    <td></td>
+                    <td ng-bind="totalsum | number:digit"></td>
+                    <td></td>
+                    <td ng-bind="discounttotalsum | number:digit"></td>
+                    <td ng-bind="taxtotalsum | number:digit"></td>
+
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
+    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="//139.196.218.9/cdn/ngdatescope.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ui.bootstrap.datetimepicker', 'ngTableExport', 'ngJsTree', 'ngSanitize', 'myfilter', 'ngDateScope']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, $sce, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            $scope.digit = 2;
+
+            $http.post('/saleorderservice/RefreshMVWSaleOrder', {})
+                    .success(function (data) {
+
+                    });
+
+            $http.post('/saleorderservice/initstockreport', {})
+                    .success(function (data) {
+
+                        $scope.digit = data.digit;
+                    });
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var sorting = params.sorting();
+                var count = params.count();
+                var page = params.page();
+                $http.post('/saleorderservice/saleorderstockreport',
+                    { page: page, count: count, sorting: JSON.stringify(sorting), filter: JSON.stringify(filter) })
+                    .success(function (data) {
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.qtysum = data.qtysum;
+                        $scope.totalsum = data.totalsum;
+                        $scope.discounttotalsum = data.discounttotalsum;
+                        $scope.taxtotalsum = data.taxtotalsum;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+
+                        $scope.showwaiter = false;
+                    });
+            };
+
+            $scope.btnreportClick = function () {
+                if (!$scope.filter.startdate || !$scope.filter.enddate) {
+                    SweetAlert.swal({ title: '请完整填写起止日期', type: 'error' });
+                    return;
+                }
+
+                $scope.showwaiter = true;
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams = new NgTableParams({ count: 25 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            };
+
+            $scope.detailClick = function (row) {
+                var stockid = row.stockid;
+                var url = '/jxcsale/saleorderreportdetail?type=bystock&stockid=' + stockid
+                            + '&startdate=' + $scope.filter.startdate + '&enddate=' + $scope.filter.enddate
+                            + ($scope.filter.customername ? ('&customername=' + encodeURIComponent($scope.filter.customername)) : '')
+                            + ($scope.filter.employeename ? ('&employeename=' + encodeURIComponent($scope.filter.employeename)) : '')
+                            + ($scope.filter.productname ? ('&productname=' + encodeURIComponent($scope.filter.productname)) : '');
+
+                $window.open(url);
+            };
+        });
+
+    </script>
+}

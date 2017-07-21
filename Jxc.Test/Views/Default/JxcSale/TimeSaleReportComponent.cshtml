@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "";
+}
+<div data-component="timesalereportcomponent" style="height:100%;">
+    <div class="timesalereportcomponent">
+        <div class="form-group form-inline pull-right">
+            <select class="form-control period">
+                <option value="3">过去3个月</option>
+                <option value="6">过去半年</option>
+                <option value="9">过去9个月</option>
+                <option value="12">过去1年</option>
+            </select>
+            <select class="form-control charttype">
+                <option value="bar">柱状图</option>
+                <option value="line">折线图</option>
+            </select>
+            <button type="button" class="btn btn-sm btn-primary btnsaveconfig">确定</button>    
+            <a href="/jxcsale/timespansalereport">查看详情</a>        
+        </div>
+        <div style="clear:both;"></div>
+        <div class="reportchart"></div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="//cdn.bootcss.com/echarts/3.6.2/echarts.common.min.js" data-define="echarts"></script>
+
+    <script data-define="timesalereportcomponent">
+        if (!componentloader) var componentloader = {};
+        if (!componentloader.timesalereportcomponent) {
+            componentloader.timesalereportcomponent = function (id) {
+                var selector = '#' + id + ' .timesalereportcomponent';
+                if (!id) selector = '.timesalereportcomponent';
+
+                var element = $(selector + ' .reportchart').get(0);
+
+                element.style.height = ($(selector).parent().height()-35) + 'px';
+                element.style.width = $(selector).parent().width() + 'px';
+
+                //console.log(element);
+                var chart = echarts.init(element);
+
+                var init = function () {
+                    $.post('/salereportservice/timesalereportcomponent', { id: id }, function (data) {
+                       
+                        var option = {
+                            title: {
+                                text: '销售走势图'
+                            },
+                            tooltip: {},
+                            legend: {
+                                data: ['销售额（' + (data.unit == 'y' ? '元' : '万元') + '）']
+                            },
+                            xAxis: {
+                                axisLabel: { interval: 0 },
+                                data: data.x//["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+                            },
+                            yAxis: {},
+                            series: [{
+                                name: '销售额（' + (data.unit == 'y' ? '元' : '万元') + '）',
+                                type: data.charttype,
+                                data: data.serie//[5, 20, 36, 10, 10, 20]
+                            }]
+                        };
+
+                        chart.clear();
+                        chart.setOption(option);
+                        $(selector + ' .period').val(data.period);
+                        $(selector + ' .charttype').val(data.charttype);
+
+                    }, 'json');
+
+                };
+
+                $(selector + ' .btnsaveconfig').click(function () {
+                    $.post('/salereportservice/timesalereportcomponentsaveconfig',
+                        { id: id, period: $(selector + ' .period').val(), charttype: $(selector + ' .charttype').val() },
+                        function (data) {
+
+                            init();
+                        }, 'json');
+                });
+
+                init();
+            };
+        }
+
+        if (!componentloader.timesalereportcomponentresize) {
+            componentloader.timesalereportcomponentresize = function (id, ui) {
+
+                var selector = '#' + id + ' .timesalereportcomponent';
+                var element = $(selector + ' .reportchart').get(0);
+                var chart = echarts.getInstanceByDom(element);
+                chart.resize({
+                    width: ui.size.width,
+                    height: ui.size.height - 35
+                });
+
+
+            };
+        }
+    </script>
+    <script>
+        $(function () {
+            componentloader.timesalereportcomponent('');
+        });
+    </script>
+}

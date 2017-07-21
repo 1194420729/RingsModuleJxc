@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<shorts>
+  <short name="gatheringbillservice" path="service/jxcpay/jxcpay/gatheringbill"></short>
+  <short name="paybillservice" path="service/jxcpay/jxcpay/paybill"></short>
+  <short name="receivablebillservice" path="service/jxcpay/jxcpay/receivablebill"></short>
+  <short name="payablebillservice" path="service/jxcpay/jxcpay/payablebill"></short>
+  <short name="commonservice" path="service/jxcpay/jxcpay/common"></short>
+  <short name="payreportservice" path="service/jxcpay/jxcpay/payreport"></short>
+</shorts>

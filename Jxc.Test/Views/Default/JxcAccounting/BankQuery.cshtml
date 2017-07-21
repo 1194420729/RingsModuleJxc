@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "现金银行查询";
+}
+<div data-pagelimit="bankquery">
+    <div ng-app="myApp" ng-controller="myCtrl">
+
+        <ol class="breadcrumb">
+            <li><a href="/"><i class="fa fa-home fa-fw"></i>首页</a></li>
+            <li><span>现金银行查询</span></li>
+        </ol>
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="javascript:;">现金银行查询</a></li>
+            <li role="presentation"><a href="/jxcaccounting/bankhistoryquery">历史余额查询</a></li>  
+        </ul>
+        <div class="panel panel-info">
+            
+            <div class="panel-body">
+                <div class="form-group form-inline">
+                    <label>账户名称</label>
+                    <input type="text" class="form-control" ng-model="filter.bankname" placeholder="按编号或名称模糊查询" />
+                    <button class="btn btn-primary" type="button" ng-click="btnqueryClick()"><i class="fa fa-search fa-fw"></i>查询</button>
+                    <button type="button" class="btn btn-primary" ng-show="totalrecordes" ng-click="csv.generate($event, '现金银行查询.csv')"><i class="fa fa-file-excel-o fa-fw"></i>导出Excel</button>
+                    <span><i class="fa fa-spinner fa-pulse fa-fw" ng-show="showwaiter"></i></span>
+                </div>
+            </div>
+            <table ng-table="tableParams" export-csv="csv" show-filter="false" class="table table-bordered table-condensed table-hover">
+                <tr ng-repeat="m in $data" style="cursor:pointer;">
+                    <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                        <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                    </td>
+                    <td data-title="'账户编号'" header-class="'bg-warning'">
+                        <a ng-href="/jxcaccounting/bankquerydetail?id={{m.id}}" target="_blank" title="查看明细账" ng-bind="m.content.code"></a>
+                    </td>
+                    <td data-title="'账户名称'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.name"></span>
+                    </td>
+                    <td data-title="'账户余额'" header-class="'bg-warning'">
+                        <span ng-bind="m.content.total | currency:'￥'"></span>
+                    </td>
+                </tr>
+                <tr class="warning">
+                    <td colspan="3">
+                        合计：<span ng-bind="totalrecordes"></span>条记录
+                    </td>
+                    <td ng-bind="totalsum | currency:'￥'"></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+@section styles{
+    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+          rel="stylesheet">
+
+    <style>
+        .table td, th {
+            text-align: center;
+        }
+
+        label {
+            min-width: 80px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="//139.196.218.9/cdn/gbk.js"></script>
+    <script src="//139.196.218.9/cdn/ng-table-export.src.js"></script>
+
+    <script>
+        var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngTableExport']);
+
+        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, $uibModal) {
+
+            $scope.filter = {};
+            $scope.queryfilter = {};
+
+            var getData = function ($defer, params) {
+                var filter = $scope.queryfilter;
+                var count = params.count();
+                var page = params.page();
+                $http.post('/bankreportservice/bankquery',
+                    { page: page, count: count, filter: JSON.stringify(filter) })
+                    .success(function (data) {
+                        $scope.showwaiter = false;
+
+                        $scope.tableParams.total(data.resulttotal);
+                        $scope.totalrecordes = data.resulttotal;
+                        $scope.totalsum = data.totalsum;
+                        $scope.datalist = data.data;
+                        $defer.resolve(data.data);
+                    });
+            };
+
+            $scope.tableParams = new NgTableParams({ count: 10 }, { counts: [10, 25, 50, 100], total: 0, getData: getData });
+
+            $scope.btnqueryClick = function () {
+                $scope.showwaiter = true;
+
+                $scope.queryfilter = JSON.parse(angular.toJson($scope.filter));
+                $scope.tableParams.reload();
+            };
+
+        });
+
+    </script>
+}

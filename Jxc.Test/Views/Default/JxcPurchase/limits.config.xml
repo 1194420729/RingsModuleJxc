@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="vendorproductlist" title="产品价格表" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="vendorproductexport" title="导出产品价格" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="vendorproductimport" title="导入产品价格" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="vendorproductadd" title="新增产品价格" groupname="采购管理" modulename="进销存"></limit>
+
+  <limit name="purchaseorderadd" title="录入采购订单" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderaudit" title="采购订单审核" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderquery" title="采购订单查询" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderdelete" title="删除采购订单" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderabort" title="中止采购订单" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderreport" title="采购订单统计" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchasebilladd" title="录入采购入库单" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchasebillaudit" title="采购入库单审核" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchasebackbilladd" title="录入采购退货单" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchasebackbillaudit" title="采购退货单审核" groupname="采购管理" modulename="进销存"></limit>  
+  <limit name="purchasesupplement" title="采购补货分析" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="timespanpurchasereport" title="采购报表" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="vendorpurchasereport" title="供应商采购统计" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchaseorderflow" title="采购订单流水" groupname="采购管理" modulename="进销存"></limit>
+  <limit name="purchasebillflow" title="采购入库流水" groupname="采购管理" modulename="进销存"></limit>
+</limits>

@@ -1,0 +1,32 @@
+﻿<script type="text/ng-template" id="employeechoice.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            选择员工
+        </h3>
+    </div>
+    <div class="modal-body">
+        <table class="table table-bordered table-condensed table-hover">
+            <thead>
+                <tr class="success">
+                    <th>No.</th>
+                    <th>员工编号</th>
+                    <th>员工姓名</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="employee in employees" ng-dblclick="employeeSelected(employee)" style="cursor:pointer;">
+                    <td ng-bind="$index+1"></td>
+                    <td ng-bind="employee.content.code"></td>
+                    <td ng-bind="employee.content.name"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <span class="help-block" style="display:inline;margin-right:40px;">鼠标双击选中</span>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>

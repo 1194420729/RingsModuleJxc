@@ -106,10 +106,13 @@
             };
 
             var setmenuSelected = function () {
+                var domain = '@Url.Action("index","home",null,Request.Url.Scheme)'; 
+                var url = '@(Request.Url.OriginalString)';
+                if (domain == url) return;
                 var menus = $('nav#menu a');
                 var hasmatch = false;
                 for (var i = 0; i < menus.length; i++) {
-                    if ($(menus[i]).prop('href') === '@(Request.Url.OriginalString)') {
+                    if ($(menus[i]).prop('href') === url) {
                         $(menus[i]).parent().addClass('Selected');
                         window.localStorage.setItem('selectedmenu', $(menus[i]).prop('href'));
                         hasmatch = true;

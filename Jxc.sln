@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonConfig", "CommonConfi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Home", "HomePage\Home.csproj", "{658069E7-2220-4F58-87C9-64DBA9FCED32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChengyunDemo.Echo", "ChengyunDemo.Echo\ChengyunDemo.Echo.csproj", "{C64747FB-4EF8-4BF2-808A-7E84649D5A28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{658069E7-2220-4F58-87C9-64DBA9FCED32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{658069E7-2220-4F58-87C9-64DBA9FCED32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{658069E7-2220-4F58-87C9-64DBA9FCED32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C64747FB-4EF8-4BF2-808A-7E84649D5A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C64747FB-4EF8-4BF2-808A-7E84649D5A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C64747FB-4EF8-4BF2-808A-7E84649D5A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C64747FB-4EF8-4BF2-808A-7E84649D5A28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<limits>
+  <limit name="mylimit" title="mytitle" groupname="mygroup" modulename="体验中心"></limit>
+</limits>

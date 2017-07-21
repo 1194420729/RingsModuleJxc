@@ -1,0 +1,108 @@
+﻿<script type="text/ng-template" id="billdetail.html">
+    <div class="modal-header">
+        <h3 class="modal-title">
+            单据明细
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="form-group form-inline">
+            <label>
+                产品
+            </label>
+            <div class="input-group">
+                <input type="text" autocomplete="off" ng-next="true" autofocus="autofocus" ng-model="product" placeholder="编号或名称模糊查询" uib-typeahead="product.content.name for product in updateProducts($viewValue)"
+                       typeahead-on-select="productSelected($item, $model, $label,$event)" typeahead-loading="loadingProductLocations"
+                       typeahead-no-results="noProductResults" typeahead-select-on-blur="true" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="productClick()">...</button>
+                </span>
+            </div>
+            <i ng-show="loadingProductLocations" class="glyphicon glyphicon-refresh"></i>
+            <span class="text-danger" ng-show="noProductResults">没有匹配项</span>
+        </div>
+        <div ng-show="showproductchoice">
+            <div class="pull-left" style="margin-right:20px;">
+                <div js-tree="category.treeConfig" ng-model="category.treeData" id="treeInstance"
+                     tree-events="select_node:selectNode">
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <table ng-table="tableParams" show-filter="true" class="table table-bordered table-condensed table-hover">
+                    <tr ng-repeat="m in $data" ng-dblclick="productChoice(m)" style="cursor:pointer;">
+                        <td data-title="'No.'" header-class="'bg-warning'" style="max-width:80px;">
+                            <span ng-bind="(tableParams.page()-1)*tableParams.count()+$index+1"></span>
+                        </td>
+                        <td data-title="'产品编号'" header-class="'bg-warning'" data-filter="{ code: 'text'}">
+                            <span ng-bind="m.content.code"></span>
+                        </td>
+                        <td data-title="'产品名称'" header-class="'bg-warning'" data-filter="{ name: 'text'}">
+                            <span ng-bind="m.content.name"></span>
+                        </td>
+                        <td data-title="'产品规格'" header-class="'bg-warning'" ng-if="billconfig.content.showstandard" data-filter="{ standard: 'text'}">
+                            <span ng-bind="m.content.standard"></span>
+                        </td>
+                        <td data-title="'产品型号'" header-class="'bg-warning'" ng-if="billconfig.content.showtype" data-filter="{ type: 'text'}">
+                            <span ng-bind="m.content.type"></span>
+                        </td>
+                        <td data-title="'库存'" header-class="'bg-warning'" ng-if="billconfig.content.showstorage">
+                            <span ng-bind="m.content.storage[stockid].qty"></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+
+        <div ng-hide="showproductchoice">
+            <div class="form-group form-inline">
+                <label>数量</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.qty" ng-model-options="{ updateOn:'blur'}" ng-change="qtyChange()" />
+            </div>
+            <div class="form-group form-inline">
+                <label>单价</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.price" ng-model-options="{ updateOn:'blur'}" ng-change="priceChange()" />
+            </div>
+            <div class="form-group form-inline">
+                <label>金额</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.total" ng-model-options="{ updateOn:'blur'}" ng-change="totalChange()" />
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.taxformat">
+                <label>税率</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.taxrate" ng-model-options="{ updateOn:'blur'}" ng-change="taxrateChange()" />%
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.taxformat">
+                <label>含税单价</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.taxprice" ng-model-options="{ updateOn:'blur'}" ng-change="taxpriceChange()" />
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.taxformat">
+                <label>含税金额</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.taxtotal" ng-model-options="{ updateOn:'blur'}" ng-change="taxtotalChange()" />
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.discountformat">
+                <label>扣率</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.discountrate" ng-model-options="{ updateOn:'blur'}" ng-change="discountrateChange()" />%
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.discountformat">
+                <label>折后单价</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.discountprice" ng-model-options="{ updateOn:'blur'}" ng-change="discountpriceChange()" />
+            </div>
+            <div class="form-group form-inline" ng-if="billconfig.content.discountformat">
+                <label>折后金额</label>
+                <input type="number" class="form-control" ng-next="true" ng-model="model.content.discounttotal" ng-model-options="{ updateOn:'blur'}" ng-change="discounttotalChange()" />
+            </div>
+            <div class="form-group form-inline">
+                <label>备注</label>
+                <input type="text" class="form-control" ng-next="true" ng-model="model.content.comment" />
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">
+            确定
+        </button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">
+            取消
+        </button>
+    </div>
+
+</script>
