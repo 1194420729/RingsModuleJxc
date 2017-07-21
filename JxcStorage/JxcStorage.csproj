@@ -70,8 +70,8 @@
       <HintPath>..\packages\NPOI.2.2.1\lib\net40\NPOI.OpenXmlFormats.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rings.Models, Version=1.0.6400.17299, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rings.Models.1.0.6400.17299\lib\net40\Rings.Models.dll</HintPath>
+    <Reference Include="Rings.Models, Version=1.0.6411.17852, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rings.Models.1.0.6411.17852\lib\net40\Rings.Models.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

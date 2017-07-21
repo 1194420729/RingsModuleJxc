@@ -44,13 +44,6 @@
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <li>
-                            <a href="/home/index" class="headerdropdown">
-                                <i class="fa fa-home fa-fw"></i>
-                                &nbsp;返回首页
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
                             <a href="/home/editpassword" class="headerdropdown">
                                 <i class="fa fa-key fa-fw"></i>
                                 &nbsp;修改密码
@@ -70,7 +63,7 @@
         <nav id="menu" style="display: none;">
             <ul>
                 @{
-                    MenuLoader menuloader = new MenuLoader(account);
+                    IMenuLoader menuloader = MenuLoaderFactory.GetInstance(account);
                 }
                 @Html.Raw(menuloader.RenderMenu())
             </ul>
@@ -106,7 +99,7 @@
             };
 
             var setmenuSelected = function () {
-                var domain = '@Url.Action("index","home",null,Request.Url.Scheme)'; 
+                var domain = '@Url.Action("index","home",null,Request.Url.Scheme)';
                 var url = '@(Request.Url.OriginalString)';
                 if (domain == url) return;
                 var menus = $('nav#menu a');

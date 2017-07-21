@@ -231,7 +231,7 @@ namespace CommonConfig
         private Object Edit_1(string parameters)
         {
             //刷新权限的定义
-            LimitLoader loader = new LimitLoader();
+            ILimitLoader loader = LimitLoaderFactory.GetInstance();
             loader.Load();
 
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
@@ -266,7 +266,7 @@ namespace CommonConfig
         public Object Edit(string parameters)
         {
             //刷新权限的定义
-            LimitLoader loader = new LimitLoader();
+            ILimitLoader loader = LimitLoaderFactory.GetInstance();
             loader.Load();
 
             IDictionary<string, object> dic = ParameterHelper.ParseParameters(parameters);
