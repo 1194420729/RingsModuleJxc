@@ -259,5 +259,20 @@ namespace JxcSale
 
         }
 
+        [MyLog("删除产品价格")]
+        public Object Delete(string parameters)
+        {
+            ParameterHelper ph = new ParameterHelper(parameters);
+            string ids = ph.GetParameterValue<string>("ids");
+
+            using (DBHelper db = new DBHelper())
+            {
+                db.RemoveRange(tablename, ids);
+                db.SaveChanges();
+            }
+            return new { message = "ok" };
+
+        }
+
     }
 }

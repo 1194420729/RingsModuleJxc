@@ -2,6 +2,7 @@
     ViewBag.Title = "新增采购订单";
 }
 <div data-pagelimit="purchaseorderadd">
+    <div class="pageload">Loading...</div>
     <div ng-app="myApp" ng-controller="myCtrl">
         @{Html.RenderPartial("/jxcpurchase/checkboxheader");}
         @{Html.RenderPartial("/jxcpurchase/employeechoice");}
@@ -293,7 +294,13 @@
     <script>
         var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree', 'ngNext', 'ui.bootstrap.datetimepicker', 'myservice']);
 
-        app.controller('myCtrl', function ($scope, $http, $window, $q, NgTableParams, SweetAlert, mytools, $uibModal) {
+        app.controller('myCtrl', function ($scope, $http, $window, $q,$timeout,$rootScope, NgTableParams, SweetAlert, mytools, $uibModal) {
+            
+            $rootScope.$watch('$viewContentLoaded', function () {
+                $timeout(function () {
+                    angular.element('.pageload').fadeOut(1500);
+                });
+            });
 
             $scope.model = { id: 0, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
