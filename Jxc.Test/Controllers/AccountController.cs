@@ -19,15 +19,25 @@ namespace Baseingfo.Test.Controllers
 
     public class AccountController : Controller
     {
-        public ActionResult Login(string lan)
+        public ActionResult Login(string lan, string c)
         {
-            ViewBag.Lan = string.IsNullOrEmpty(lan) ? "zh-CN" : lan;
+            if (!string.IsNullOrEmpty(c))
+            {
+                ViewBag.Company = c;
+            }
+
+            if (string.IsNullOrEmpty(lan))
+            {
+                lan = "zh-CN";
+            }
+
+            ViewBag.Lan = lan;
 
             if (string.IsNullOrEmpty(lan) == false && lan.ToLower() != "zh-cn")
             {
                 return View(lan + "/login");
             }
-
+             
             return View();
         }
 

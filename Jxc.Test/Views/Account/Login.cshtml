@@ -221,14 +221,14 @@
                     type: 'post',
                     dataType: 'json',
                     data: {
-                        company: $('#company').val()                         
+                        company: $('#company').val()
                     },
                     success: function (data) {
                         if (data.message == 'ok') {
                             $('#zt').empty();
                             $('#zt').append('<option value="">请选择账套</option>');
                             $.each(data.list, function (index, item) {
-                                $('#zt').append('<option value="'+item.id+'">'+item.name+'</option>');
+                                $('#zt').append('<option value="' + item.id + '">' + item.name + '</option>');
                             });
 
                             if ($('#company').val() == localStorage.getItem('rings_company')) {
@@ -239,7 +239,12 @@
                 });
             });
 
-            $('#company').val(localStorage.getItem('rings_company'));
+            var passedcompany = '@ViewBag.Company';
+            if (passedcompany) {
+                $('#company').val(passedcompany);
+            } else {
+                $('#company').val(localStorage.getItem('rings_company'));
+            }
             $('#language').val(localStorage.getItem('rings_language') || 'zh-CN');
             if ('@(ViewBag.Lan)' !== $('#language').val()) {
                 $('#language').change();
