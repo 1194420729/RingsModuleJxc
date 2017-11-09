@@ -4,7 +4,7 @@
   <limit name="vendorproductexport" title="导出产品价格" groupname="采购管理" modulename="进销存"></limit>
   <limit name="vendorproductimport" title="导入产品价格" groupname="采购管理" modulename="进销存"></limit>
   <limit name="vendorproductadd" title="新增产品价格" groupname="采购管理" modulename="进销存"></limit>
-
+  <limit name="vendorproductdelete" title="删除产品价格" groupname="采购管理" modulename="进销存"></limit>
   <limit name="purchaseorderadd" title="录入采购订单" groupname="采购管理" modulename="进销存"></limit>
   <limit name="purchaseorderaudit" title="采购订单审核" groupname="采购管理" modulename="进销存"></limit>
   <limit name="purchaseorderquery" title="采购订单查询" groupname="采购管理" modulename="进销存"></limit>

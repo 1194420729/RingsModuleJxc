@@ -251,12 +251,12 @@
     </div>
 </div>
 @section styles{
-    <link href="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
-    <link href="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
-    <link href="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
-    <link href="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
+    <link href="https://cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/css/datetimepicker.min.css"
           rel="stylesheet">
-    <link href="//cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/jstree/3.2.1/themes/default/style.min.css" rel="stylesheet">
     <style>
         .table td, th {
             text-align: center;
@@ -268,23 +268,24 @@
     </style>
 }
 @section scripts{
-    <script src="//cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
-    <script src="//cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
-    <script src="//cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
-    <script src="//cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
-    <script src="//cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
-    <script src="//cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
-    <script src="//cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
-    <script src="//cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
-    <script src="//139.196.218.9/cdn/moment-zh-cn.js"></script>
-    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
-    <script src="//cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
-    <script src="//cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
-    <script src="//139.196.218.9/cdn/ngJsTree.min.js"></script>
-    <script src="//139.196.218.9/cdn/myservice.js"></script>
-    <script src="//139.196.218.9/cdn/ngnext.js"></script>
-    <script src="//cdn.bootcss.com/node-uuid/1.4.7/uuid.min.js"></script>
-    <script src="//139.196.218.9/cdn/myfilter.js"></script>
+    <script src="https://cdn.bootcss.com/angular.js/1.4.7/angular.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-sanitize/1.5.7/angular-sanitize.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://cdn.bootcss.com/ng-table/1.0.0-beta.7/ng-table.js"></script>
+    <script src="https://cdn.bootcss.com/sweetalert/1.1.0/sweetalert.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-sweetalert/1.1.2/SweetAlert.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-loading-bar/0.8.0/loading-bar.min.js"></script>
+    <script src="https://cdn.bootcss.com/moment.js/2.14.1/moment.min.js"></script>
+    <script src="https://jxc.51yunxitong.cn/content/cdn/moment-zh-cn.js"></script>
+    <script src="https://cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.min.js"></script>
+    <script src="https://cdn.bootcss.com/angular-bootstrap-datetimepicker/1.0.1/js/datetimepicker.templates.min.js"></script>
+    <script src="https://cdn.bootcss.com/jstree/3.2.1/jstree.min.js"></script>
+    <script src="https://jxc.51yunxitong.cn/content/cdn/ngJsTree.min.js"></script>
+    <script src="https://jxc.51yunxitong.cn/content/cdn/myservice.js"></script>
+    <script src="https://jxc.51yunxitong.cn/content/cdn/ngnext.js"></script>
+    <script src="https://cdn.bootcss.com/node-uuid/1.4.7/uuid.min.js"></script>
+    <script src="https://jxc.51yunxitong.cn/content/cdn/myfilter.js"></script>
+    <script src="https://cdn.bootcss.com/mathjs/3.16.4/math.min.js"></script>
 
     <script>
         var app = angular.module('myApp', ['ngTable', 'oitozero.ngSweetAlert', 'angular-loading-bar', 'ui.bootstrap', 'ngJsTree', 'ngNext', 'ui.bootstrap.datetimepicker', 'myservice', 'myfilter']);
@@ -295,7 +296,7 @@
             $scope.model = { id: id, content: {} };
             $scope.tableParams = new NgTableParams({ count: 99999 });
             $scope.global = {};
-             
+
             $http.post('/purchasebillservice/loadbill', {id:id})
                     .success(function (data) {
                         $scope.makername = data.makername;
@@ -317,8 +318,8 @@
                             dataset: $scope.model.content.details
                         });
 
-                        if(!$scope.model.content.auditorid){ 
-                            $window.onbeforeunload = function () { 
+                        if(!$scope.model.content.auditorid){
+                            $window.onbeforeunload = function () {
                                 if ($scope.tableParams.total() > 0) {
                                     return ' ';
                                 }
@@ -554,7 +555,7 @@
                     animation: false,
                     templateUrl: 'billdetail.html',
                     controller: 'billdetailModalCtrl',
-                    size: 'lg', 
+                    size: 'lg',
                     resolve: {
                         model: function () { return model; }
                     }
@@ -713,17 +714,21 @@
             };
 
             $scope.$watch('model.content.details', function () {
+                math.config({
+                    number: 'BigNumber'
+                });
+
                 var qtysum = 0;
                 var totalsum = 0;
                 var taxtotalsum = 0;
                 var discounttotalsum = 0;
                 angular.forEach($scope.model.content.details, function (item) {
-                    if (item.qty) qtysum += item.qty;
-                    if (item.total) totalsum += item.total;
-                    if (item.taxtotal) taxtotalsum += item.taxtotal;
-                    if (item.discounttotal) discounttotalsum += item.discounttotal;
+                    if (item.qty) qtysum = math.eval(qtysum + '+' + item.qty);
+                    if (item.total) totalsum = math.eval(totalsum + '+' + item.total);
+                    if (item.taxtotal) taxtotalsum = math.eval(taxtotalsum + '+' + item.taxtotal);
+                    if (item.discounttotal) discounttotalsum = math.eval(discounttotalsum + '+' + item.discounttotal);
                 });
-
+                
                 $scope.qtysum = qtysum;
                 $scope.totalsum = totalsum;
                 $scope.taxtotalsum = taxtotalsum;
